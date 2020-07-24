@@ -1,35 +1,29 @@
 {
   "name": "Copy",
   "tree": {
-    "$className": "DataModel",
+    "$className": "ModuleScript",
     "$ignoreUnknownInstances": true,
 
-    "Workspace" : {
-      "$className": "Workspace",
-      "$ignoreUnknownInstances": true,
-      "$path": "src/Workspace",
-
-      "TestLoader": {
-        "$className": "Script",
-        
-        "$properties": {
-          "Enabled": false
-        },
-  
-        "Test": {
-          "$className": "ModuleScript",
-  
-          "Across": { "$className": "ModuleScript" },
-          "CallCopy": { "$className": "ModuleScript" },
-          "Flush": { "$className": "ModuleScript" },
-          "Parameters": { "$className": "ModuleScript" },
-          "Preserve": { "$className": "ModuleScript" },
-          "Stress": { "$className": "ModuleScript" },
-          "Transform": { "$className": "ModuleScript" }
-        }
+    "TestLoader": {
+      "$className": "Script",
+      
+      "$properties": {
+        "Enabled": false
       },
-      "CopyPrinter": { "$className": "ModuleScript" },
-      "Instances": { "$className": "ModuleScript" }
-    }
-  }  
+
+      "Test": {
+        "$className": "ModuleScript",
+
+        "Across": { "$className": "ModuleScript" },
+        "CallCopy": { "$className": "ModuleScript" },
+        "Flush": { "$className": "ModuleScript" },
+        "Parameters": { "$className": "ModuleScript" },
+        "Preserve": { "$className": "ModuleScript" },
+        "Stress": { "$className": "ModuleScript" },
+        "Transform": { "$className": "ModuleScript" }
+      }
+    },
+    "CopyPrinter": { "$className": "ModuleScript" },
+    "Instances": { "$className": "ModuleScript" }
+  }
 }

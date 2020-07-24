@@ -87,7 +87,7 @@ return {
 	NestedTables = function(Copy)
 		local someTable = {} do
 			local current = someTable
-			for i = 1, NESTED_ITER do
+			for _ = 1, NESTED_ITER do
 				local new = {}
 				current[1] = new
 				current = new
@@ -100,7 +100,7 @@ return {
 		local finish = os.clock() - t
 		do
 			local current = newTable
-			for i = 1, NESTED_ITER do
+			for _ = 1, NESTED_ITER do
 				current = current[1]
 			end
 			

@@ -35,13 +35,13 @@ return {
 				print("hello world!")
 			end,
 		}, {
-			__index = function(self)
+			__index = function()
 				return "does not exist!"
 			end
 		})
 		dict.part = Instance.new("Part", dict.folder)
 		dict.cyclic = dict
-		getmetatable(dict.userdata).__index = function(self, k)
+		getmetatable(dict.userdata).__index = function(_, k)
 			return "indexed with " .. k 
 		end
 		

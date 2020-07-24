@@ -38,7 +38,7 @@ local RUNNING_TESTS = {
 		"Dictionaries", 
 		"Metatables",
 	},
-	Parameters = {
+	Flags = {
 		"CopyKeysOn",
 		"CopyKeysOff",
 		"CopyMetaOn",
@@ -48,7 +48,8 @@ local RUNNING_TESTS = {
 		"FlushRelation", 
 		"SetParentOn", 
 		"SetParentOff",    
-		"ErrorNonParameter"
+		"ErrorNonFlag",
+		"GetBackupFlag"
 	},
 	Transform = { 
 		"Values",

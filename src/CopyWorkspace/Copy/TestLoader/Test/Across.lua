@@ -31,8 +31,9 @@ return {
 		local array = { nil, "b", nil }
 		
 		Copy:Across(array, completeArray)
-		assert(array == array)
-		assert(array[1] == "a", array[2] == "b", array[3] == "c")
+		assert(array[1] == "a")
+		assert(array[2] == "b")
+		assert(array[3] == "c")
 	end,
 	
 	Dictionaries = function(Copy)

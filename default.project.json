@@ -1,38 +1,18 @@
 {
   "name": "Copy",
   "tree": {
-    "$path": "src/CopyWorkspace",
+    "$className": "DataModel",
+    "$ignoreUnknownInstances": true,
 
-    "$properties": {
-      "Parent": {
-        "Type": "Ref",
-        "Value": "game.Workspace"
+    "Workspace": {
+      "$className": "Workspace",
+      "$ignoreUnknownInstances": true,
+
+      "CopyWorkspace": {
+        "$className": "Folder",
+        "$path": "src/CopyWorkspace",
+        "$ignoreUnknownInstances": false
       }
-    },
-
-    "Copy": {
-      "$className": "ModuleScript",
-
-      "TestLoader": {
-        "$className": "Script",
-        "$properties": {
-          "Enabled": false
-        },
-  
-        "Test": {
-          "$className": "ModuleScript",
-  
-          "Across": { "$className": "ModuleScript" },
-          "CallCopy": { "$className": "ModuleScript" },
-          "Flush": { "$className": "ModuleScript" },
-          "Parameters": { "$className": "ModuleScript" },
-          "Preserve": { "$className": "ModuleScript" },
-          "Stress": { "$className": "ModuleScript" },
-          "Transform": { "$className": "ModuleScript" }
-        }
-      },
-      "CopyPrinter": { "$className": "ModuleScript" },
-      "Instances": { "$className": "ModuleScript" }
     }
-  }  
+  }
 }

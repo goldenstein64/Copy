@@ -101,6 +101,22 @@ local function attemptFlush(self)
 	end
 end
 
+local function copyParams(params, argParams)
+	if argParams then
+		for k, v in pairs(argParams) do
+			params[k] = v
+		end
+	end
+end
+
+local function flushParams(params, argParams)
+	if argParams then
+		for k in pairs(params) do
+			params[k] = nil
+		end
+	end
+end
+
 -- Private Properties
 local allFlags = {}
 
@@ -115,7 +131,7 @@ local Copy = {
 	Transform = {},
 	NIL = newproxy(false),
 }
-Copy.Parameters = Copy.Flags
+Copy.Parameters = setmetatable({}, {__index = Copy.Flags})
 local CopyMt = {}
 local flagsMt = {}
 setmetatable(Copy, CopyMt)
@@ -131,39 +147,29 @@ end
 
 -- Public Functions
 function CopyMt:__call(value, parameters)
-	if parameters then
-		self.Parameters = parameters
-	end
+	copyParams(self.Parameters, parameters)
 	Instances.ApplyTransform(self, value)
 	local result = copyAny(self, value)
 	attemptFlush(self)
-	if parameters then
-		self.Parameters = self.Flags
-	end
+	flushParams(self.Parameters, parameters)
 	return result
 end
 
 function Copy:Across(to, from, parameters)
 	assert(type(from) == "table" and type(to) == "table",
 		"`to` and `from` can only be of type 'table'")
-	if parameters then
-		self.Parameters = parameters
-	end
+	copyParams(self.Parameters, parameters)
 	Instances.ApplyTransform(self, from)
 	local result = copyTable(self, to, from)
 	attemptFlush(self)
-	if parameters then
-		self.Parameters = self.Flags
-	end
+	flushParams(self.Parameters, parameters)
 	return result
 end
 
 function Copy:Preserve(...)
 	for i = 1, select("#", ...) do
 		local var = select(i, ...)
-		if var == nil then 
-			continue
-		end
+		if var == nil then continue end
 		self.Transform[var] = var
 	end
 end

@@ -42,6 +42,7 @@ function Test.MakeFactory(copy)
 			}, {
 				__newindex = getmetatable(copy.Flags).__newindex
 			}),
+			Parameters = {},
 			Transform = {},
 			NIL = newproxy(false),
 			
@@ -51,7 +52,7 @@ function Test.MakeFactory(copy)
 		}, {
 			__call = getmetatable(copy).__call
 		})
-		newCopy.Parameters = newCopy.Flags
+		setmetatable(newCopy.Parameters, {__index = newCopy.Flags})
 		return newCopy
 	end
 end
@@ -74,9 +75,9 @@ function testMt:__call(testDict, copy)
 			local result = table.pack(xpcall(test, function(msg)
 				warn(debug.traceback("false " .. msg))
 			end, factory()))
-			local s = result[1]
-			if s then 
-				print(table.unpack(result, 1, result.n))
+			local ok = result[1]
+			if ok then 
+				print(ok, table.unpack(result, 2, result.n))
 			end
 		end
 	end

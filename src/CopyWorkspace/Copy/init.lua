@@ -104,7 +104,7 @@ end
 local function copyParams(params, argParams)
 	if argParams then
 		for k, v in pairs(argParams) do
-			params[k] = v
+			rawset(params, k, v)
 		end
 	end
 end
@@ -112,7 +112,7 @@ end
 local function flushParams(params, argParams)
 	if argParams then
 		for k in pairs(params) do
-			params[k] = nil
+			rawset(params, k, nil)
 		end
 	end
 end
@@ -123,19 +123,21 @@ local allFlags = {}
 -- Module
 local Copy = {
 	Flags = {
-		copyKeys = true,
-		copyMeta = true,
+		copyKeys = false,
+		copyMeta = false,
 		flush = true,
 		setParent = false,
 	},
 	Transform = {},
 	NIL = newproxy(false),
 }
-Copy.Parameters = setmetatable({}, {__index = Copy.Flags})
+Copy.Parameters = {}
 local CopyMt = {}
 local flagsMt = {}
+local paramsMt = { __index = Copy.Flags }
 setmetatable(Copy, CopyMt)
 setmetatable(Copy.Flags, flagsMt)
+setmetatable(Copy.Parameters, paramsMt)
 
 function flagsMt:__newindex(k, v)
 	if allFlags[k] then
@@ -155,14 +157,12 @@ function CopyMt:__call(value, parameters)
 	return result
 end
 
-function Copy:Across(to, from, parameters)
+function Copy:Across(to, from)
 	assert(type(from) == "table" and type(to) == "table",
 		"`to` and `from` can only be of type 'table'")
-	copyParams(self.Parameters, parameters)
 	Instances.ApplyTransform(self, from)
 	local result = copyTable(self, to, from)
 	attemptFlush(self)
-	flushParams(self.Parameters, parameters)
 	return result
 end
 
@@ -170,13 +170,13 @@ function Copy:Preserve(...)
 	for i = 1, select("#", ...) do
 		local var = select(i, ...)
 		if var == nil then continue end
-		self.Transform[var] = var
+		rawset(self.Transform, var, var)
 	end
 end
 
 function Copy:Flush()
 	for k in pairs(self.Transform) do
-		self.Transform[k] = nil
+		rawset(self.Transform, k, nil)
 	end
 end
 

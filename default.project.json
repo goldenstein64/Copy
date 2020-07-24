@@ -2,16 +2,13 @@
   "name": "Copy",
   "tree": {
     "$className": "DataModel",
-    "$ignoreUnknownInstances": true,
 
     "Workspace": {
       "$className": "Workspace",
-      "$ignoreUnknownInstances": true,
 
       "CopyWorkspace": {
         "$className": "Folder",
-        "$path": "src/CopyWorkspace",
-        "$ignoreUnknownInstances": false
+        "$path": "src/CopyWorkspace"
       }
     }
   }

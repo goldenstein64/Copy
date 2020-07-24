@@ -1,2 +1,2 @@
 # Copy
-A (Luau-specialized) module for copying any value with state.
+A module that copies any value with state.

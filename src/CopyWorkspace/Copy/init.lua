@@ -157,12 +157,14 @@ function CopyMt:__call(value, parameters)
 	return result
 end
 
-function Copy:Across(to, from)
+function Copy:Across(to, from, parameters)
 	assert(type(from) == "table" and type(to) == "table",
 		"`to` and `from` can only be of type 'table'")
+	copyParams(self.Parameters, parameters)
 	Instances.ApplyTransform(self, from)
 	local result = copyTable(self, to, from)
 	attemptFlush(self)
+	flushParams(self.Parameters, parameters)
 	return result
 end
 

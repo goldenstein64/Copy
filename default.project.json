@@ -1,29 +1,38 @@
 {
   "name": "Copy",
   "tree": {
-    "$className": "ModuleScript",
-    "$ignoreUnknownInstances": true,
+    "$path": "src/CopyWorkspace",
 
-    "TestLoader": {
-      "$className": "Script",
-      
-      "$properties": {
-        "Enabled": false
-      },
-
-      "Test": {
-        "$className": "ModuleScript",
-
-        "Across": { "$className": "ModuleScript" },
-        "CallCopy": { "$className": "ModuleScript" },
-        "Flush": { "$className": "ModuleScript" },
-        "Parameters": { "$className": "ModuleScript" },
-        "Preserve": { "$className": "ModuleScript" },
-        "Stress": { "$className": "ModuleScript" },
-        "Transform": { "$className": "ModuleScript" }
+    "$properties": {
+      "Parent": {
+        "Type": "Ref",
+        "Value": "game.Workspace"
       }
     },
-    "CopyPrinter": { "$className": "ModuleScript" },
-    "Instances": { "$className": "ModuleScript" }
-  }
+
+    "Copy": {
+      "$className": "ModuleScript",
+
+      "TestLoader": {
+        "$className": "Script",
+        "$properties": {
+          "Enabled": false
+        },
+  
+        "Test": {
+          "$className": "ModuleScript",
+  
+          "Across": { "$className": "ModuleScript" },
+          "CallCopy": { "$className": "ModuleScript" },
+          "Flush": { "$className": "ModuleScript" },
+          "Parameters": { "$className": "ModuleScript" },
+          "Preserve": { "$className": "ModuleScript" },
+          "Stress": { "$className": "ModuleScript" },
+          "Transform": { "$className": "ModuleScript" }
+        }
+      },
+      "CopyPrinter": { "$className": "ModuleScript" },
+      "Instances": { "$className": "ModuleScript" }
+    }
+  }  
 }

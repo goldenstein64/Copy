@@ -84,7 +84,7 @@ return {
 	end,
 	
 	DeleteValues = function(Copy)
-		local someVar = newproxy()
+		local someVar = newproxy(false)
 		local someTable = { key = someVar }
 		
 		Copy.Transform[someVar] = Copy.NIL
@@ -116,7 +116,7 @@ return {
 	
 	-- copying Copy.NIL
 	CheckNIL = function(Copy)
-		Copy.Flags.AutoFlush = false
+		Copy.Flags.flush = false
 		local someTable = { Copy.NIL }
 		
 		local newTable = Copy(someTable)

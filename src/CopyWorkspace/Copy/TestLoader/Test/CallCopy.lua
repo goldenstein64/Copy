@@ -81,7 +81,7 @@ return {
 	CheckCopied = function(Copy)
 		local copiedValues = {
 			table = {},
-			userdata = newproxy(),
+			userdata = newproxy(false),
 			instance = Instance.new("Part"),
 			random = Random.new()
 		}

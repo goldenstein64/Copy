@@ -16,7 +16,7 @@ return {
 	CheckFunctionality = function(Copy)
 		local someTable = {}
 		
-		Copy.Flags.AutoFlush = false
+		Copy.Flags.flush = false
 		local newTable1 = Copy(someTable)
 		local newTable2 = Copy(someTable)
 		local storedTable = Copy.Transform[someTable]

@@ -161,7 +161,9 @@ end
 function Copy:Preserve(...)
 	for i = 1, select("#", ...) do
 		local var = select(i, ...)
-		if var == nil then continue end
+		if var == nil then 
+			continue
+		end
 		self.Transform[var] = var
 	end
 end

@@ -20,8 +20,6 @@ Test suite hierarchy:
 
 local testFooter = "[/details]\n___"
 
-local result = sourceHeader .. "\n"
-
 local copyModule = script.Parent
 local instancesModule = copyModule.Instances
 

@@ -26,7 +26,7 @@ return {
 			[key] = "value"
 		}
 
-		Copy.Flags.copyKeys = true
+		Copy.Flags.CopyKeys = true
 		local newDict = Copy(dict)
 		local newKey = next(newDict)
 
@@ -38,7 +38,7 @@ return {
 			[key] = "value"
 		}
 		
-		Copy.Flags.copyKeys = false
+		Copy.Flags.CopyKeys = false
 		local newDict = Copy(dict)
 		local newKey = next(newDict)
 		
@@ -52,7 +52,7 @@ return {
 			[key] = "value"
 		}
 		
-		local newDict = Copy(dict, {copyKeys = true})
+		local newDict = Copy(dict, { CopyKeys = true })
 		local newKey = next(newDict)
 		
 		assert(key ~= newKey)
@@ -63,7 +63,7 @@ return {
 			[key] = "value"
 		}
 		
-		local newDict = Copy(dict, {copyKeys = false})
+		local newDict = Copy(dict, { CopyKeys = false })
 		local newKey = next(newDict)
 		
 		assert(key == newKey)
@@ -73,7 +73,7 @@ return {
 		local meta = {}
 		local dict = setmetatable({}, meta)
 		
-		Copy.Flags.copyMeta = true
+		Copy.Flags.CopyMeta = true
 		local newDict = Copy(dict)
 		local newMeta = getmetatable(newDict)
 		
@@ -83,7 +83,7 @@ return {
 		local meta = {}
 		local dict = setmetatable({}, meta)
 		
-		Copy.Flags.copyMeta = false
+		Copy.Flags.CopyMeta = false
 		local newDict = Copy(dict)
 		local newMeta = getmetatable(newDict)
 		
@@ -95,7 +95,7 @@ return {
 		local meta = {}
 		local dict = setmetatable({}, meta)
 		
-		local newDict = Copy(dict, {copyMeta = true})
+		local newDict = Copy(dict, { CopyMeta = true })
 		local newMeta = getmetatable(newDict)
 		
 		assert(meta ~= newMeta)
@@ -104,7 +104,7 @@ return {
 		local meta = {}
 		local dict = setmetatable({}, meta)
 		
-		local newDict = Copy(dict, {copyMeta = false})
+		local newDict = Copy(dict, { CopyMeta = false })
 		local newMeta = getmetatable(newDict)
 		
 		assert(meta == newMeta)
@@ -116,7 +116,7 @@ return {
 			sub = {}
 		}
 		
-		Copy.Flags.flush = true
+		Copy.Flags.Flush = true
 		local _ = Copy(dict)
 		
 		assert( isEmpty(Copy.Transform) )
@@ -126,7 +126,7 @@ return {
 			sub = {}
 		}
 		
-		Copy.Flags.flush = false
+		Copy.Flags.Flush = false
 		local _ = Copy(dict)
 		
 		assert( not isEmpty(Copy.Transform) )
@@ -138,7 +138,7 @@ return {
 			sub = {}
 		}
 		
-		local _ = Copy(dict, {flush = true})
+		local _ = Copy(dict, { Flush = true })
 		
 		assert( isEmpty(Copy.Transform) )
 	end,
@@ -147,14 +147,14 @@ return {
 			sub = {}
 		}
 		
-		local _ = Copy(dict, {flush = false})
+		local _ = Copy(dict, { Flush = false })
 		
 		assert( not isEmpty(Copy.Transform) )
 	end,
 	
 	-- relationship between tables and subtables
 	FlushRelation = function(Copy)
-		local params = { flush = false }
+		local params = { Flush = false }
 		
 		local someTable = { 
 			sub = {}
@@ -178,7 +178,7 @@ return {
 			
 		end
 		
-		Copy.Flags.setParent = true
+		Copy.Flags.SetParent = true
 		local newArray = Copy(array)
 		
 		for i = 1, 5 do
@@ -195,7 +195,7 @@ return {
 			array[i] = newPart
 		end
 		
-		Copy.Flags.setParent = false
+		Copy.Flags.SetParent = false
 		local newArray = Copy(array)
 		
 		for i = 1, 5 do
@@ -215,7 +215,7 @@ return {
 			
 		end
 		
-		local newArray = Copy(array, {setParent = true})
+		local newArray = Copy(array, { SetParent = true })
 		
 		for i = 1, 5 do
 			assert(newArray[i].Parent == array[i].Parent)
@@ -231,7 +231,7 @@ return {
 			array[i] = newPart
 		end
 		
-		local newArray = Copy(array, {setParent = false})
+		local newArray = Copy(array, { SetParent = false })
 		
 		for i = 1, 5 do
 			assert(newArray[i].Parent == nil)
@@ -246,11 +246,11 @@ return {
 	end,
 
 	GetBackupFlag = function(Copy)
-		Copy.Flags.copyKeys = true
-		local params = { copyKeys = nil }
+		Copy.Flags.CopyKeys = true
+		local params = { CopyKeys = nil }
 
 		local key = newproxy(false)
-		local newDict = Copy({ [key] = "value"}, params)
+		local newDict = Copy({ [key] = "value" }, params)
 
 		local newKey = next(newDict)
 

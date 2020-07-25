@@ -30,13 +30,15 @@ local RUNNING_TESTS = {
 		"Cyclic",
 		"DuplicateValues",
 		"DuplicateKeys",
-		"DuplicateMetatables"
+		"DuplicateMetatables",
 	},
 	Across = { 
 		"ErrorNonTable", 
 		"Arrays", 
 		"Dictionaries", 
 		"Metatables",
+		"CheckMetaFlagOn",
+		"CheckMetaFlagOff",
 	},
 	Flags = {
 		"CopyKeysOn",
@@ -57,7 +59,7 @@ local RUNNING_TESTS = {
 		"SetParentParamOn",
 		"SetParentParamOff",   
 		"ErrorNonFlag",
-		"GetBackupFlag"
+		"GetBackupFlag",
 	},
 	Transform = { 
 		"Values",
@@ -86,7 +88,7 @@ local RUNNING_TESTS = {
 		"Symbols", 
 		"Userdatas", 
 		"NestedTables",
-		"IdenticalTables"
+		"IdenticalTables",
 	},
 }
 

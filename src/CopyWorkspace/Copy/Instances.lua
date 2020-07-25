@@ -113,7 +113,7 @@ local Instances = {
 -- Public Functions
 function Instances.ApplyTransform(copy, tabl)
 	local instances = indexTable(tabl, copy)
-	cloneRootAncestors(instances, copy.Transform, copy.Parameters.setParent)
+	cloneRootAncestors(instances, copy.Transform, copy.Parameters.SetParent)
 end
 
 return Instances

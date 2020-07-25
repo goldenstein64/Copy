@@ -58,5 +58,32 @@ return {
 		
 		Copy:Across(otherTable, someTable)
 		assert(getmetatable(otherTable).otherKey == "other value")
-	end
+	end,
+
+	CheckMetaFlagOn = function(Copy)
+		local mt = {}
+		local someTable = setmetatable({}, mt)
+		local otherTable = setmetatable({}, {})
+
+		Copy.Flags.CopyMeta = true
+		Copy:Across(otherTable, someTable)
+
+		local otherMt = getmetatable(otherTable)
+
+		assert(otherMt ~= mt)
+	end,
+	CheckMetaFlagOff = function(Copy)
+		local mt = {}
+		local someTable = setmetatable({}, mt)
+		local otherTable = setmetatable({}, {})
+
+		Copy.Flags.CopyMeta = false
+		Copy:Across(otherTable, someTable)
+
+		local otherMt = getmetatable(otherTable)
+
+		assert(otherMt == mt)
+	end,
+
+
 }

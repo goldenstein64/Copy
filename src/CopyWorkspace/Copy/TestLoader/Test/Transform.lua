@@ -116,7 +116,7 @@ return {
 	
 	-- copying Copy.NIL
 	CheckNIL = function(Copy)
-		Copy.Flags.flush = false
+		Copy.Flags.Flush = false
 		local someTable = { Copy.NIL }
 		
 		local newTable = Copy(someTable)

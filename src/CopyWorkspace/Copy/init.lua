@@ -31,7 +31,7 @@ local function copyTable(self, newTable, oldTable)
 	if oldTable == self.Transform then return newTable end
 	for k, v in pairs(oldTable) do
 		local newKey = k
-		if self.Parameters.copyKeys then
+		if self.Parameters.CopyKeys then
 			newKey = copyAny(self, k)
 			if newKey == nil then
 				newKey = k
@@ -46,7 +46,7 @@ local function copyTable(self, newTable, oldTable)
 	end
 	local meta = getmetatable(oldTable)
 	if type(meta) == "table" then
-		if self.Parameters.copyMeta then
+		if self.Parameters.CopyMeta then
 			local newMeta = getmetatable(newTable)
 			if type(newMeta) == "table" then
 				copyTable(self, newMeta, meta)
@@ -96,7 +96,7 @@ function copyAny(self, var)
 end
 
 local function attemptFlush(self)
-	if self.Parameters.flush then
+	if self.Parameters.Flush then
 		self:Flush()
 	end
 end
@@ -123,10 +123,10 @@ local allFlags = {}
 -- Module
 local Copy = {
 	Flags = {
-		copyKeys = false,
-		copyMeta = false,
-		flush = true,
-		setParent = false,
+		CopyKeys = false,
+		CopyMeta = false,
+		Flush = true,
+		SetParent = false,
 	},
 	Transform = {},
 	NIL = newproxy(false),

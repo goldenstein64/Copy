@@ -29,7 +29,6 @@ function Test.MakeFactory(copy)
 			}, {
 				__newindex = getmetatable(copy.Flags).__newindex
 			}),
-			Parameters = {},
 			Transform = {},
 			NIL = newproxy(false),
 			
@@ -39,7 +38,6 @@ function Test.MakeFactory(copy)
 		}, {
 			__call = getmetatable(copy).__call
 		})
-		setmetatable(newCopy.Parameters, {__index = newCopy.Flags})
 		return newCopy
 	end
 end

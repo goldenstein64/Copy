@@ -1,14 +1,24 @@
 {
   "name": "Copy",
   "tree": {
-    "$className": "DataModel",
+    "$path": "src/CopyWorkspace/Copy",
 
-    "Workspace": {
-      "$className": "Workspace",
+    "Instances": { "$className": "ModuleScript" },
 
-      "CopyWorkspace": {
-        "$className": "Folder",
-        "$path": "src/CopyWorkspace"
+    "TestLoader": {
+      "$className": "Script",
+
+      "Test": {
+        "$className": "ModuleScript",
+
+        "Across": { "$className": "ModuleScript" },
+        "AcrossFlags": { "$className": "ModuleScript" },
+        "CallCopy": { "$className": "ModuleScript" },
+        "Flags": { "$className": "ModuleScript" },
+        "Flush": { "$className": "ModuleScript" },
+        "Preserve": { "$className": "ModuleScript" },
+        "Stress": { "$className": "ModuleScript" },
+        "Transform": { "$className": "ModuleScript" }
       }
     }
   }

@@ -1,3 +1,16 @@
+--[[
+
+(a child of) The Copy Module
+A module that copies any value with state.
+
+Author: goldenstein64
+Free Model: https://www.roblox.com/library/5089132938
+Docs: TBD
+
+ver 1
+
+--]]
+
 return {
 
   CopyKeysOn = function(Copy)
@@ -16,7 +29,7 @@ return {
     local newKey = Copy.Transform[key]
 
     assert(newKey ~= key)
-    assert(otherTable[newKey] == "other value")
+    assert(otherTable[newKey] == "value")
   end,
   CopyKeysOff = function(Copy)
     local key, otherKey = newproxy(false), newproxy(false)

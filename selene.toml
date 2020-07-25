@@ -1,5 +1,6 @@
 std = "roblox"
 
+
 [rules]
 incorrect_standard_library_use = "allow" # assert(cond) instead of assert(cond, msg)
 multiple_statements = "allow" # if cond then continue end

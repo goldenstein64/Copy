@@ -1,7 +1,7 @@
 --[[
 
 (a child of) The Copy Module
-A module that copies any value with state. No more, no less.
+A module that copies any value with state.
 
 Author: goldenstein64
 Free Model: https://www.roblox.com/library/5089132938
@@ -19,11 +19,11 @@ return {
 		local otherMt = getmetatable(otherUserdata)
 		otherMt.__index = {}
 		
-		local s = pcall(function()
+		local ok = pcall(function()
 			Copy:Across(userdata, otherUserdata)
 		end)
 		
-		assert(not s)
+		assert(not ok)
 	end,
 	
 	Arrays = function(Copy)
@@ -56,8 +56,11 @@ return {
 		local someTable = setmetatable({}, { key = "value" })
 		local otherTable = setmetatable({}, { otherKey = "other value" })
 		
+		Copy.Flags.CopyMeta = true
 		Copy:Across(otherTable, someTable)
-		assert(getmetatable(otherTable).otherKey == "other value")
+
+		assert(getmetatable(otherTable).key == "value")
+		assert(getmetatable(otherTable).otherKey == nil)
 	end,
 
 	CheckMetaFlagOn = function(Copy)

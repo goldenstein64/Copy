@@ -1,7 +1,7 @@
 --[[
 
 (a child of) The Copy Module
-A module that copies any value with state. No more, no less.
+A module that copies any value with state.
 
 Author: goldenstein64
 Free Model: https://www.roblox.com/library/5089132938

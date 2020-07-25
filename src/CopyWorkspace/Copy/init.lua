@@ -47,12 +47,7 @@ local function copyTable(self, newTable, oldTable)
 	local meta = getmetatable(oldTable)
 	if type(meta) == "table" then
 		if self.Parameters.CopyMeta then
-			local newMeta = getmetatable(newTable)
-			if type(newMeta) == "table" then
-				copyTable(self, newMeta, meta)
-			else
-				setmetatable(newTable, copyAny(self, meta))
-			end
+			setmetatable(newTable, copyAny(self, meta))
 		else
 			setmetatable(newTable, meta)
 		end
@@ -101,24 +96,24 @@ local function attemptFlush(self)
 	end
 end
 
-local function copyParams(params, argParams)
-	if argParams then
-		for k, v in pairs(argParams) do
-			rawset(params, k, v)
-		end
-	end
-end
-
-local function flushParams(params, argParams)
-	if argParams then
-		for k in pairs(params) do
-			rawset(params, k, nil)
-		end
-	end
-end
-
--- Private Properties
 local allFlags = {}
+
+local function initializeParams(self)
+	self.Parameters = setmetatable({}, { __index = self.Flags })
+end
+
+local function copyParams(self, argParams)
+	if argParams then
+		local params = self.Parameters
+		for k, v in pairs(argParams) do
+			params[k] = v
+		end
+	end
+end
+
+local function deleteParams(self)
+	self.Params = nil
+end
 
 -- Module
 local Copy = {
@@ -131,13 +126,11 @@ local Copy = {
 	Transform = {},
 	NIL = newproxy(false),
 }
-Copy.Parameters = {}
+Copy.Parameters = nil
 local CopyMt = {}
 local flagsMt = {}
-local paramsMt = { __index = Copy.Flags }
 setmetatable(Copy, CopyMt)
 setmetatable(Copy.Flags, flagsMt)
-setmetatable(Copy.Parameters, paramsMt)
 
 function flagsMt:__newindex(k, v)
 	if allFlags[k] then
@@ -149,22 +142,24 @@ end
 
 -- Public Functions
 function CopyMt:__call(value, parameters)
-	copyParams(self.Parameters, parameters)
+	initializeParams(self)
+	copyParams(self, parameters)
 	Instances.ApplyTransform(self, value)
 	local result = copyAny(self, value)
 	attemptFlush(self)
-	flushParams(self.Parameters, parameters)
+	deleteParams(self)
 	return result
 end
 
 function Copy:Across(to, from, parameters)
 	assert(type(from) == "table" and type(to) == "table",
 		"`to` and `from` can only be of type 'table'")
-	copyParams(self.Parameters, parameters)
+	initializeParams(self)
+	copyParams(self, parameters)
 	Instances.ApplyTransform(self, from)
 	local result = copyTable(self, to, from)
 	attemptFlush(self)
-	flushParams(self.Parameters, parameters)
+	deleteParams(self)
 	return result
 end
 

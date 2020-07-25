@@ -1,16 +1,3 @@
---[[
-
-(a child of) The Copy Module
-A module that copies any value with state.
-
-Author: goldenstein64
-Free Model: https://www.roblox.com/library/5089132938
-Docs: TBD
-
-ver 1
-
---]]
-
 -- Private Functions
 local function getTransform(copy, var)
 	local result = copy.Transform[var]

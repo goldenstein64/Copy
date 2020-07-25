@@ -127,5 +127,5 @@ return {
 		end
 		
 		return "IdenticalTables", finish
-	end
+	end,
 }

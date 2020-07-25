@@ -65,5 +65,5 @@ return {
 	
 	AvoidNil = function(Copy)
 		Copy:Preserve(1, nil, 3)
-	end
+	end,
 }

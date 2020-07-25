@@ -112,7 +112,7 @@ local function copyParams(self, argParams)
 end
 
 local function deleteParams(self)
-	self.Params = nil
+	self.Parameters = nil
 end
 
 -- Module
@@ -142,6 +142,7 @@ end
 
 -- Public Functions
 function CopyMt:__call(value, parameters)
+	assert(type(parameters) == "table", "`parameters` can only be of type 'table'")
 	initializeParams(self)
 	copyParams(self, parameters)
 	Instances.ApplyTransform(self, value)
@@ -152,6 +153,7 @@ function CopyMt:__call(value, parameters)
 end
 
 function Copy:Across(to, from, parameters)
+	assert(type(parameters) == "table", "`parameters` can only be of type 'table'")
 	assert(type(from) == "table" and type(to) == "table",
 		"`to` and `from` can only be of type 'table'")
 	initializeParams(self)

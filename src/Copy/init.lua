@@ -5,6 +5,7 @@ A module that copies any value with state.
 
 Author: goldenstein64
 Free Model: https://www.roblox.com/library/5089132938
+GitHub: https://github.com/goldenstein64/Copy
 Docs: TBD
 
 ver 1
@@ -96,16 +97,13 @@ local function attemptFlush(self)
 	end
 end
 
-local function initializeParams(self)
-	self.Parameters = setmetatable({}, { __index = self.Flags })
-end
-
-local function copyParams(self, argParams)
+local function initializeParams(self, argParams)
 	if argParams then
-		local params = self.Parameters
+		local params = setmetatable({}, { __index = self.Flags })
 		for k, v in pairs(argParams) do
 			params[k] = v
 		end
+		self.Parameters = params
 	end
 end
 
@@ -142,10 +140,10 @@ end
 
 -- Public Functions
 function CopyMt:__call(value, parameters)
-	assert(type(parameters) == "table", 
-		"`parameters` can only be of type 'table'")
-	initializeParams(self)
-	copyParams(self, parameters)
+	local type_parameters = type(parameters)
+	assert(type_parameters == "table" or type_parameters == "nil", 
+		"`parameters` can only be of type 'table' or 'nil'")
+	initializeParams(self, parameters)
 	Instances.ApplyTransform(self, value)
 	local result = copyAny(self, value)
 	attemptFlush(self)
@@ -154,12 +152,12 @@ function CopyMt:__call(value, parameters)
 end
 
 function Copy:Across(to, from, parameters)
-	assert(type(parameters) == "table", 
-		"`parameters` can only be of type 'table'")
+	local type_parameters = type(parameters)
+	assert(type_parameters == "table" or type_parameters == "nil", 
+		"`parameters` can only be of type 'table' or 'nil'")
 	assert(type(from) == "table" and type(to) == "table",
 		"`to` and `from` can only be of type 'table'")
-	initializeParams(self)
-	copyParams(self, parameters)
+	initializeParams(self, parameters)
 	Instances.ApplyTransform(self, from)
 	local result = copyTable(self, to, from)
 	attemptFlush(self)

@@ -1,5 +1,5 @@
 
-.gitignore
 roblox.toml
 selene.toml
 testing.project.json
+*.rbxmx

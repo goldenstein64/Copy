@@ -75,6 +75,12 @@ local RUNNING_TESTS = {
 	Flush = { 
 		"CheckFunctionality",
 	},
+	InstanceArtifacts = {
+		"CopyKeysOn",
+		"CopyKeysOff",
+		"CopyMetaOn",
+		"CopyMetaOff",
+	},
 	Stress = { 
 		"Primitives", 
 		"Tables", 

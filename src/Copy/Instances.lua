@@ -37,14 +37,16 @@ end
 function indexSubTable(state, tabl)
 	state.Explored[tabl] = true
 	for k, v in pairs(tabl) do
-		if state.Copy.Parameters.copyKeys then
+		if state.Copy.Parameters.CopyKeys then
 			indexValue(state, k)
 		end
 		indexValue(state, v)
 	end
-	local mt = getmetatable(tabl)
-	if type(mt) == "table" then
-		indexValue(state, mt)
+	if state.Copy.Parameters.CopyMeta then
+		local mt = getmetatable(tabl)
+		if type(mt) == "table" then
+			indexValue(state, mt)
+		end
 	end
 end
 local function indexTable(var, copy)

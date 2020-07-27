@@ -98,13 +98,13 @@ local function attemptFlush(self)
 end
 
 local function initializeParams(self, argParams)
+	local params = {}
 	if argParams then
-		local params = setmetatable({}, { __index = self.Flags })
 		for k, v in pairs(argParams) do
 			params[k] = v
 		end
-		self.Parameters = params
 	end
+	self.Parameters = setmetatable(params, { __index = self.Flags })
 end
 
 local function deleteParams(self)

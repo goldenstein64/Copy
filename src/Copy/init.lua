@@ -96,8 +96,6 @@ local function attemptFlush(self)
 	end
 end
 
-local allFlags = {}
-
 local function initializeParams(self)
 	self.Parameters = setmetatable({}, { __index = self.Flags })
 end
@@ -115,6 +113,9 @@ local function deleteParams(self)
 	self.Parameters = nil
 end
 
+-- Private Properties
+local allFlags = {}
+
 -- Module
 local Copy = {
 	Flags = {
@@ -126,7 +127,6 @@ local Copy = {
 	Transform = {},
 	NIL = newproxy(false),
 }
-Copy.Parameters = nil
 local CopyMt = {}
 local flagsMt = {}
 setmetatable(Copy, CopyMt)
@@ -142,7 +142,8 @@ end
 
 -- Public Functions
 function CopyMt:__call(value, parameters)
-	assert(type(parameters) == "table", "`parameters` can only be of type 'table'")
+	assert(type(parameters) == "table", 
+		"`parameters` can only be of type 'table'")
 	initializeParams(self)
 	copyParams(self, parameters)
 	Instances.ApplyTransform(self, value)
@@ -153,7 +154,8 @@ function CopyMt:__call(value, parameters)
 end
 
 function Copy:Across(to, from, parameters)
-	assert(type(parameters) == "table", "`parameters` can only be of type 'table'")
+	assert(type(parameters) == "table", 
+		"`parameters` can only be of type 'table'")
 	assert(type(from) == "table" and type(to) == "table",
 		"`to` and `from` can only be of type 'table'")
 	initializeParams(self)

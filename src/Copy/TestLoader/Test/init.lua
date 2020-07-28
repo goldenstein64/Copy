@@ -22,10 +22,10 @@ function Test.MakeFactory(copy)
 	return function()
 		local newCopy = setmetatable({
 			Flags = setmetatable({
-				CopyKeys = false,
-				CopyMeta = false,
-				Flush = true,
-				SetParent = false,
+				CopyKeys = copy.Flags.CopyKeys,
+				CopyMeta = copy.Flags.CopyMeta,
+				Flush = copy.Flags.Flush,
+				SetParent = copy.Flags.SetParent,
 			}, {
 				__newindex = getmetatable(copy.Flags).__newindex
 			}),

@@ -32,7 +32,7 @@ local function copyTable(self, newTable, oldTable)
 	if oldTable == self.Transform then return newTable end
 	for k, v in pairs(oldTable) do
 		local newKey = k
-		if self.Parameters.CopyKeys then
+		if self.Flags.CopyKeys then
 			newKey = copyAny(self, k)
 			if newKey == nil then
 				newKey = k
@@ -47,7 +47,7 @@ local function copyTable(self, newTable, oldTable)
 	end
 	local meta = getmetatable(oldTable)
 	if type(meta) == "table" then
-		if self.Parameters.CopyMeta then
+		if self.Flags.CopyMeta then
 			setmetatable(newTable, copyAny(self, meta))
 		else
 			setmetatable(newTable, meta)
@@ -92,23 +92,9 @@ function copyAny(self, var)
 end
 
 local function attemptFlush(self)
-	if self.Parameters.Flush then
+	if self.Flags.Flush then
 		self:Flush()
 	end
-end
-
-local function initializeParams(self, argParams)
-	local params = {}
-	if argParams then
-		for k, v in pairs(argParams) do
-			params[k] = v
-		end
-	end
-	self.Parameters = setmetatable(params, { __index = self.Flags })
-end
-
-local function deleteParams(self)
-	self.Parameters = nil
 end
 
 -- Private Properties
@@ -139,29 +125,19 @@ function flagsMt:__newindex(k, v)
 end
 
 -- Public Functions
-function CopyMt:__call(value, parameters)
-	local type_parameters = type(parameters)
-	assert(type_parameters == "table" or type_parameters == "nil", 
-		"`parameters` can only be of type 'table' or 'nil'")
-	initializeParams(self, parameters)
+function CopyMt:__call(value)
 	Instances.ApplyTransform(self, value)
 	local result = copyAny(self, value)
 	attemptFlush(self)
-	deleteParams(self)
 	return result
 end
 
-function Copy:Across(to, from, parameters)
-	local type_parameters = type(parameters)
-	assert(type_parameters == "table" or type_parameters == "nil", 
-		"`parameters` can only be of type 'table' or 'nil'")
+function Copy:Across(to, from)
 	assert(type(from) == "table" and type(to) == "table",
 		"`to` and `from` can only be of type 'table'")
-	initializeParams(self, parameters)
 	Instances.ApplyTransform(self, from)
 	local result = copyTable(self, to, from)
 	attemptFlush(self)
-	deleteParams(self)
 	return result
 end
 

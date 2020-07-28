@@ -37,12 +37,12 @@ end
 function indexSubTable(state, tabl)
 	state.Explored[tabl] = true
 	for k, v in pairs(tabl) do
-		if state.Copy.Parameters.CopyKeys then
+		if state.Copy.Flags.CopyKeys then
 			indexValue(state, k)
 		end
 		indexValue(state, v)
 	end
-	if state.Copy.Parameters.CopyMeta then
+	if state.Copy.Flags.CopyMeta then
 		local mt = getmetatable(tabl)
 		if type(mt) == "table" then
 			indexValue(state, mt)
@@ -102,7 +102,7 @@ local Instances = {
 -- Public Functions
 function Instances.ApplyTransform(copy, tabl)
 	local instances = indexTable(tabl, copy)
-	cloneRootAncestors(instances, copy.Transform, copy.Parameters.SetParent)
+	cloneRootAncestors(instances, copy.Transform, copy.Flags.SetParent)
 end
 
 return Instances

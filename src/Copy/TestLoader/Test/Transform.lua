@@ -11,6 +11,7 @@ return {
 	Keys = function(Copy)
 		local dict = { key = "value" }
 		
+		Copy.Flags.CopyKeys = true
 		Copy.Transform["key"] = "someOtherKey"
 		local newDict = Copy(dict)
 		
@@ -32,6 +33,7 @@ return {
 		local someTable = setmetatable({ Value = 3 }, addMeta)
 		local otherTable = { Value = 8 }
 		
+		Copy.Flags.CopyMeta = true
 		Copy.Transform[addMeta] = otherMeta
 		local newTable = Copy(someTable)
 		
@@ -85,6 +87,7 @@ return {
 		local someMeta = {}
 		setmetatable(someTable, someMeta)
 		
+		Copy.Flags.CopyMeta = true
 		Copy.Transform[someMeta] = Copy.NIL
 		local newTable = Copy(someTable)
 		
@@ -95,6 +98,7 @@ return {
 	DeleteKeySafeguard = function(Copy)
 		local someTable = { key = "value" }
 		
+		Copy.Flags.CopyKeys = true
 		Copy.Transform["key"] = Copy.NIL
 		local newTable = Copy(someTable)
 		

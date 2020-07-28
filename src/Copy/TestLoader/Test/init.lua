@@ -22,8 +22,8 @@ function Test.MakeFactory(copy)
 	return function()
 		local newCopy = setmetatable({
 			Flags = setmetatable({
-				CopyKeys = true,
-				CopyMeta = true,
+				CopyKeys = false,
+				CopyMeta = false,
 				Flush = true,
 				SetParent = false,
 			}, {

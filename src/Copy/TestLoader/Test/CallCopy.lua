@@ -13,10 +13,11 @@ return {
 	end,
 	
 	TechnicalSample = function(Copy)
+		local parentFolder = Instance.new("Folder")
 		local dict = setmetatable({
 			member = 8,
 			userdata = newproxy(true),
-			folder = Instance.new("Folder", workspace),
+			folder = Instance.new("Folder", parentFolder),
 		
 			greet = function()
 				print("hello world!")
@@ -34,21 +35,21 @@ return {
 		
 		local newDict = Copy(dict)
 		
-		assert(dict ~= newDict)
+		assert(dict ~= newDict) --> This table was copied!
 		
-		assert(newDict.member == 8)
-		assert(newDict.cyclic == newDict)
-		assert(dict.part ~= newDict.part)
-		assert(dict.greet == newDict.greet)
+		assert(newDict.member == 8) --> Copies stateless members
+		assert(newDict.cyclic == newDict) --> Retains cyclic behavior
+		assert(dict.part ~= newDict.part) --> Clones parts
+		assert(dict.greet == newDict.greet) --> Retains functions
 		
-		assert(getmetatable(dict) ~= getmetatable(newDict))
-		assert(newDict.fakeMember == "does not exist!")
+		assert(getmetatable(dict) == getmetatable(newDict)) --> Retains metatables
+		assert(newDict.fakeMember == "does not exist!") --> Retains metamethods
 		
-		assert(dict.userdata ~= newDict.userdata)
-		assert(newDict.userdata.key == "indexed with key")
+		assert(dict.userdata ~= newDict.userdata) --> Copies userdatas
+		assert(newDict.userdata.key == "indexed with key") --> Retains metamethods
 		
-		assert(newDict.folder.Part == newDict.part)
-		assert(newDict.folder.Parent == nil)
+		assert(newDict.folder.Part == newDict.part) --> Retains hierarchy
+		assert(newDict.folder.Parent == nil) --> Root ancestors are not parented
 	end,
 	
 	-- Copying Copy

@@ -12,7 +12,7 @@ return {
 
 		Copy.Flags.Flush = false
 		Copy.Flags.CopyKeys = true
-		Copy:Across(otherTable, someTable)
+		Copy:Extend(otherTable, someTable)
 		local newKey = Copy.Transform[key]
 
 		assert(newKey ~= key)
@@ -28,7 +28,7 @@ return {
 		}
 
 		Copy.Flags.CopyKeys = false
-		Copy:Across(otherTable, someTable)
+		Copy:Extend(otherTable, someTable)
 		
 		assert(otherTable[key] == "value")
 	end,
@@ -40,7 +40,7 @@ return {
 
 		Copy.Flags.Flush = false
 		Copy.Flags.CopyMeta = true
-		Copy:Across(otherTable, someTable)
+		Copy:Extend(otherTable, someTable)
 		local newMeta = Copy.Transform[meta]
 
 		assert(newMeta ~= meta)
@@ -53,7 +53,7 @@ return {
 		local otherTable = setmetatable({}, otherMeta)
 
 		Copy.Flags.CopyMeta = false
-		Copy:Across(otherTable, someTable)
+		Copy:Extend(otherTable, someTable)
 		
 		assert(getmetatable(otherTable) == meta)
 	end,

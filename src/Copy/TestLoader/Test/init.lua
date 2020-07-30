@@ -32,7 +32,7 @@ function Test.MakeFactory(copy)
 			Transform = {},
 			NIL = newproxy(false),
 			
-			Across = copy.Across,
+			Extend = copy.Extend,
 			Preserve = copy.Preserve,
 			Flush = copy.Flush,
 		}, {

@@ -19,17 +19,20 @@ local RUNNING_TESTS = {
 		"DuplicateKeys",
 		"DuplicateMetatables",
 	},
-	Across = {
+	Extend = {
 		"ErrorNonTable",
 		"Arrays",
 		"Dictionaries",
 		"Metatables",
 		"CheckMetaFlagOn",
 		"CheckMetaFlagOff",
-	},
-	Extend = {
-		"ExtendOnce",
 		"ExtendTwice",
+	},
+	ExtendFlags = {
+		"CopyKeysOn",
+		"CopyKeysOff",
+		"CopyMetaOn",
+		"CopyMetaOff",
 	},
 	Flags = {
 		"CopyKeysOn",
@@ -42,12 +45,6 @@ local RUNNING_TESTS = {
 		"SetParentOn",
 		"SetParentOff",
 		"ErrorNonFlag",
-	},
-	AcrossFlags = {
-		"CopyKeysOn",
-		"CopyKeysOff",
-		"CopyMetaOn",
-		"CopyMetaOff",
 	},
 	Transform = {
 		"Values",

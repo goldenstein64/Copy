@@ -27,7 +27,8 @@ local function getTransform(self, var)
 end
 
 local copyAny
-local function copyTable(self, newTable, oldTable)
+local function copyTable(self, oldTable, newTable)
+	newTable = newTable or {}
 	self.Transform[oldTable] = newTable
 	if oldTable == self.Transform then return newTable end
 	for k, v in pairs(oldTable) do
@@ -48,7 +49,12 @@ local function copyTable(self, newTable, oldTable)
 	local meta = getmetatable(oldTable)
 	if type(meta) == "table" then
 		if self.Flags.CopyMeta then
-			setmetatable(newTable, copyAny(self, meta))
+			local success, copy = getTransform(self, meta)
+			if success then
+				setmetatable(newTable, copy)
+			else
+				setmetatable(newTable, copyTable(self, meta))
+			end
 		else
 			setmetatable(newTable, meta)
 		end
@@ -64,7 +70,7 @@ local function copyUserdata(self, userdata)
 	self.Transform[userdata] = newUserdata
 	if hasMeta then
 		local newMeta = getmetatable(newUserdata)
-		copyTable(self, newMeta, meta)
+		copyTable(self, meta, newMeta)
 	end
 	return newUserdata
 end
@@ -75,19 +81,18 @@ local function copyRandom(self, random)
 	return newRandom
 end
 
-function copyAny(self, var)
-	local success, copy = getTransform(self, var)
-	if success then return copy end
-	
-	local type_var = typeof(var)
-	if type_var == "table" then
-		return copyTable(self, {}, var)
-	elseif type_var == "userdata" then
-		return copyUserdata(self, var)
-	elseif type_var == "Random" then
-		return copyRandom(self, var)
-	else
-		return var
+do
+	local switchCopy = {
+		table = copyTable,
+		userdata = copyUserdata,
+		Random = copyRandom,
+	}
+	function copyAny(self, var)
+		local success, copy = getTransform(self, var)
+		if success then return copy end
+		
+		local handler = switchCopy[typeof(var)]
+		return handler and handler(self, var) or var
 	end
 end
 
@@ -132,7 +137,7 @@ function CopyMt:__call(value)
 	return result
 end
 
-function Copy:Across(base, ...)
+function Copy:Extend(base, ...)
 	assert(type(base) == "table",
 		"`base` can only be of type 'table'")
 	for i = 1, select("#", ...) do
@@ -140,7 +145,7 @@ function Copy:Across(base, ...)
 		assert(type(modifier) == "table", 
 			"All modifier arguments provided can only be of type 'table'")
 		Instances.ApplyTransform(self, modifier)
-		copyTable(self, base, modifier)
+		copyTable(self, modifier, base)
 	end
 	attemptFlush(self)
 	return base

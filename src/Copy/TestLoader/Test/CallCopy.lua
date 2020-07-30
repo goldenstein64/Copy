@@ -127,14 +127,14 @@ return {
 		assert(newTransform["value"] == nil)
 	end,
 	
-	-- for Copy:Across
+	-- for Copy:Extend
 	TransformSafeguardAcross = function(Copy)
 		Copy.Transform["value"] = "other value"
 		local newTransform = {
 			["different value"] = "separate value"
 		}
 		
-		Copy:Across(newTransform, Copy.Transform)
+		Copy:Extend(newTransform, Copy.Transform)
 		
 		assert(newTransform["value"] == nil)
 	end,

@@ -1,3 +1,18 @@
+local base = {
+	Key = "base value",
+	BaseKey = "inherited value"
+}
+
+local modifier = {
+	Key = "modified value",
+	ModKey = "extended value"
+}
+
+local modifier2 = {
+	Key = "modified 2 value",
+	Mod2Key = "extended 2 value",
+}
+
 return {
 	
 	ErrorNonTable = function(Copy)
@@ -7,7 +22,7 @@ return {
 		otherMt.__index = {}
 		
 		local ok = pcall(function()
-			Copy:Across(userdata, otherUserdata)
+			Copy:Extend(userdata, otherUserdata)
 		end)
 		
 		assert(not ok)
@@ -17,7 +32,7 @@ return {
 		local completeArray = { "a", "b", "c" }
 		local array = { nil, "b", nil }
 		
-		Copy:Across(array, completeArray)
+		Copy:Extend(array, completeArray)
 		assert(array[1] == "a" and array[2] == "b" and array[3] == "c")
 	end,
 	
@@ -32,7 +47,7 @@ return {
 			return "other method"
 		end
 		
-		Copy:Across(namespace, otherNamespace)
+		Copy:Extend(namespace, otherNamespace)
 		assert(namespace.OtherMethod ~= nil)
 		assert(namespace.OtherMethod() == "other method")
 	end,
@@ -42,7 +57,7 @@ return {
 		local otherTable = setmetatable({}, { otherKey = "other value" })
 		
 		Copy.Flags.CopyMeta = true
-		Copy:Across(otherTable, someTable)
+		Copy:Extend(otherTable, someTable)
 
 		assert(getmetatable(otherTable).key == "value")
 		assert(getmetatable(otherTable).otherKey == nil)
@@ -54,7 +69,7 @@ return {
 		local otherTable = setmetatable({}, {})
 
 		Copy.Flags.CopyMeta = true
-		Copy:Across(otherTable, someTable)
+		Copy:Extend(otherTable, someTable)
 
 		local otherMt = getmetatable(otherTable)
 
@@ -66,11 +81,20 @@ return {
 		local otherTable = setmetatable({}, {})
 
 		Copy.Flags.CopyMeta = false
-		Copy:Across(otherTable, someTable)
+		Copy:Extend(otherTable, someTable)
 
 		local otherMt = getmetatable(otherTable)
 
 		assert(otherMt == mt)
+	end,
+
+	ExtendTwice = function(Copy)
+		local object = Copy:Extend({}, base, modifier, modifier2)
+
+		assert(object.Key == "modified 2 value")
+		assert(object.BaseKey == "inherited value")
+		assert(object.ModKey == "extended value")
+		assert(object.Mod2Key == "extended 2 value")
 	end,
 
 }

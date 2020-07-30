@@ -18,9 +18,7 @@ return {
 		local array = { nil, "b", nil }
 		
 		Copy:Across(array, completeArray)
-		assert(array[1] == "a")
-		assert(array[2] == "b")
-		assert(array[3] == "c")
+		assert(array[1] == "a" and array[2] == "b" and array[3] == "c")
 	end,
 	
 	Dictionaries = function(Copy)
@@ -80,16 +78,16 @@ return {
 			Method = function()
 				return "base method!"
 			end,
-			BaseMethod = function()
-				return "base BaseMethod!"
+			FromBase = function()
+				return "FromBase!"
 			end
 		}
 		local Child = {
 			Method = function()
 				return "child method!"
 			end,
-			ChildMethod = function()
-				return "child ChildMethod!"
+			FromChild = function()
+				return "FromChild!"
 			end
 		}
 
@@ -97,8 +95,8 @@ return {
 		Copy:Across(newObject, Child)
 
 		assert(newObject.Method() == "child method!")
-		assert(newObject.BaseMethod() == "base BaseMethod!")
-		assert(newObject.ChildMethod() == "child ChildMethod!")
+		assert(newObject.FromBase() == "FromBase!")
+		assert(newObject.FromChild() == "FromChild!")
 	end,
 
 

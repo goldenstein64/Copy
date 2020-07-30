@@ -35,6 +35,7 @@ function Test.MakeFactory(copy)
 			Across = copy.Across,
 			Preserve = copy.Preserve,
 			Flush = copy.Flush,
+			Extend = copy.Extend,
 		}, {
 			__call = getmetatable(copy).__call
 		})

@@ -28,6 +28,10 @@ local RUNNING_TESTS = {
 		"CheckMetaFlagOff",
 		"ExtensionSample",
 	},
+	Extend = {
+		"ExtendOnce",
+		"ExtendTwice",
+	},
 	Flags = {
 		"CopyKeysOn",
 		"CopyKeysOff",

@@ -132,11 +132,11 @@ function CopyMt:__call(value)
 	return result
 end
 
-function Copy:Across(to, from)
-	assert(type(from) == "table" and type(to) == "table",
-		"`to` and `from` can only be of type 'table'")
-	Instances.ApplyTransform(self, from)
-	local result = copyTable(self, to, from)
+function Copy:Across(base, modifier)
+	assert(type(base) == "table" and type(modifier) == "table",
+		"`base` and `modifier` can only be of type 'table'")
+	Instances.ApplyTransform(self, modifier)
+	local result = copyTable(self, base, modifier)
 	attemptFlush(self)
 	return result
 end
@@ -153,6 +153,15 @@ function Copy:Flush()
 	for k in pairs(self.Transform) do
 		rawset(self.Transform, k, nil)
 	end
+end
+
+function Copy:Extend(base, ...)
+	local object = CopyMt.__call(self, base)
+	for i = 1, select("#", ...) do
+		local modifier = select(i, ...)
+		self:Across(object, modifier)
+	end
+	return object
 end
 
 return Copy

@@ -126,10 +126,10 @@ return {
 	end,
 
 	ErrorNonFlag = function(Copy)
-		local s = pcall(function()
+		local ok = pcall(function()
 			Copy.Flags.NonFlag = true
 		end)
-		assert(s == false)
+		assert(ok == false)
 	end,
 
 }

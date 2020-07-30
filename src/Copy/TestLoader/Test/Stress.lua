@@ -19,7 +19,7 @@ return {
 		
 		local finish = os.clock() - t
 		assert(#newTable == ITER)
-		return "Primitives", finish
+		return "Primitives", string.format("%.6f", finish)
 	end,
 	
 	-- Table stress test
@@ -35,7 +35,7 @@ return {
 		
 		local finish = os.clock() - t
 		assert(#newTable == ITER)
-		return "Tables", finish
+		return "Tables", string.format("%.6f", finish)
 	end,
 	
 	-- Symbol stress test
@@ -51,7 +51,7 @@ return {
 		
 		local finish = os.clock() - t
 		assert(#newTable == ITER)
-		return "Symbols", finish
+		return "Symbols", string.format("%.6f", finish)
 	end,
 	
 	-- Full userdata stress test
@@ -67,7 +67,7 @@ return {
 		
 		local finish = os.clock() - t
 		assert(#newTable == ITER)
-		return "Userdatas", finish
+		return "Userdatas", string.format("%.6f", finish)
 	end,
 	
 	-- Nested stress test
@@ -94,7 +94,7 @@ return {
 			assert(current ~= nil)
 		end
 		
-		return "NestedTables", finish
+		return "NestedTables", string.format("%.6f", finish)
 	end,
 	
 	-- Identical subtables
@@ -113,7 +113,7 @@ return {
 			end
 		end
 		
-		return "IdenticalTables", finish
+		return "IdenticalTables", string.format("%.6f", finish)
 	end,
 	
 }

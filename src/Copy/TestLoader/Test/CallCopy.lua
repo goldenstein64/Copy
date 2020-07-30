@@ -14,11 +14,14 @@ return {
 	
 	TechnicalSample = function(Copy)
 		local parentFolder = Instance.new("Folder")
+		
+		local key = {}
 		local dict = setmetatable({
 			member = 8,
 			userdata = newproxy(true),
 			folder = Instance.new("Folder", parentFolder),
-		
+			[key] = "value",
+
 			greet = function()
 				print("hello world!")
 			end,
@@ -41,6 +44,8 @@ return {
 		assert(newDict.cyclic == newDict) --> Retains cyclic behavior
 		assert(dict.part ~= newDict.part) --> Clones parts
 		assert(dict.greet == newDict.greet) --> Retains functions
+
+		assert(dict[key] == "value") --> Retains keys
 		
 		assert(getmetatable(dict) == getmetatable(newDict)) --> Retains metatables
 		assert(newDict.fakeMember == "does not exist!") --> Retains metamethods

@@ -26,6 +26,7 @@ local RUNNING_TESTS = {
 		"Metatables",
 		"CheckMetaFlagOn",
 		"CheckMetaFlagOff",
+		"ExtensionSample",
 	},
 	Flags = {
 		"CopyKeysOn",

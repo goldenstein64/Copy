@@ -75,5 +75,31 @@ return {
 		assert(otherMt == mt)
 	end,
 
+	ExtensionSample = function(Copy)
+		local Base = {
+			Method = function()
+				return "base method!"
+			end,
+			BaseMethod = function()
+				return "base BaseMethod!"
+			end
+		}
+		local Child = {
+			Method = function()
+				return "child method!"
+			end,
+			ChildMethod = function()
+				return "child ChildMethod!"
+			end
+		}
+
+		local newObject = Copy(Base)
+		Copy:Across(newObject, Child)
+
+		assert(newObject.Method() == "child method!")
+		assert(newObject.BaseMethod() == "base BaseMethod!")
+		assert(newObject.ChildMethod() == "child ChildMethod!")
+	end,
+
 
 }

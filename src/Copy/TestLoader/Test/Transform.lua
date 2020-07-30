@@ -107,9 +107,9 @@ return {
 	
 	-- copying Copy.NIL
 	CheckNIL = function(Copy)
-		Copy.Flags.Flush = false
 		local someTable = { Copy.NIL }
 		
+		Copy.Flags.Flush = false
 		local newTable = Copy(someTable)
 		local newNIL = Copy.Transform[Copy.NIL]
 		

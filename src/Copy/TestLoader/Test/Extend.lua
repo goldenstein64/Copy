@@ -16,7 +16,7 @@ local modifier2 = {
 return {
 
 	ExtendOnce = function(Copy)
-		local object = Copy:Extend(base, modifier)
+		local object = Copy:Across({}, base, modifier)
 
 		assert(object.Key == "modified value")
 		assert(object.BaseKey == "inherited value")
@@ -24,7 +24,7 @@ return {
 	end,
 
 	ExtendTwice = function(Copy)
-		local object = Copy:Extend(base, modifier, modifier2)
+		local object = Copy:Across({}, base, modifier, modifier2)
 
 		assert(object.Key == "modified 2 value")
 		assert(object.BaseKey == "inherited value")

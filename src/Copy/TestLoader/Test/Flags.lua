@@ -129,7 +129,7 @@ return {
 		local ok = pcall(function()
 			Copy.Flags.NonFlag = true
 		end)
-		assert(ok == false)
+		assert(not ok)
 	end,
 
 }

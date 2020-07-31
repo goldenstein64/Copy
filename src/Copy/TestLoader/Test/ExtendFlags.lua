@@ -45,8 +45,8 @@ return {
 
 		assert(newMeta ~= meta)
 		assert(getmetatable(otherTable) == newMeta)
-
 	end,
+	
 	CopyMetaOff = function(Copy)
 		local meta, otherMeta = {}, {}
 		local someTable = setmetatable({}, meta)

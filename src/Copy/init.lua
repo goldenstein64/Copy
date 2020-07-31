@@ -87,12 +87,12 @@ do
 		userdata = copyUserdata,
 		Random = copyRandom,
 	}
-	function copyAny(self, var)
-		local success, copy = getTransform(self, var)
+	function copyAny(self, value)
+		local success, copy = getTransform(self, value)
 		if success then return copy end
 		
-		local handler = switchCopy[typeof(var)]
-		return handler and handler(self, var) or var
+		local handler = switchCopy[typeof(value)]
+		return handler and handler(self, value) or value
 	end
 end
 
@@ -121,11 +121,14 @@ local flagsMt = {}
 setmetatable(Copy, CopyMt)
 setmetatable(Copy.Flags, flagsMt)
 
-function flagsMt:__newindex(k, v)
-	if allFlags[k] then
-		rawset(self, k, v)
+for flagName in pairs(Copy.Flags) do
+	allFlags[flagName] = true
+end
+function flagsMt:__newindex(flagName, value)
+	if allFlags[flagName] then
+		rawset(self, flagName, value)
 	else
-		error(string.format("Attempt to assign %q to Copy.Flags", k))
+		error(string.format("Attempt to assign %q to Copy.Flags", flagName))
 	end
 end
 
@@ -153,15 +156,15 @@ end
 
 function Copy:Preserve(...)
 	for i = 1, select("#", ...) do
-		local var = select(i, ...)
-		if var == nil then continue end
-		rawset(self.Transform, var, var)
+		local value = select(i, ...)
+		if value == nil then continue end
+		rawset(self.Transform, value, value)
 	end
 end
 
 function Copy:Flush()
-	for k in pairs(self.Transform) do
-		rawset(self.Transform, k, nil)
+	for value in pairs(self.Transform) do
+		rawset(self.Transform, value, nil)
 	end
 end
 

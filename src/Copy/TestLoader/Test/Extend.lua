@@ -33,6 +33,7 @@ return {
 		local array = { nil, "b", nil }
 		
 		Copy:Extend(array, completeArray)
+
 		assert(array[1] == "a" and array[2] == "b" and array[3] == "c")
 	end,
 	
@@ -48,6 +49,7 @@ return {
 		end
 		
 		Copy:Extend(namespace, otherNamespace)
+
 		assert(namespace.OtherMethod ~= nil)
 		assert(namespace.OtherMethod() == "other method")
 	end,
@@ -59,8 +61,9 @@ return {
 		Copy.Flags.CopyMeta = true
 		Copy:Extend(otherTable, someTable)
 
-		assert(getmetatable(otherTable).key == "value")
-		assert(getmetatable(otherTable).otherKey == nil)
+		local otherMt = getmetatable(otherTable)
+		assert(otherMt.key == "value")
+		assert(otherMt.otherKey == nil)
 	end,
 
 	CheckMetaFlagOn = function(Copy)
@@ -72,7 +75,6 @@ return {
 		Copy:Extend(otherTable, someTable)
 
 		local otherMt = getmetatable(otherTable)
-
 		assert(otherMt ~= mt)
 	end,
 	CheckMetaFlagOff = function(Copy)
@@ -84,13 +86,17 @@ return {
 		Copy:Extend(otherTable, someTable)
 
 		local otherMt = getmetatable(otherTable)
-
 		assert(otherMt == mt)
 	end,
 
 	ExtendTwice = function(Copy)
-		local object = Copy:Extend({}, base, modifier, modifier2)
+		local object = {
+			objectKey = "object value"
+		}
 
+		Copy:Extend(object, base, modifier, modifier2)
+
+		assert(object.objectKey == "object value")
 		assert(object.Key == "modified 2 value")
 		assert(object.BaseKey == "inherited value")
 		assert(object.ModKey == "extended value")

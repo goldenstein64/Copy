@@ -140,18 +140,18 @@ function CopyMt:__call(value)
 	return result
 end
 
-function Copy:Extend(base, ...)
-	assert(type(base) == "table",
+function Copy:Extend(object, ...)
+	assert(type(object) == "table",
 		"`base` can only be of type 'table'")
 	for i = 1, select("#", ...) do
 		local modifier = select(i, ...)
 		assert(type(modifier) == "table", 
 			"All modifier arguments provided can only be of type 'table'")
 		Instances.ApplyTransform(self, modifier)
-		copyTable(self, modifier, base)
+		copyTable(self, modifier, object)
 	end
 	attemptFlush(self)
-	return base
+	return object
 end
 
 function Copy:Preserve(...)

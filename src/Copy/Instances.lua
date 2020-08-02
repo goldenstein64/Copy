@@ -49,6 +49,7 @@ function indexSubTable(state, tabl)
 		end
 	end
 end
+
 local function indexTable(var, copy)
 	local state = {
 		Copy = copy,
@@ -59,47 +60,44 @@ local function indexTable(var, copy)
 	return state.Instances
 end
 
-local function isRootAncestor(instance, instances)
-	local result = true
-	for other in pairs(instances) do
-		if instance:IsDescendantOf(other) then
-			result = false
-			break
-		end
-	end
-	return result
-end
-
-local function getRegisteredDescendants(instance, instances)
+local function getInstanceRelations(instance, instances)
 	local result = {}
 	for other in pairs(instances) do
-		if instance:IsAncestorOf(other) then
+		if instance == other then 
+			continue
+		elseif instance:IsDescendantOf(other) then
+			return false
+		elseif instance:IsAncestorOf(other) then
 			result[other] = true
 		end
 	end
-	return result
+	return true, result
 end
 
-local function cloneRootAncestors(instances, transform, parentAncestors)
+local function cloneRootAncestors(instances, transform, setParent)
 	for instance in pairs(instances) do
-		if not isRootAncestor(instance, instances) then continue end
-		local newInstance = safeClone(instance, parentAncestors)
-		transform[instance] = newInstance
-		local descendants = instance:GetDescendants()
-		local newDescendants = newInstance:GetDescendants()
-		for desc in pairs(getRegisteredDescendants(instance, instances)) do
-			local descIndex = table.find(descendants, desc)
-			transform[desc] = newDescendants[descIndex]
+		local isRootAncestor, registeredDescendants = getInstanceRelations(instance, instances)
+		if isRootAncestor then
+			local newInstance = safeClone(instance, setParent)
+			transform[instance] = newInstance
+			if next(registeredDescendants) ~= nil then
+				local descendants = instance:GetDescendants()
+				local newDescendants = newInstance:GetDescendants()
+				for desc in pairs(registeredDescendants) do
+					local descIndex = table.find(descendants, desc)
+					transform[desc] = newDescendants[descIndex]
+				end
+			end
 		end
 	end
 end
 
 -- Module
-local Instances = {
-	SafeClone = safeClone
-}
+local Instances = {}
 
 -- Public Functions
+Instances.SafeClone = safeClone
+
 function Instances.ApplyTransform(copy, tabl)
 	local instances = indexTable(tabl, copy)
 	cloneRootAncestors(instances, copy.Transform, copy.Flags.SetParent)

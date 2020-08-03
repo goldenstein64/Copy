@@ -31,6 +31,7 @@ function Test.MakeFactory(copy)
 			}),
 			Transform = {},
 			NIL = newproxy(false),
+			FORCE = newproxy(false),
 			
 			Extend = copy.Extend,
 			Preserve = copy.Preserve,

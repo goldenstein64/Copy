@@ -16,11 +16,14 @@ ver 1
 local Instances = require(script.Instances)
 
 -- Private Functions
-local function getTransform(self, var)
-	local result = self.Transform[var]
+local switchCopy
+local function getTransform(self, value)
+	local result = self.Transform[value]
 	
 	if result == self.NIL then
 		return true, nil
+	elseif result == self.FORCE then
+		return false, result
 	else
 		return result ~= nil, result
 	end
@@ -33,7 +36,8 @@ local function copyTable(self, oldTable, newTable)
 	if oldTable == self.Transform then return newTable end
 	for k, v in pairs(oldTable) do
 		local newKey = k
-		if self.Flags.CopyKeys then
+		local success, copy = getTransform(self, k)
+		if self.Flags.CopyKeys and copy ~= self.NIL or not success and copy == self.FORCE then
 			newKey = copyAny(self, k)
 			if newKey == nil then
 				newKey = k
@@ -48,8 +52,8 @@ local function copyTable(self, oldTable, newTable)
 	end
 	local meta = getmetatable(oldTable)
 	if type(meta) == "table" then
-		if self.Flags.CopyMeta then
-			local success, copy = getTransform(self, meta)
+		local success, copy = getTransform(self, meta)
+		if self.Flags.CopyMeta and copy ~= self.NIL or not success and copy == self.FORCE then
 			if success then
 				setmetatable(newTable, copy)
 			else
@@ -81,19 +85,17 @@ local function copyRandom(self, random)
 	return newRandom
 end
 
-do
-	local switchCopy = {
-		table = copyTable,
-		userdata = copyUserdata,
-		Random = copyRandom,
-	}
-	function copyAny(self, value)
-		local success, copy = getTransform(self, value)
-		if success then return copy end
-		
-		local handler = switchCopy[typeof(value)]
-		return handler and handler(self, value) or value
-	end
+local switchCopy = {
+	table = copyTable,
+	userdata = copyUserdata,
+	Random = copyRandom,
+}
+function copyAny(self, value)
+	local success, copy = getTransform(self, value)
+	if success then return copy end
+	
+	local handler = switchCopy[typeof(value)]
+	return handler and handler(self, value) or value
 end
 
 local function attemptFlush(self)
@@ -115,6 +117,7 @@ local Copy = {
 	},
 	Transform = {},
 	NIL = newproxy(false),
+	FORCE = newproxy(false),
 }
 local CopyMt = {}
 local flagsMt = {}

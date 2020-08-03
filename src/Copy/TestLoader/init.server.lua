@@ -56,6 +56,8 @@ local RUNNING_TESTS = {
 		"DeleteMetatables",
 		"DeleteKeySafeguard",
 		"CheckNIL",
+		"ForceKeys",
+		"ForceMeta",
 	},
 	Preserve = {
 		"Values",

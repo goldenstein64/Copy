@@ -104,6 +104,35 @@ return {
 		
 		assert(newTable.key == "value")
 	end,
+
+	ForceKeys = function(Copy)
+		local key = newproxy(false)
+		local someTable = { [key] = "value" }
+
+		Copy.Flags.Flush = false
+		Copy.Flags.CopyKeys = false
+		Copy.Transform[key] = Copy.FORCE
+		local newTable = Copy(someTable)
+		local newKey = Copy.Transform[key]
+
+		assert(newKey ~= key)
+		assert(newTable[newKey] == "value")
+	end,
+
+	ForceMeta = function(Copy)
+		local meta = {}
+		local someTable = setmetatable({}, meta)
+
+		Copy.Flags.Flush = false
+		Copy.Flags.CopyMeta = false
+		Copy.Transform[meta] = Copy.FORCE
+		local newTable = Copy(someTable)
+		local newMeta = getmetatable(newTable)
+		local newMeta2 = Copy.Transform[meta]
+
+		assert(newMeta ~= meta)
+		assert(newMeta == newMeta2)
+	end,
 	
 	-- copying Copy.NIL
 	CheckNIL = function(Copy)

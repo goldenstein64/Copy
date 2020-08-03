@@ -26,9 +26,9 @@ local function safeClone(instance, setParent)
 end
 
 local indexSubTable
-local function indexValue(state, var)
+local function indexSubValue(state, var)
 	local type_var = typeof(var)
-	if type_var == "Instance" and not getTransform(state.Copy, var) then
+	if type_var == "Instance" and not getTransform(state, var) then
 		state.Instances[var] = true
 	elseif type_var == "table" and not state.Explored[var] then
 		indexSubTable(state, var)
@@ -37,33 +37,35 @@ end
 function indexSubTable(state, tabl)
 	state.Explored[tabl] = true
 	for k, v in pairs(tabl) do
-		if state.Copy.Flags.CopyKeys then
-			indexValue(state, k)
+		if state.Flags.CopyKeys then
+			indexSubValue(state, k)
 		end
-		indexValue(state, v)
+		indexSubValue(state, v)
 	end
-	if state.Copy.Flags.CopyMeta then
+	if state.Flags.CopyMeta then
 		local mt = getmetatable(tabl)
 		if type(mt) == "table" then
-			indexValue(state, mt)
+			indexSubValue(state, mt)
 		end
 	end
 end
 
-local function indexTable(var, copy)
+local function indexValue(copy, value)
 	local state = {
-		Copy = copy,
+		Flags = copy.Flags,
+		Transform = copy.Transform,
+		NIL = copy.NIL,
 		Instances = {},
 		Explored = {}
 	}
-	indexValue(state, var)
+	indexSubValue(state, value)
 	return state.Instances
 end
 
 local function getInstanceRelations(instance, instances)
 	local result = {}
 	for other in pairs(instances) do
-		if instance == other then 
+		if instance == other then
 			continue
 		elseif instance:IsDescendantOf(other) then
 			return false
@@ -96,10 +98,12 @@ end
 local Instances = {}
 
 -- Public Functions
-Instances.SafeClone = safeClone
+function Instances.SafeClone(copy, instance)
+	return safeClone(instance, copy.Flags.SetParent)
+end
 
-function Instances.ApplyTransform(copy, tabl)
-	local instances = indexTable(tabl, copy)
+function Instances.ApplyTransform(copy, value)
+	local instances = indexValue(copy, value)
 	cloneRootAncestors(instances, copy.Transform, copy.Flags.SetParent)
 end
 

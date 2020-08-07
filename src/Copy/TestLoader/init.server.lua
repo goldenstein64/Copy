@@ -52,7 +52,6 @@ local RUNNING_TESTS = {
 		"Metatables",
 		"SubValues",
 		"AltPreserve",
-		"CheckNIL",
 	},
 	QueueDelete = {
 		"DeleteValues",
@@ -70,6 +69,10 @@ local RUNNING_TESTS = {
 		"Metatables",
 		"MultipleValues",
 		"AvoidNil",
+	},
+	OperationSelect = {
+		"KeySelect",
+		"MetaSelect",
 	},
 	Flush = {
 		"CheckFunctionality",

@@ -17,10 +17,6 @@ local Instances = require(script.Instances)
 
 -- Private Functions
 local switchCopy
-local function getTransform(self, value)
-	local result = self.Transform[value]
-	return result ~= nil, result
-end
 
 local copyAny
 local function copyTable(self, oldTable, newTable)
@@ -30,12 +26,12 @@ local function copyTable(self, oldTable, newTable)
 	for k, v in pairs(oldTable) do
 		local newKey, newValue
 
-		if self.Flags.CopyKeys and not self.Operations.NIL[k] or self.Operations.FORCE[k] then
+		if self.Flags.CopyKeys or self.Operations.Force[k] then
 			newKey = copyAny(self, k)
 		else
 			newKey = k
 		end
-		if self.Operations.NIL[v] then
+		if self.Operations.Delete[v] then
 			newValue = nil
 		else
 			newValue = copyAny(self, v)
@@ -45,11 +41,11 @@ local function copyTable(self, oldTable, newTable)
 	end
 	local meta = getmetatable(oldTable)
 	if type(meta) == "table" then
-		if self.Flags.CopyMeta or self.Operations.FORCE[meta] then
-			local success, copy = getTransform(self, meta)
-			if self.Operations.NIL[meta] then
-				setmetatable(newTable, nil)
-			elseif success then
+		if self.Operations.Delete[meta] then
+			setmetatable(newTable, nil)
+		elseif self.Flags.CopyMeta or self.Operations.Force[meta] then
+			local copy = self.Transform[meta]
+			if copy ~= nil then
 				setmetatable(newTable, copy)
 			else
 				setmetatable(newTable, copyTable(self, meta))
@@ -86,8 +82,8 @@ switchCopy = {
 	Random = copyRandom,
 }
 function copyAny(self, value)
-	local success, copy = getTransform(self, value)
-	if success then return copy end
+	local copy = self.Transform[value]
+	if copy ~= nil then return copy end
 	
 	local handler = switchCopy[typeof(value)]
 	return handler and handler(self, value) or value
@@ -113,8 +109,8 @@ local Copy = {
 	Transform = {},
 
 	Operations = {
-		NIL = {},
-		FORCE = {},
+		Delete = {},
+		Force = {},
 	},
 }
 local CopyMt = {}
@@ -167,7 +163,7 @@ function Copy:QueueDelete(...)
 	for i = 1, select("#", ...) do
 		local value = select(i, ...)
 		if value == nil then continue end
-		rawset(self.Operations.NIL, value, true)
+		rawset(self.Operations.Delete, value, true)
 	end
 end
 
@@ -175,7 +171,7 @@ function Copy:QueueForce(...)
 	for i = 1, select("#", ...) do
 		local value = select(i, ...)
 		if value == nil then continue end
-		rawset(self.Operations.FORCE, value, true)
+		rawset(self.Operations.Force, value, true)
 	end
 end
 

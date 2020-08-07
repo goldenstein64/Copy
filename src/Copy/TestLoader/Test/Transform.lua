@@ -72,14 +72,4 @@ return {
 		assert(newDict.shared == dict.shared)
 	end,
 	
-	-- copying Copy.NIL
-	CheckNIL = function(Copy)
-		local someTable = { Copy.NIL }
-		
-		Copy.Flags.Flush = false
-		local newTable = Copy(someTable)
-		local newNIL = Copy.Transform[Copy.NIL]
-		
-		assert(newTable[1] == newNIL)
-	end,
 }

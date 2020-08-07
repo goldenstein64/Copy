@@ -32,8 +32,8 @@ function Test.MakeFactory(copy)
 			Transform = {},
 			
 			Operations = {
-				NIL = {},
-				FORCE = {},
+				Delete = {},
+				Force = {},
 			},
 			
 			Extend = copy.Extend,

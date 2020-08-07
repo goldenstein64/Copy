@@ -18,6 +18,16 @@ for _, mod in ipairs(script:GetChildren()) do
 end
 
 -- Public Functions
+function Test.PrintTests()
+	local result = "RUNNING_TESTS = {\n"
+	for name, array in pairs(Test.AllTests) do
+		local formatString = "\t%s = {\n" .. string.rep("\t\t%q,\n", #array) .. "\t},\n"
+		result ..= string.format(formatString, name, table.unpack(array))
+	end
+	result ..= "}"
+	print(result)
+end
+
 function Test.MakeFactory(copy)
 	return function()
 		local newCopy = setmetatable({

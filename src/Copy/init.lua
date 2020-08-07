@@ -171,12 +171,6 @@ function Copy:Preserve(...)
 	end
 end
 
-function Copy:Flush()
-	for value in pairs(self.Transform) do
-		rawset(self.Transform, value, nil)
-	end
-end
-
 function Copy:Delete(...)
 	for i = 1, select("#", ...) do
 		local value = select(i, ...)
@@ -190,6 +184,12 @@ function Copy:ForceCopy(...)
 		local value = select(i, ...)
 		if value == nil then continue end
 		rawset(self.Operations.FORCE, value, true)
+	end
+end
+
+function Copy:Flush()
+	for value in pairs(self.Transform) do
+		rawset(self.Transform, value, nil)
 	end
 end
 

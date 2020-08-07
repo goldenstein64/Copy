@@ -52,12 +52,17 @@ local RUNNING_TESTS = {
 		"Metatables",
 		"SubValues",
 		"AltPreserve",
+		"CheckNIL",
+	},
+	Delete = {
 		"DeleteValues",
 		"DeleteMetatables",
 		"DeleteKeySafeguard",
-		"CheckNIL",
+	},
+	ForceCopy = {
 		"ForceKeys",
 		"ForceMeta",
+		"ForceMultipleKeys",
 	},
 	Preserve = {
 		"Values",

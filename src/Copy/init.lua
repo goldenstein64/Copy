@@ -19,14 +19,7 @@ local Instances = require(script.Instances)
 local switchCopy
 local function getTransform(self, value)
 	local result = self.Transform[value]
-	
-	if result == self.NIL then
-		return true, nil
-	elseif result == self.FORCE then
-		return false, result
-	else
-		return result ~= nil, result
-	end
+	return result ~= nil, result
 end
 
 local copyAny
@@ -35,26 +28,28 @@ local function copyTable(self, oldTable, newTable)
 	self.Transform[oldTable] = newTable
 	if oldTable == self.Transform then return newTable end
 	for k, v in pairs(oldTable) do
-		local newKey = k
-		local success, copy = getTransform(self, k)
-		if self.Flags.CopyKeys and copy ~= self.NIL or not success and copy == self.FORCE then
+		local newKey, newValue
+
+		if self.Flags.CopyKeys and not self.Operations.NIL[k] or self.Operations.FORCE[k] then
 			newKey = copyAny(self, k)
-			if newKey == nil then
-				newKey = k
-			end
+		else
+			newKey = k
 		end
-		
-		rawset(
-			newTable,
-			newKey,
-			copyAny(self, v)
-		)
+		if self.Operations.NIL[v] then
+			newValue = nil
+		else
+			newValue = copyAny(self, v)
+		end
+
+		rawset(newTable, newKey, newValue)
 	end
 	local meta = getmetatable(oldTable)
 	if type(meta) == "table" then
-		local success, copy = getTransform(self, meta)
-		if self.Flags.CopyMeta and copy ~= self.NIL or not success and copy == self.FORCE then
-			if success then
+		if self.Flags.CopyMeta or self.Operations.FORCE[meta] then
+			local success, copy = getTransform(self, meta)
+			if self.Operations.NIL[meta] then
+				setmetatable(newTable, nil)
+			elseif success then
 				setmetatable(newTable, copy)
 			else
 				setmetatable(newTable, copyTable(self, meta))
@@ -85,10 +80,17 @@ local function copyRandom(self, random)
 	return newRandom
 end
 
-local switchCopy = {
+local function copyInstance(self, instance)
+	local newInstance = Instances.GetTransform(self, instance)
+	self.Transform[instance] = newInstance
+	return newInstance
+end
+
+switchCopy = {
 	table = copyTable,
 	userdata = copyUserdata,
 	Random = copyRandom,
+	Instance = copyInstance,
 }
 function copyAny(self, value)
 	local success, copy = getTransform(self, value)
@@ -101,6 +103,7 @@ end
 local function attemptFlush(self)
 	if self.Flags.Flush then
 		self:Flush()
+		Instances.Flush(self)
 	end
 end
 
@@ -116,8 +119,11 @@ local Copy = {
 		SetParent = false,
 	},
 	Transform = {},
-	NIL = newproxy(false),
-	FORCE = newproxy(false),
+
+	Operations = {
+		NIL = {},
+		FORCE = {},
+	},
 }
 local CopyMt = {}
 local flagsMt = {}
@@ -137,7 +143,7 @@ end
 
 -- Public Functions
 function CopyMt:__call(value)
-	Instances.ApplyTransform(self, value)
+	Instances.IndexTransform(self, value)
 	local result = copyAny(self, value)
 	attemptFlush(self)
 	return result
@@ -150,7 +156,7 @@ function Copy:Extend(object, ...)
 		local modifier = select(i, ...)
 		assert(type(modifier) == "table", 
 			"All modifier arguments provided can only be of type 'table'")
-		Instances.ApplyTransform(self, modifier)
+		Instances.IndexTransform(self, modifier)
 		copyTable(self, modifier, object)
 	end
 	attemptFlush(self)
@@ -168,6 +174,22 @@ end
 function Copy:Flush()
 	for value in pairs(self.Transform) do
 		rawset(self.Transform, value, nil)
+	end
+end
+
+function Copy:Delete(...)
+	for i = 1, select("#", ...) do
+		local value = select(i, ...)
+		if value == nil then continue end
+		rawset(self.Operations.NIL, value, true)
+	end
+end
+
+function Copy:ForceCopy(...)
+	for i = 1, select("#", ...) do
+		local value = select(i, ...)
+		if value == nil then continue end
+		rawset(self.Operations.FORCE, value, true)
 	end
 end
 

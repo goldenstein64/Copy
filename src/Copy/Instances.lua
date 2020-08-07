@@ -1,12 +1,7 @@
 -- Private Functions
-local function getTransform(copy, var)
-	local result = copy.Transform[var]
-	
-	if result == copy.NIL then
-		return true, nil
-	else
-		return result ~= nil, result
-	end
+local function getTransform(copy, value)
+	local result = copy.Transform[value]
+	return result ~= nil, result
 end
 
 local function safeClone(instance, setParent)
@@ -28,7 +23,7 @@ end
 local indexSubTable
 local function indexSubValue(state, var)
 	local type_var = typeof(var)
-	if type_var == "Instance" and not getTransform(state, var) then
+	if type_var == "Instance" and not getTransform(state.Copy, var) then
 		state.Instances[var] = true
 	elseif type_var == "table" and not state.Explored[var] then
 		indexSubTable(state, var)
@@ -37,24 +32,20 @@ end
 function indexSubTable(state, tabl)
 	state.Explored[tabl] = true
 	for k, v in pairs(tabl) do
-		if state.Flags.CopyKeys then
+		if state.Copy.Flags.CopyKeys and not state.Copy.Operations.NIL[k] or state.Copy.Operations.FORCE[k] then
 			indexSubValue(state, k)
 		end
 		indexSubValue(state, v)
 	end
-	if state.Flags.CopyMeta then
-		local mt = getmetatable(tabl)
-		if type(mt) == "table" then
-			indexSubValue(state, mt)
-		end
+	local meta = getmetatable(tabl)
+	if (state.Copy.Flags.CopyMeta or state.Copy.Operations.FORCE[meta]) and type(meta) == "table" then
+		indexSubValue(state, meta)
 	end
 end
 
 local function indexValue(copy, value)
 	local state = {
-		Flags = copy.Flags,
-		Transform = copy.Transform,
-		NIL = copy.NIL,
+		Copy = copy,
 		Instances = {},
 		Explored = {}
 	}
@@ -95,16 +86,32 @@ local function cloneRootAncestors(instances, transform, setParent)
 end
 
 -- Module
-local Instances = {}
+local Instances = {
+	Transform = {}
+}
 
 -- Public Functions
 function Instances.SafeClone(copy, instance)
 	return safeClone(instance, copy.Flags.SetParent)
 end
 
-function Instances.ApplyTransform(copy, value)
+function Instances.IndexTransform(copy, value)
+	local newTransform = {}
+	Instances.Transform[copy] = newTransform
 	local instances = indexValue(copy, value)
-	cloneRootAncestors(instances, copy.Transform, copy.Flags.SetParent)
+	cloneRootAncestors(instances, newTransform, copy.Flags.SetParent)
+end
+
+function Instances.GetTransform(copy, instance)
+	local newInstance = Instances.Transform[copy][instance]
+	if newInstance == nil then
+		newInstance = safeClone(instance, copy.Flags.SetParent)
+	end
+	return newInstance
+end
+
+function Instances.Flush(copy)
+	Instances.Transform[copy] = nil
 end
 
 return Instances

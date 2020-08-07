@@ -30,12 +30,17 @@ function Test.MakeFactory(copy)
 				__newindex = getmetatable(copy.Flags).__newindex
 			}),
 			Transform = {},
-			NIL = newproxy(false),
-			FORCE = newproxy(false),
+			
+			Operations = {
+				NIL = {},
+				FORCE = {},
+			},
 			
 			Extend = copy.Extend,
 			Preserve = copy.Preserve,
 			Flush = copy.Flush,
+			Delete = copy.Delete,
+			ForceCopy = copy.ForceCopy,
 		}, {
 			__call = getmetatable(copy).__call
 		})

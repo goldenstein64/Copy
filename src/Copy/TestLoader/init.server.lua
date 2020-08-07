@@ -54,17 +54,17 @@ local RUNNING_TESTS = {
 		"AltPreserve",
 		"CheckNIL",
 	},
-	Delete = {
+	QueueDelete = {
 		"DeleteValues",
 		"DeleteMetatables",
 		"DeleteKeySafeguard",
 	},
-	ForceCopy = {
+	QueueForce = {
 		"ForceKeys",
 		"ForceMeta",
 		"ForceMultipleKeys",
 	},
-	Preserve = {
+	QueuePreserve = {
 		"Values",
 		"Keys",
 		"Metatables",

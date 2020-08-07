@@ -6,7 +6,7 @@ return {
 
 		Copy.Flags.Flush = false
 		Copy.Flags.CopyKeys = false
-		Copy:ForceCopy(key)
+		Copy:QueueForce(key)
 		local newTable = Copy(someTable)
 		local newKey = Copy.Transform[key]
 
@@ -27,7 +27,7 @@ return {
 
 		Copy.Flags.Flush = false
 		Copy.Flags.CopyKeys = false
-		Copy:ForceCopy(key)
+		Copy:QueueForce(key)
 		local newTable = Copy(someTable)
 		local newKey = Copy.Transform[key]
 
@@ -42,7 +42,7 @@ return {
 
 		Copy.Flags.Flush = false
 		Copy.Flags.CopyMeta = false
-		Copy:ForceCopy(meta)
+		Copy:QueueForce(meta)
 		local newTable = Copy(someTable)
 		local newMeta = getmetatable(newTable)
 		local newMeta2 = Copy.Transform[meta]

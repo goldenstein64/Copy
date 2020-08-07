@@ -37,10 +37,10 @@ function Test.MakeFactory(copy)
 			},
 			
 			Extend = copy.Extend,
-			Preserve = copy.Preserve,
+			QueuePreserve = copy.QueuePreserve,
+			QueueDelete = copy.QueueDelete,
+			QueueForce = copy.QueueForce,
 			Flush = copy.Flush,
-			Delete = copy.Delete,
-			ForceCopy = copy.ForceCopy,
 		}, {
 			__call = getmetatable(copy).__call
 		})

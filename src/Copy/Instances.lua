@@ -86,32 +86,18 @@ local function cloneRootAncestors(instances, transform, setParent)
 end
 
 -- Module
-local Instances = {
-	Transform = {}
-}
+local Instances = {}
 
 -- Public Functions
 function Instances.SafeClone(copy, instance)
 	return safeClone(instance, copy.Flags.SetParent)
 end
 
-function Instances.IndexTransform(copy, value)
+function Instances.ApplyTransform(copy, value)
 	local newTransform = {}
 	Instances.Transform[copy] = newTransform
 	local instances = indexValue(copy, value)
-	cloneRootAncestors(instances, newTransform, copy.Flags.SetParent)
-end
-
-function Instances.GetTransform(copy, instance)
-	local newInstance = Instances.Transform[copy][instance]
-	if newInstance == nil then
-		newInstance = safeClone(instance, copy.Flags.SetParent)
-	end
-	return newInstance
-end
-
-function Instances.Flush(copy)
-	Instances.Transform[copy] = nil
+	cloneRootAncestors(instances, copy.Transform, copy.Flags.SetParent)
 end
 
 return Instances

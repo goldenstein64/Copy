@@ -5,7 +5,7 @@ return {
 			shared = {}
 		}
 		
-		Copy:Preserve(dict.shared)
+		Copy:QueuePreserve(dict.shared)
 		local newDict = Copy(dict)
 		
 		assert(newDict.shared == dict.shared)
@@ -15,7 +15,7 @@ return {
 		local keyTable = {}
 		local someTable = { [keyTable] = 4 }
 		
-		Copy:Preserve(keyTable)
+		Copy:QueuePreserve(keyTable)
 		local newTable = Copy(someTable)
 		
 		assert(newTable[keyTable] == 4)
@@ -29,7 +29,7 @@ return {
 		end
 		setmetatable(obj, mt)
 		
-		Copy:Preserve(mt)
+		Copy:QueuePreserve(mt)
 		local newObj = Copy(obj)
 		
 		assert(getmetatable(newObj) == getmetatable(obj))
@@ -42,7 +42,7 @@ return {
 			notShared = {}
 		}
 		
-		Copy:Preserve(someTable.shared, someTable.sharedToo)
+		Copy:QueuePreserve(someTable.shared, someTable.sharedToo)
 		local newTable = Copy(someTable)
 		
 		assert(newTable.shared == someTable.shared)
@@ -51,6 +51,6 @@ return {
 	end,
 	
 	AvoidNil = function(Copy)
-		Copy:Preserve(1, nil, 3)
+		Copy:QueuePreserve(1, nil, 3)
 	end,
 }

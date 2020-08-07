@@ -80,17 +80,10 @@ local function copyRandom(self, random)
 	return newRandom
 end
 
-local function copyInstance(self, instance)
-	local newInstance = Instances.GetTransform(self, instance)
-	self.Transform[instance] = newInstance
-	return newInstance
-end
-
 switchCopy = {
 	table = copyTable,
 	userdata = copyUserdata,
 	Random = copyRandom,
-	Instance = copyInstance,
 }
 function copyAny(self, value)
 	local success, copy = getTransform(self, value)
@@ -103,7 +96,6 @@ end
 local function attemptFlush(self)
 	if self.Flags.Flush then
 		self:Flush()
-		Instances.Flush(self)
 	end
 end
 
@@ -143,7 +135,7 @@ end
 
 -- Public Functions
 function CopyMt:__call(value)
-	Instances.IndexTransform(self, value)
+	Instances.ApplyTransform(self, value)
 	local result = copyAny(self, value)
 	attemptFlush(self)
 	return result
@@ -156,14 +148,14 @@ function Copy:Extend(object, ...)
 		local modifier = select(i, ...)
 		assert(type(modifier) == "table", 
 			"All modifier arguments provided can only be of type 'table'")
-		Instances.IndexTransform(self, modifier)
+		Instances.ApplyTransform(self, modifier)
 		copyTable(self, modifier, object)
 	end
 	attemptFlush(self)
 	return object
 end
 
-function Copy:Preserve(...)
+function Copy:QueuePreserve(...)
 	for i = 1, select("#", ...) do
 		local value = select(i, ...)
 		if value == nil then continue end
@@ -171,7 +163,7 @@ function Copy:Preserve(...)
 	end
 end
 
-function Copy:Delete(...)
+function Copy:QueueDelete(...)
 	for i = 1, select("#", ...) do
 		local value = select(i, ...)
 		if value == nil then continue end
@@ -179,7 +171,7 @@ function Copy:Delete(...)
 	end
 end
 
-function Copy:ForceCopy(...)
+function Copy:QueueForce(...)
 	for i = 1, select("#", ...) do
 		local value = select(i, ...)
 		if value == nil then continue end

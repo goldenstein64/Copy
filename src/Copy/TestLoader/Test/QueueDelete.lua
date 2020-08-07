@@ -4,7 +4,7 @@ return {
 		local someVar = newproxy(false)
 		local someTable = { key = someVar }
 		
-		Copy:Delete(someVar)
+		Copy:QueueDelete(someVar)
 		local newTable = Copy(someTable)
 		
 		assert(newTable.key == nil)
@@ -16,7 +16,7 @@ return {
 		setmetatable(someTable, someMeta)
 		
 		Copy.Flags.CopyMeta = true
-		Copy:Delete(someMeta)
+		Copy:QueueDelete(someMeta)
 		local newTable = Copy(someTable)
 		
 		assert(getmetatable(newTable) == nil)
@@ -27,7 +27,7 @@ return {
 		local someTable = { key = "value" }
 		
 		Copy.Flags.CopyKeys = true
-		Copy:Delete("key")
+		Copy:QueueDelete("key")
 		local newTable = Copy(someTable)
 		
 		assert(newTable.key == "value")

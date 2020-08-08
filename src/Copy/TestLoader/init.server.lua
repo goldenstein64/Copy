@@ -71,8 +71,10 @@ local RUNNING_TESTS = {
 		"AvoidNil",
 	},
 	OperationSelect = {
-		"KeySelect",
-		"MetaSelect",
+		"KeySelectFlagOff",
+		"KeySelectFlagOn",
+		"MetaSelectFlagOff",
+		"MetaSelectFlagOn",
 	},
 	Flush = {
 		"CheckFunctionality",

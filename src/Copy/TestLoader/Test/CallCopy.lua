@@ -1,3 +1,24 @@
+local function getDictLen(dict)
+	local result = 0
+	for _ in pairs(dict) do
+		result += 1
+	end
+	return result
+end
+
+local function toBinary(number)--Returns string n in binary
+	local result = ""
+	if number == 0 then
+		result = "0"
+	end
+	while number > 0 do
+		local digit = number % 2
+		result = tostring(digit) .. result
+		number = (number - digit) / 2
+	end
+	return result
+end
+
 return {
 	
 	PremiseSample = function(Copy)
@@ -59,14 +80,29 @@ return {
 	
 	-- Copying Copy
 	SelfCopy = function(Copy)
-		local newCopy = Copy(Copy)
-		
-		local someArray = { 5, 6, 7 }
-		local newArray = newCopy(someArray)
-		
-		for i, old_v in ipairs(someArray) do
-			local new_v = newArray[i]
-			assert(old_v == new_v)
+		local allFlags = {}
+		for flagName in pairs(Copy.Flags) do
+			table.insert(allFlags, flagName)
+		end
+		local totalPermutations = 2^#allFlags
+		for i = 0, totalPermutations - 1 do
+			for index, flagName in ipairs(allFlags) do
+				Copy.Flags[flagName] = (i / 2^index) % 1 >= 0.5
+			end
+			local newCopy = Copy(Copy)
+			for k, v in pairs(Copy) do
+				local type_v = type(v)
+				if type_v == "function" then
+					assert(newCopy[k] == v)
+				elseif type_v == "table" then
+					if getDictLen(newCopy[k]) ~= getDictLen(v) and v ~= Copy.Transform then
+						error("Test failed for " .. toBinary(i) .. " at " .. tostring(k) 
+							.. "\nwith " .. tostring(getDictLen(newCopy[k])) .. " == " 
+							.. tostring(getDictLen(v))
+						)
+					end
+				end
+			end
 		end
 	end,
 	

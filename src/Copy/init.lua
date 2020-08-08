@@ -93,6 +93,11 @@ local function attemptFlush(self)
 	if self.Flags.Flush then
 		self:Flush()
 	end
+	for _, operationList in pairs(self.Operations) do
+		for k in pairs(operationList) do
+			rawset(operationList, k, nil)
+		end
+	end
 end
 
 -- Private Properties

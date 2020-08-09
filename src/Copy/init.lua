@@ -25,8 +25,6 @@ local function getTransform(self, context, value)
 	end
 end
 
-local switchCopy
-
 local copyAny
 local function copyTable(self, context, oldTable, newTable)
 	newTable = newTable or {}
@@ -78,7 +76,7 @@ local function copyRandom(self, context, random)
 	return newRandom
 end
 
-switchCopy = {
+local switchCopy = {
 	table = copyTable,
 	userdata = copyUserdata,
 	Random = copyRandom,

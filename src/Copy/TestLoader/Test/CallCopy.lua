@@ -66,7 +66,7 @@ return {
 		assert(dict.part ~= newDict.part) --> Clones parts
 		assert(dict.greet == newDict.greet) --> Retains functions
 
-    assert(newDict[key] == "does not exist!") --> Copies keys, meaning old ones don't map!
+		assert(newDict[key] == "does not exist!") --> Copies keys, which means old keys don't map!
 		
 		assert(getmetatable(dict) ~= getmetatable(newDict)) --> Copies metatables
 		assert(newDict.fakeMember == "does not exist!") --> Retains metamethods

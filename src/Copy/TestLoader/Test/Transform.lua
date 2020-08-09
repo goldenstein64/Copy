@@ -11,7 +11,6 @@ return {
 	Keys = function(Copy)
 		local dict = { key = "value" }
 		
-		Copy.Flags.CopyKeys = true
 		Copy.Transform["key"] = "someOtherKey"
 		local newDict = Copy(dict)
 		
@@ -33,7 +32,6 @@ return {
 		local someTable = setmetatable({ Value = 3 }, addMeta)
 		local otherTable = { Value = 8 }
 		
-		Copy.Flags.CopyMeta = true
 		Copy.Transform[addMeta] = otherMeta
 		local newTable = Copy(someTable)
 		

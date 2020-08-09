@@ -5,54 +5,6 @@ local function isEmpty(t)
 end
 
 return {
-	
-	-- CopyKeys
-	CopyKeysOn = function(Copy)
-		local key = newproxy(false)
-		local dict = {
-			[key] = "value"
-		}
-
-		Copy.Flags.CopyKeys = true
-		local newDict = Copy(dict)
-		local newKey = next(newDict)
-
-		assert(key ~= newKey)
-	end,
-	CopyKeysOff = function(Copy)
-		local key = newproxy(false)
-		local dict = {
-			[key] = "value"
-		}
-		
-		Copy.Flags.CopyKeys = false
-		local newDict = Copy(dict)
-		local newKey = next(newDict)
-		
-		assert(key == newKey)
-	end,
-
-	-- CopyMeta
-	CopyMetaOn = function(Copy)
-		local meta = {}
-		local dict = setmetatable({}, meta)
-		
-		Copy.Flags.CopyMeta = true
-		local newDict = Copy(dict)
-		local newMeta = getmetatable(newDict)
-		
-		assert(meta ~= newMeta)
-	end,
-	CopyMetaOff = function(Copy)
-		local meta = {}
-		local dict = setmetatable({}, meta)
-		
-		Copy.Flags.CopyMeta = false
-		local newDict = Copy(dict)
-		local newMeta = getmetatable(newDict)
-		
-		assert(meta == newMeta)
-	end,
 
 	-- Flush
 	FlushOn = function(Copy)

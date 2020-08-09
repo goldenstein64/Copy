@@ -32,8 +32,6 @@ function Test.MakeFactory(copy)
 	return function()
 		local newCopy = setmetatable({
 			Flags = setmetatable({
-				CopyKeys = copy.Flags.CopyKeys,
-				CopyMeta = copy.Flags.CopyMeta,
 				Flush = copy.Flags.Flush,
 				SetParent = copy.Flags.SetParent,
 			}, {
@@ -41,10 +39,7 @@ function Test.MakeFactory(copy)
 			}),
 			Transform = {},
 			
-			Operations = {
-				Delete = {},
-				Force = {},
-			},
+			NIL = newproxy(false),
 			
 			Extend = copy.Extend,
 			QueuePreserve = copy.QueuePreserve,

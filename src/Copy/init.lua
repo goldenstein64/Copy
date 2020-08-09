@@ -16,7 +16,15 @@ ver 1
 local Instances = require(script.Instances)
 
 -- Private Functions
-local switchCopy
+local function getTransform(self, value)
+	local result = self.Transform[value]
+
+	if result == self.NIL then
+		return true, nil
+	else
+		return result ~= nil, result
+	end
+end
 
 local copyAny
 local function copyTable(self, oldTable, newTable)
@@ -24,35 +32,18 @@ local function copyTable(self, oldTable, newTable)
 	self.Transform[oldTable] = newTable
 	if oldTable == self.Transform then return newTable end
 	for k, v in pairs(oldTable) do
-		local newKey, newValue
-
-		if self.Flags.CopyKeys or self.Operations.Force[k] then
-			newKey = copyAny(self, k)
-		else
+		local newKey = copyAny(self, k)
+		if newKey == nil then
 			newKey = k
 		end
-		if self.Operations.Delete[v] then
-			newValue = nil
-		else
-			newValue = copyAny(self, v)
-		end
+		local newValue = copyAny(self, v)
 
 		rawset(newTable, newKey, newValue)
 	end
+
 	local meta = getmetatable(oldTable)
 	if type(meta) == "table" then
-		if self.Operations.Delete[meta] then
-			setmetatable(newTable, nil)
-		elseif self.Flags.CopyMeta or self.Operations.Force[meta] then
-			local copy = self.Transform[meta]
-			if copy ~= nil then
-				setmetatable(newTable, copy)
-			else
-				setmetatable(newTable, copyTable(self, meta))
-			end
-		else
-			setmetatable(newTable, meta)
-		end
+		setmetatable(newTable, copyAny(self, meta))
 	end
 	
 	return newTable
@@ -76,14 +67,14 @@ local function copyRandom(self, random)
 	return newRandom
 end
 
-switchCopy = {
+local switchCopy = {
 	table = copyTable,
 	userdata = copyUserdata,
 	Random = copyRandom,
 }
 function copyAny(self, value)
-	local copy = self.Transform[value]
-	if copy ~= nil then return copy end
+	local success, copy = getTransform(self, value)
+	if success then return copy end
 	
 	local handler = switchCopy[typeof(value)]
 	return handler and handler(self, value) or value
@@ -93,11 +84,6 @@ local function attemptFlush(self)
 	if self.Flags.Flush then
 		self:Flush()
 	end
-	for _, operationList in pairs(self.Operations) do
-		for k in pairs(operationList) do
-			rawset(operationList, k, nil)
-		end
-	end
 end
 
 -- Private Properties
@@ -106,17 +92,12 @@ local allFlags = {}
 -- Module
 local Copy = {
 	Flags = {
-		CopyKeys = false,
-		CopyMeta = false,
 		Flush = true,
 		SetParent = false,
 	},
 	Transform = {},
 
-	Operations = {
-		Delete = {},
-		Force = {},
-	},
+	NIL = newproxy(false),
 }
 local CopyMt = {}
 local flagsMt = {}
@@ -168,7 +149,7 @@ function Copy:QueueDelete(...)
 	for i = 1, select("#", ...) do
 		local value = select(i, ...)
 		if value == nil then continue end
-		rawset(self.Operations.Delete, value, true)
+		rawset(self.Transform, value, self.NIL)
 	end
 end
 
@@ -176,7 +157,7 @@ function Copy:QueueForce(...)
 	for i = 1, select("#", ...) do
 		local value = select(i, ...)
 		if value == nil then continue end
-		rawset(self.Operations.Force, value, true)
+		rawset(self.Transform, value, CopyMt.__call(self, value))
 	end
 end
 

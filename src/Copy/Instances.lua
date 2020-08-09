@@ -1,4 +1,14 @@
 -- Private Functions
+local function getTransform(copy, value)
+	local result = copy.Transform[value]
+
+	if result == copy.NIL then
+		return true, nil
+	else
+		return result ~= nil, result
+	end
+end
+
 local function safeClone(instance, setParent)
 	local oldArchivable = instance.Archivable
 	instance.Archivable = true
@@ -16,24 +26,22 @@ local function safeClone(instance, setParent)
 end
 
 local indexSubTable
-local function indexSubValue(state, var)
-	local type_var = typeof(var)
-	if type_var == "Instance" and state.Copy.Transform[var] == nil then
-		state.Instances[var] = true
-	elseif type_var == "table" and not state.Explored[var] then
-		indexSubTable(state, var)
+local function indexSubValue(state, value)
+	local type_var = typeof(value)
+	if type_var == "Instance" and not getTransform(state.Copy, value) then
+		state.Instances[value] = true
+	elseif type_var == "table" and not state.Explored[value] then
+		indexSubTable(state, value)
 	end
 end
 function indexSubTable(state, tabl)
 	state.Explored[tabl] = true
 	for k, v in pairs(tabl) do
-		if state.Copy.Flags.CopyKeys or state.Copy.Operations.Force[k] then
-			indexSubValue(state, k)
-		end
+		indexSubValue(state, k)
 		indexSubValue(state, v)
 	end
 	local meta = getmetatable(tabl)
-	if (state.Copy.Flags.CopyMeta or state.Copy.Operations.Force[meta]) and type(meta) == "table" then
+	if type(meta) == "table" then
 		indexSubValue(state, meta)
 	end
 end

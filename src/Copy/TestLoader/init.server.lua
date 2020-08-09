@@ -55,13 +55,15 @@ local RUNNING_TESTS = {
 	},
 	QueueDelete = {
 		"DeleteValues",
-		"DeleteMetatables",
+		"DeleteMeta",
 		"DeleteKeySafeguard",
+		"AvoidNil",
 	},
 	QueueForce = {
 		"ForceKeys",
 		"ForceMeta",
 		"ForceMultipleKeys",
+		"AvoidNil",
 	},
 	QueuePreserve = {
 		"Values",

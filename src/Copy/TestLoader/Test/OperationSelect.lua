@@ -1,7 +1,7 @@
 --[[
 
 Precedence of modifiers should be as follows:
-Transform > Flags > Operations
+Cache > Flags > Transform
 
 --]]
 

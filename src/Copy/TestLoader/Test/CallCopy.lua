@@ -95,7 +95,7 @@ return {
 				if type_v == "function" then
 					assert(newCopy[k] == v)
 				elseif type_v == "table" then
-					if getDictLen(newCopy[k]) ~= getDictLen(v) and v ~= Copy.Transform then
+					if getDictLen(newCopy[k]) ~= getDictLen(v) and v ~= Copy.Cache then
 						error("Test failed for " .. toBinary(i) .. " at " .. tostring(k) 
 							.. "\nwith " .. tostring(getDictLen(newCopy[k])) .. " == " 
 							.. tostring(getDictLen(v))

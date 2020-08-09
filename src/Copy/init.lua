@@ -16,43 +16,44 @@ ver 1
 local Instances = require(script.Instances)
 
 -- Private Functions
-local switchCopy
+local function getCache(self, value)
+	local result = self.Cache[value]
+	return result ~= nil, result
+end
+
+local function getTransform(self, value)
+	local result = self.Transform[value]
+
+	if result == self.NIL then
+		return true, nil
+	else
+		return result ~= nil, result
+	end
+end
 
 local copyAny
 local function copyTable(self, oldTable, newTable)
 	newTable = newTable or {}
-	self.Transform[oldTable] = newTable
-	if oldTable == self.Transform then return newTable end
+	self.Cache[oldTable] = newTable
+	if oldTable == self.Cache then return newTable end
 	for k, v in pairs(oldTable) do
-		local newKey, newValue
-
-		if self.Flags.CopyKeys or self.Operations.Force[k] then
+		local newKey = k
+		local success, copy_k = getTransform(self, k)
+		if self.Flags.CopyKeys or success and copy_k ~= nil then
 			newKey = copyAny(self, k)
-		else
-			newKey = k
 		end
-		if self.Operations.Delete[v] then
-			newValue = nil
-		else
-			newValue = copyAny(self, v)
-		end
+		local newValue = copyAny(self, v)
 
 		rawset(newTable, newKey, newValue)
 	end
 	local meta = getmetatable(oldTable)
 	if type(meta) == "table" then
-		if self.Operations.Delete[meta] then
-			setmetatable(newTable, nil)
-		elseif self.Flags.CopyMeta or self.Operations.Force[meta] then
-			local copy = self.Transform[meta]
-			if copy ~= nil then
-				setmetatable(newTable, copy)
-			else
-				setmetatable(newTable, copyTable(self, meta))
-			end
-		else
-			setmetatable(newTable, meta)
+		local newMeta = meta
+		if self.Flags.CopyMeta or getTransform(self, meta) then
+			newMeta = copyAny(self, meta)
 		end
+		
+		setmetatable(newTable, newMeta)
 	end
 	
 	return newTable
@@ -62,7 +63,7 @@ local function copyUserdata(self, userdata)
 	local meta = getmetatable(userdata)
 	local hasMeta = type(meta) == "table"
 	local newUserdata = newproxy(hasMeta)
-	self.Transform[userdata] = newUserdata
+	self.Cache[userdata] = newUserdata
 	if hasMeta then
 		local newMeta = getmetatable(newUserdata)
 		copyTable(self, meta, newMeta)
@@ -72,18 +73,21 @@ end
 
 local function copyRandom(self, random)
 	local newRandom = random:Clone()
-	self.Transform[random] = newRandom
+	self.Cache[random] = newRandom
 	return newRandom
 end
 
-switchCopy = {
+local switchCopy = {
 	table = copyTable,
 	userdata = copyUserdata,
 	Random = copyRandom,
 }
+local retrievalFns = { getTransform, getCache }
 function copyAny(self, value)
-	local copy = self.Transform[value]
-	if copy ~= nil then return copy end
+	for _, retriever in ipairs(retrievalFns) do
+		local success, copy = retriever(self, value)
+		if success then return copy end
+	end
 	
 	local handler = switchCopy[typeof(value)]
 	return handler and handler(self, value) or value
@@ -92,11 +96,6 @@ end
 local function attemptFlush(self)
 	if self.Flags.Flush then
 		self:Flush()
-	end
-	for _, operationList in pairs(self.Operations) do
-		for k in pairs(operationList) do
-			rawset(operationList, k, nil)
-		end
 	end
 end
 
@@ -111,12 +110,10 @@ local Copy = {
 		Flush = true,
 		SetParent = false,
 	},
+	Cache = {},
 	Transform = {},
 
-	Operations = {
-		Delete = {},
-		Force = {},
-	},
+	NIL = newproxy(false),
 }
 local CopyMt = {}
 local flagsMt = {}
@@ -136,7 +133,7 @@ end
 
 -- Public Functions
 function CopyMt:__call(value)
-	Instances.ApplyTransform(self, value)
+	Instances.ApplyCache(self, value)
 	local result = copyAny(self, value)
 	attemptFlush(self)
 	return result
@@ -149,7 +146,7 @@ function Copy:Extend(object, ...)
 		local modifier = select(i, ...)
 		assert(type(modifier) == "table", 
 			"All modifier arguments provided can only be of type 'table'")
-		Instances.ApplyTransform(self, modifier)
+		Instances.ApplyCache(self, modifier)
 		copyTable(self, modifier, object)
 	end
 	attemptFlush(self)
@@ -168,21 +165,33 @@ function Copy:QueueDelete(...)
 	for i = 1, select("#", ...) do
 		local value = select(i, ...)
 		if value == nil then continue end
-		rawset(self.Operations.Delete, value, true)
+		rawset(self.Transform, value, self.NIL)
 	end
 end
 
 function Copy:QueueForce(...)
+	local oldFlag = self.Flags.Flush
+	self.Flags.Flush = false
 	for i = 1, select("#", ...) do
 		local value = select(i, ...)
 		if value == nil then continue end
-		rawset(self.Operations.Force, value, true)
+		rawset(self.Transform, value, CopyMt.__call(self, value))
+	end
+	self.Flags.Flush = oldFlag
+end
+
+function Copy:MassTransform(dict)
+	for value, copy in pairs(dict) do
+		rawset(self.Transform, value, copy)
 	end
 end
 
 function Copy:Flush()
 	for value in pairs(self.Transform) do
 		rawset(self.Transform, value, nil)
+	end
+	for value in pairs(self.Cache) do
+		rawset(self.Cache, value, nil)
 	end
 end
 

@@ -40,11 +40,9 @@ function Test.MakeFactory(copy)
 				__newindex = getmetatable(copy.Flags).__newindex
 			}),
 			Transform = {},
-			
-			Operations = {
-				Delete = {},
-				Force = {},
-			},
+			Cache = {},
+
+			NIL = newproxy(false),
 			
 			Extend = copy.Extend,
 			QueuePreserve = copy.QueuePreserve,
@@ -59,6 +57,7 @@ function Test.MakeFactory(copy)
 end
 
 function testMt:__call(testDict, copy)
+	testDict = testDict or Test.AllTests
 	local factory = Test.MakeFactory(copy)
 	for aspectKey, array in pairs(testDict) do
 		local aspectArray = self.Aspects[aspectKey]

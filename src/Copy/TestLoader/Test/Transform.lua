@@ -4,8 +4,9 @@ return {
 		local array = { "value" }
 		
 		Copy.Transform["value"] = "some other value"
-		
-		assert(Copy(array)[1] == "some other value")
+		local newArray = Copy(array)
+
+		assert(newArray[1] == "some other value")
 	end,
 	
 	Keys = function(Copy)

@@ -10,7 +10,7 @@ return {
 		assert(newTable.key == nil)
 	end,
 	
-	DeleteMetatables = function(Copy)
+	DeleteMeta = function(Copy)
 		local someTable = {}
 		local someMeta = {}
 		setmetatable(someTable, someMeta)
@@ -33,4 +33,7 @@ return {
 		assert(newTable.key == "value")
 	end,
 
+	AvoidNil = function(Copy)
+		Copy:QueueDelete(1, nil, 3)
+	end,
 }

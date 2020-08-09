@@ -63,7 +63,7 @@ return {
 		Copy.Flags.Flush = true
 		local _ = Copy(dict)
 		
-		assert( isEmpty(Copy.Transform) )
+		assert( isEmpty(Copy.Cache) )
 	end,
 	FlushOff = function(Copy)
 		local dict = {
@@ -73,7 +73,7 @@ return {
 		Copy.Flags.Flush = false
 		local _ = Copy(dict)
 		
-		assert( not isEmpty(Copy.Transform) )
+		assert( not isEmpty(Copy.Cache) )
 	end,
 
 	-- relationship between tables and subtables

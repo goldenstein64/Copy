@@ -51,4 +51,7 @@ return {
 		assert(newMeta == newMeta2)
 	end,
 
+	AvoidNil = function(Copy)
+		Copy:QueueForce(1, nil, 3)
+	end,
 }

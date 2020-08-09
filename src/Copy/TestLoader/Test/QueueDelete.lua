@@ -4,7 +4,7 @@ return {
 		local someVar = newproxy(false)
 		local someTable = { key = someVar }
 		
-		Copy:QueueDelete(someVar)
+		Copy:QueueDelete("Values", someVar)
 		local newTable = Copy(someTable)
 		
 		assert(newTable.key == nil)
@@ -15,8 +15,7 @@ return {
 		local someMeta = {}
 		setmetatable(someTable, someMeta)
 		
-		Copy.Flags.CopyMeta = true
-		Copy:QueueDelete(someMeta)
+		Copy:QueueDelete("Meta", someMeta)
 		local newTable = Copy(someTable)
 		
 		assert(getmetatable(newTable) == nil)
@@ -26,8 +25,7 @@ return {
 	DeleteKeySafeguard = function(Copy)
 		local someTable = { key = "value" }
 		
-		Copy.Flags.CopyKeys = true
-		Copy:QueueDelete("key")
+		Copy:QueueDelete("Keys", "key")
 		local newTable = Copy(someTable)
 		
 		assert(newTable.key == "value")

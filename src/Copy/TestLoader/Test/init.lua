@@ -32,19 +32,20 @@ function Test.MakeFactory(copy)
 	return function()
 		local newCopy = setmetatable({
 			Flags = setmetatable({
-				CopyKeys = copy.Flags.CopyKeys,
-				CopyMeta = copy.Flags.CopyMeta,
 				Flush = copy.Flags.Flush,
 				SetParent = copy.Flags.SetParent,
 			}, {
 				__newindex = getmetatable(copy.Flags).__newindex
 			}),
-			Transform = {},
-			
-			Operations = {
-				Delete = {},
-				Force = {},
-			},
+			Transform = setmetatable({
+				Keys = {},
+				Values = {},
+				Meta = {},
+			}, {
+				__index = getmetatable(copy.Transform).__index
+			}),
+
+			NIL = newproxy(false),
 			
 			Extend = copy.Extend,
 			QueuePreserve = copy.QueuePreserve,
@@ -74,7 +75,7 @@ function testMt:__call(testDict, copy)
 			end
 			
 			local result = table.pack(xpcall(test, function(msg)
-				warn(debug.traceback("false " .. msg))
+				warn(debug.traceback(msg))
 			end, factory()))
 			local ok = result[1]
 			if ok then 

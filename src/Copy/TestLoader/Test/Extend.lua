@@ -58,7 +58,6 @@ return {
 		local someTable = setmetatable({}, { key = "value" })
 		local otherTable = setmetatable({}, { otherKey = "other value" })
 		
-		Copy.Flags.CopyMeta = true
 		Copy:Extend(otherTable, someTable)
 
 		local otherMt = getmetatable(otherTable)
@@ -66,27 +65,15 @@ return {
 		assert(otherMt.otherKey == nil)
 	end,
 
-	CheckMetaFlagOn = function(Copy)
+	CheckMeta = function(Copy)
 		local mt = {}
 		local someTable = setmetatable({}, mt)
 		local otherTable = setmetatable({}, {})
 
-		Copy.Flags.CopyMeta = true
 		Copy:Extend(otherTable, someTable)
 
 		local otherMt = getmetatable(otherTable)
 		assert(otherMt ~= mt)
-	end,
-	CheckMetaFlagOff = function(Copy)
-		local mt = {}
-		local someTable = setmetatable({}, mt)
-		local otherTable = setmetatable({}, {})
-
-		Copy.Flags.CopyMeta = false
-		Copy:Extend(otherTable, someTable)
-
-		local otherMt = getmetatable(otherTable)
-		assert(otherMt == mt)
 	end,
 
 	ExtendTwice = function(Copy)

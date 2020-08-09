@@ -1,4 +1,14 @@
 -- Private Functions
+local function getTransform(copy, context, value)
+	local result = copy.Transform[context][value]
+
+	if result == copy.NIL then
+		return true, nil
+	else
+		return result ~= nil, result
+	end
+end
+
 local function safeClone(instance, setParent)
 	local oldArchivable = instance.Archivable
 	instance.Archivable = true
@@ -16,64 +26,76 @@ local function safeClone(instance, setParent)
 end
 
 local indexSubTable
-local function indexSubValue(state, var)
-	local type_var = typeof(var)
-	if type_var == "Instance" and state.Copy.Transform[var] == nil then
-		state.Instances[var] = true
-	elseif type_var == "table" and not state.Explored[var] then
-		indexSubTable(state, var)
+local function indexSubValue(state, context, value)
+	local type_value = typeof(value)
+	if type_value == "Instance" and not getTransform(state.Copy, context, value) then
+		state.Instances[context][value] = true
+	elseif type_value == "table" and not state.Explored[value] then
+		indexSubTable(state, value)
 	end
 end
 function indexSubTable(state, tabl)
 	state.Explored[tabl] = true
 	for k, v in pairs(tabl) do
-		if state.Copy.Flags.CopyKeys or state.Copy.Operations.Force[k] then
-			indexSubValue(state, k)
-		end
-		indexSubValue(state, v)
+		indexSubValue(state, "Keys", k)
+		indexSubValue(state, "Values", v)
 	end
 	local meta = getmetatable(tabl)
-	if (state.Copy.Flags.CopyMeta or state.Copy.Operations.Force[meta]) and type(meta) == "table" then
-		indexSubValue(state, meta)
+	if type(meta) == "table" then
+		indexSubValue(state, "Meta", meta)
 	end
 end
 
 local function indexValue(copy, value)
 	local state = {
 		Copy = copy,
-		Instances = {},
+		Instances = {
+			Keys = {},
+			Values = {},
+			Meta = {},
+		},
 		Explored = {}
 	}
-	indexSubValue(state, value)
+	indexSubValue(state, "Values", value)
 	return state.Instances
 end
 
 local function getInstanceRelations(instance, instances)
-	local result = {}
-	for other in pairs(instances) do
-		if instance == other then
-			continue
-		elseif instance:IsDescendantOf(other) then
-			return false
-		elseif instance:IsAncestorOf(other) then
-			result[other] = true
+	local registeredDescendants = {
+		Keys = {},
+		Values = {},
+		Meta = {},
+	}
+	for context, contextDict in pairs(instances) do
+		for other in pairs(contextDict) do
+			if instance == other then
+				continue
+			elseif instance:IsDescendantOf(other) then
+				return false
+			elseif instance:IsAncestorOf(other) then
+				registeredDescendants[context][other] = true
+			end
 		end
 	end
-	return true, result
+	return true, registeredDescendants
 end
 
 local function cloneRootAncestors(instances, transform, setParent)
-	for instance in pairs(instances) do
-		local isRootAncestor, registeredDescendants = getInstanceRelations(instance, instances)
-		if isRootAncestor then
-			local newInstance = safeClone(instance, setParent)
-			transform[instance] = newInstance
-			if next(registeredDescendants) ~= nil then
-				local descendants = instance:GetDescendants()
-				local newDescendants = newInstance:GetDescendants()
-				for desc in pairs(registeredDescendants) do
-					local descIndex = table.find(descendants, desc)
-					transform[desc] = newDescendants[descIndex]
+	for context, contextDict in pairs(instances) do
+		for instance in pairs(contextDict) do
+			local isRootAncestor, registeredDescendants = getInstanceRelations(instance, instances)
+			if isRootAncestor then
+				local newInstance = safeClone(instance, setParent)
+				transform[context][instance] = newInstance
+				if next(registeredDescendants) ~= nil then
+					local descendants = instance:GetDescendants()
+					local newDescendants = newInstance:GetDescendants()
+					for descContext, descContextDict in pairs(registeredDescendants) do
+						for desc in pairs(descContextDict) do
+							local descIndex = table.find(descendants, desc)
+							transform[descContext][desc] = newDescendants[descIndex]
+						end
+					end
 				end
 			end
 		end

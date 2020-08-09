@@ -56,7 +56,7 @@ return {
 		getmetatable(dict.userdata).__index = function(_, k)
 			return "indexed with " .. k 
 		end
-		
+
 		local newDict = Copy(dict)
 		
 		assert(dict ~= newDict) --> This table was copied!
@@ -65,10 +65,10 @@ return {
 		assert(newDict.cyclic == newDict) --> Retains cyclic behavior
 		assert(dict.part ~= newDict.part) --> Clones parts
 		assert(dict.greet == newDict.greet) --> Retains functions
-
-		assert(dict[key] == "value") --> Retains keys
 		
-		assert(getmetatable(dict) == getmetatable(newDict)) --> Retains metatables
+		assert(newDict[key] == "does not exist!") --> Copies keys, meaning old ones don't map!
+		
+		assert(getmetatable(dict) ~= getmetatable(newDict)) --> Copies metatables
 		assert(newDict.fakeMember == "does not exist!") --> Retains metamethods
 		
 		assert(dict.userdata ~= newDict.userdata) --> Copies userdatas
@@ -156,34 +156,34 @@ return {
 	end,
 	
 	TransformSafeguard = function(Copy)
-		Copy.Transform["value"] = "other value"
+		Copy.Transform.Values["value"] = "other value"
 		
 		local newTransform = Copy(Copy.Transform)
 		
-		assert(newTransform["value"] == nil)
+		assert(newTransform.Values["value"] == nil)
 	end,
 	
 	-- for Copy:Extend
 	TransformSafeguardAcross = function(Copy)
-		Copy.Transform["value"] = "other value"
-		local newTransform = {
+		Copy.Transform.Values["value"] = "other value"
+		local newTransformValues = {
 			["different value"] = "separate value"
 		}
 		
-		Copy:Extend(newTransform, Copy.Transform)
+		Copy:Extend(newTransformValues, Copy.Transform.Values)
 		
-		assert(newTransform["value"] == nil)
+		assert(newTransformValues["value"] == nil)
 	end,
 	
 	-- proper Transform duplication
 	TransformSafeguardBypass = function(Copy)
-		Copy.Transform["value"] = "other value"
+		Copy.Transform.Values["value"] = "other value"
 		
-		local oldTransform
-		Copy.Transform, oldTransform = {}, Copy.Transform
+		local oldTransform = Copy.Transform
+		Copy.Transform = { Keys = {}, Values = {}, Meta = {}, }
 		local newTransform = Copy(oldTransform)
 		
-		assert(newTransform["value"] == "other value")
+		assert(newTransform.Values["value"] == "other value")
 	end,
 	
 	Cyclic = function(Copy)
@@ -200,8 +200,10 @@ return {
 		local someTable = { subTable, subTable }
 		
 		local newTable = Copy(someTable)
-		
-		assert(newTable[1] == newTable[2])
+
+		local value1 = newTable[1]
+		local value2 = newTable[2]
+		assert(value1 == value2)
 	end,
 	
 	DuplicateKeys = function(Copy)
@@ -214,8 +216,8 @@ return {
 		local newTable = Copy(someTable)
 		
 		local key1 = next(newTable[1])
-		
-		assert(newTable[2][key1] == true)
+		local key2 = next(newTable[2])
+		assert(key1 == key2)
 	end,
 	
 	DuplicateMetatables = function(Copy)
@@ -229,7 +231,6 @@ return {
 		
 		local meta1 = getmetatable(newTable[1])
 		local meta2 = getmetatable(newTable[2])
-		
 		assert(meta1 == meta2)
 	end,
 }

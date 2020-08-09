@@ -5,75 +5,33 @@ local function isEmpty(t)
 end
 
 return {
-	
-	-- CopyKeys
-	CopyKeysOn = function(Copy)
-		local key = newproxy(false)
-		local dict = {
-			[key] = "value"
-		}
-
-		Copy.Flags.CopyKeys = true
-		local newDict = Copy(dict)
-		local newKey = next(newDict)
-
-		assert(key ~= newKey)
-	end,
-	CopyKeysOff = function(Copy)
-		local key = newproxy(false)
-		local dict = {
-			[key] = "value"
-		}
-		
-		Copy.Flags.CopyKeys = false
-		local newDict = Copy(dict)
-		local newKey = next(newDict)
-		
-		assert(key == newKey)
-	end,
-
-	-- CopyMeta
-	CopyMetaOn = function(Copy)
-		local meta = {}
-		local dict = setmetatable({}, meta)
-		
-		Copy.Flags.CopyMeta = true
-		local newDict = Copy(dict)
-		local newMeta = getmetatable(newDict)
-		
-		assert(meta ~= newMeta)
-	end,
-	CopyMetaOff = function(Copy)
-		local meta = {}
-		local dict = setmetatable({}, meta)
-		
-		Copy.Flags.CopyMeta = false
-		local newDict = Copy(dict)
-		local newMeta = getmetatable(newDict)
-		
-		assert(meta == newMeta)
-	end,
 
 	-- Flush
 	FlushOn = function(Copy)
-		local dict = {
-			sub = {}
-		}
+		local someValue = {}
+		local dict = setmetatable({
+			[someValue] = someValue
+		}, someValue)
 		
 		Copy.Flags.Flush = true
-		local _ = Copy(dict)
+		Copy(dict)
 		
-		assert( isEmpty(Copy.Transform) )
+		for _, contextDict in pairs(Copy.Transform) do
+			assert( isEmpty(contextDict) )
+		end
 	end,
 	FlushOff = function(Copy)
-		local dict = {
-			sub = {}
-		}
+		local someValue = {}
+		local dict = setmetatable({
+			[someValue] = someValue
+		}, someValue)
 		
 		Copy.Flags.Flush = false
-		local _ = Copy(dict)
+		Copy(dict)
 		
-		assert( not isEmpty(Copy.Transform) )
+		for _, contextDict in pairs(Copy.Transform) do
+			assert( not isEmpty(contextDict) )
+		end
 	end,
 
 	-- relationship between tables and subtables

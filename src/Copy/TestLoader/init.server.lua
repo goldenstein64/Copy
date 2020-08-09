@@ -24,21 +24,10 @@ local RUNNING_TESTS = {
 		"Arrays",
 		"Dictionaries",
 		"Metatables",
-		"CheckMetaFlagOn",
-		"CheckMetaFlagOff",
+		"CheckMeta",
 		"ExtendTwice",
 	},
-	ExtendFlags = {
-		"CopyKeysOn",
-		"CopyKeysOff",
-		"CopyMetaOn",
-		"CopyMetaOff",
-	},
 	Flags = {
-		"CopyKeysOn",
-		"CopyKeysOff",
-		"CopyMetaOn",
-		"CopyMetaOff",
 		"FlushOn",
 		"FlushOff",
 		"FlushRelation",
@@ -58,11 +47,6 @@ local RUNNING_TESTS = {
 		"DeleteMetatables",
 		"DeleteKeySafeguard",
 	},
-	QueueForce = {
-		"ForceKeys",
-		"ForceMeta",
-		"ForceMultipleKeys",
-	},
 	QueuePreserve = {
 		"Values",
 		"Keys",
@@ -70,20 +54,8 @@ local RUNNING_TESTS = {
 		"MultipleValues",
 		"AvoidNil",
 	},
-	OperationSelect = {
-		"KeySelectFlagOff",
-		"KeySelectFlagOn",
-		"MetaSelectFlagOff",
-		"MetaSelectFlagOn",
-	},
 	Flush = {
 		"CheckFunctionality",
-	},
-	InstanceArtifacts = {
-		"CopyKeysOn",
-		"CopyKeysOff",
-		"CopyMetaOn",
-		"CopyMetaOff",
 	},
 	Stress = {
 		"Primitives",

@@ -6,7 +6,7 @@ return {
 		Copy.Flags.Flush = false
 		local newTable1 = Copy(someTable)
 		local newTable2 = Copy(someTable)
-		local storedTable = Copy.Transform[someTable]
+		local storedTable = Copy.Transform.Values[someTable]
 		Copy:Flush()
 		local newTable3 = Copy(someTable)
 		

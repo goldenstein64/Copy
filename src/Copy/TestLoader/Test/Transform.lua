@@ -3,7 +3,7 @@ return {
 	Values = function(Copy)
 		local array = { "value" }
 		
-		Copy.Transform["value"] = "some other value"
+		Copy.Transform.Values["value"] = "some other value"
 		
 		assert(Copy(array)[1] == "some other value")
 	end,
@@ -11,8 +11,7 @@ return {
 	Keys = function(Copy)
 		local dict = { key = "value" }
 		
-		Copy.Flags.CopyKeys = true
-		Copy.Transform["key"] = "someOtherKey"
+		Copy.Transform.Keys["key"] = "someOtherKey"
 		local newDict = Copy(dict)
 		
 		assert(newDict.key == nil)
@@ -33,8 +32,7 @@ return {
 		local someTable = setmetatable({ Value = 3 }, addMeta)
 		local otherTable = { Value = 8 }
 		
-		Copy.Flags.CopyMeta = true
-		Copy.Transform[addMeta] = otherMeta
+		Copy.Transform.Meta[addMeta] = otherMeta
 		local newTable = Copy(someTable)
 		
 		assert(someTable + otherTable == 11)
@@ -51,9 +49,9 @@ return {
 			key = "value"
 		}
 		
-		Copy.Transform["value"] = "some other value"
+		Copy.Transform.Values["value"] = "some other value"
 		local newSubObj = Copy(obj.sub) -- this flushes the last line
-		Copy.Transform[obj.sub] = newSubObj
+		Copy.Transform.Values[obj.sub] = newSubObj
 		local newObj = Copy(obj)
 		
 		assert(newObj.key == "value")
@@ -66,7 +64,7 @@ return {
 			shared = {}
 		}
 		
-		Copy.Transform[dict.shared] = dict.shared
+		Copy.Transform.Values[dict.shared] = dict.shared
 		local newDict = Copy(dict)
 		
 		assert(newDict.shared == dict.shared)

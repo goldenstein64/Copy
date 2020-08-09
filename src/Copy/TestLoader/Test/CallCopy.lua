@@ -66,7 +66,7 @@ return {
 		assert(dict.part ~= newDict.part) --> Clones parts
 		assert(dict.greet == newDict.greet) --> Retains functions
 
-		assert(dict[key] == "value") --> Retains keys
+		assert(newDict[key] == "value") --> Retains keys
 		
 		assert(getmetatable(dict) == getmetatable(newDict)) --> Retains metatables
 		assert(newDict.fakeMember == "does not exist!") --> Retains metamethods

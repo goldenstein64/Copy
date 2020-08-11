@@ -1,5 +1,3 @@
-local DEFAULT_ERROR = "assertion failed!"
-
 local R = Random.new()
 
 local function isEmpty(t)
@@ -27,7 +25,7 @@ return {
 		Copy.Flags.Flush = false
 		local _ = Copy(dict)
 
-		assert(not isEmpty(Copy.Transform), DEFAULT_ERROR)
+		assert(not isEmpty(Copy.Transform))
 	end,
 
 	-- relationship between tables and subtables
@@ -40,7 +38,7 @@ return {
 		local newSubTable = Copy(someTable.sub)
 		local newTable = Copy(someTable)
 
-		assert(newTable.sub == newSubTable, DEFAULT_ERROR)
+		assert(newTable.sub == newSubTable)
 	end,
 
 	-- SetParent
@@ -58,7 +56,7 @@ return {
 		local newArray = Copy(array)
 
 		for i = 1, 5 do
-			assert(newArray[i].Parent == array[i].Parent, DEFAULT_ERROR)
+			assert(newArray[i].Parent == array[i].Parent)
 		end
 	end,
 	SetParentOff = function(Copy)
@@ -75,7 +73,7 @@ return {
 		local newArray = Copy(array)
 
 		for i = 1, 5 do
-			assert(newArray[i].Parent == nil, DEFAULT_ERROR)
+			assert(newArray[i].Parent == nil)
 		end
 	end,
 
@@ -83,7 +81,7 @@ return {
 		local ok = pcall(function()
 			Copy.Flags.NonFlag = true
 		end)
-		assert(not ok, DEFAULT_ERROR)
+		assert(not ok)
 	end,
 
 }

@@ -1,5 +1,3 @@
-local DEFAULT_ERROR = "assertion failed!"
-
 local base = {
 	Key = "base value",
 	BaseKey = "inherited value"
@@ -27,7 +25,7 @@ return {
 			Copy:Extend(userdata, otherUserdata)
 		end)
 
-		assert(not ok, DEFAULT_ERROR)
+		assert(not ok)
 	end,
 
 	Arrays = function(Copy)
@@ -36,9 +34,9 @@ return {
 
 		Copy:Extend(array, completeArray)
 
-		assert(array[1] == "a", DEFAULT_ERROR)
-		assert(array[2] == "b", DEFAULT_ERROR)
-		assert(array[3] == "c", DEFAULT_ERROR)
+		assert(array[1] == "a")
+		assert(array[2] == "b")
+		assert(array[3] == "c")
 	end,
 
 	Dictionaries = function(Copy)
@@ -54,8 +52,8 @@ return {
 
 		Copy:Extend(namespace, otherNamespace)
 
-		assert(namespace.OtherMethod ~= nil, DEFAULT_ERROR)
-		assert(namespace.OtherMethod() == "other method", DEFAULT_ERROR)
+		assert(namespace.OtherMethod ~= nil)
+		assert(namespace.OtherMethod() == "other method")
 	end,
 
 	Metatables = function(Copy)
@@ -65,8 +63,8 @@ return {
 		Copy:Extend(otherTable, someTable)
 
 		local otherMt = getmetatable(otherTable)
-		assert(otherMt.key == "value", DEFAULT_ERROR)
-		assert(otherMt.otherKey == nil, DEFAULT_ERROR)
+		assert(otherMt.key == "value")
+		assert(otherMt.otherKey == nil)
 	end,
 
 	ExtendTwice = function(Copy)
@@ -76,11 +74,11 @@ return {
 
 		Copy:Extend(object, base, modifier, modifier2)
 
-		assert(object.objectKey == "object value", DEFAULT_ERROR)
-		assert(object.Key == "modified 2 value", DEFAULT_ERROR)
-		assert(object.BaseKey == "inherited value", DEFAULT_ERROR)
-		assert(object.ModKey == "extended value", DEFAULT_ERROR)
-		assert(object.Mod2Key == "extended 2 value", DEFAULT_ERROR)
+		assert(object.objectKey == "object value")
+		assert(object.Key == "modified 2 value")
+		assert(object.BaseKey == "inherited value")
+		assert(object.ModKey == "extended value")
+		assert(object.Mod2Key == "extended 2 value")
 	end,
 
 }

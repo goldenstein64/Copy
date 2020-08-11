@@ -1,5 +1,3 @@
-local DEFAULT_ERROR = "assertion failed!"
-
 return {
 
 	DeleteValues = function(Copy)
@@ -13,7 +11,7 @@ return {
 		end)
 		local newTable = Copy(someTable)
 
-		assert(newTable.key == nil, DEFAULT_ERROR)
+		assert(newTable.key == nil)
 	end,
 
 	DeleteMetatables = function(Copy)
@@ -26,7 +24,7 @@ return {
 		end)
 		local newTable = Copy(someTable)
 
-		assert(getmetatable(newTable) == nil, DEFAULT_ERROR)
+		assert(getmetatable(newTable) == nil)
 	end,
 
 	-- preserving a key if an attempt is made to make it nil
@@ -40,7 +38,7 @@ return {
 		end)
 		local newTable = Copy(someTable)
 
-		assert(newTable.key == "value", DEFAULT_ERROR)
+		assert(newTable.key == "value")
 	end,
 
 }

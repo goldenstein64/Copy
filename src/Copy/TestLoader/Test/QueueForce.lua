@@ -1,5 +1,3 @@
-local DEFAULT_ERROR = "assertion failed!"
-
 return {
 
 	ForceKeys = function(Copy)
@@ -11,8 +9,8 @@ return {
 		local newTable = Copy(someTable)
 		local newKey = Copy.Transform[key]
 
-		assert(newKey ~= key, DEFAULT_ERROR)
-		assert(newTable[newKey] == "value", DEFAULT_ERROR)
+		assert(newKey ~= key)
+		assert(newTable[newKey] == "value")
 	end,
 
 	ForceMultipleKeys = function(Copy)
@@ -31,9 +29,9 @@ return {
 		local newTable = Copy(someTable)
 		local newKey = Copy.Transform[key]
 
-		assert(newKey ~= key, DEFAULT_ERROR)
-		assert(newTable[1][newKey] == "value 1", DEFAULT_ERROR)
-		assert(newTable[2][newKey] == "value 2", DEFAULT_ERROR)
+		assert(newKey ~= key)
+		assert(newTable[1][newKey] == "value 1")
+		assert(newTable[2][newKey] == "value 2")
 	end,
 
 	ForceMeta = function(Copy)
@@ -46,8 +44,8 @@ return {
 		local newMeta = getmetatable(newTable)
 		local newMeta2 = Copy.Transform[meta]
 
-		assert(newMeta ~= meta, DEFAULT_ERROR)
-		assert(newMeta == newMeta2, DEFAULT_ERROR)
+		assert(newMeta ~= meta)
+		assert(newMeta == newMeta2)
 	end,
 
 	AvoidNil = function(Copy)

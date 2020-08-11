@@ -1,5 +1,3 @@
-local DEFAULT_ERROR = "assertion failed!"
-
 return {
 
 	Values = function(Copy)
@@ -10,7 +8,7 @@ return {
 		Copy:QueuePreserve(dict.shared)
 		local newDict = Copy(dict)
 
-		assert(newDict.shared == dict.shared, DEFAULT_ERROR)
+		assert(newDict.shared == dict.shared)
 	end,
 
 	Keys = function(Copy)
@@ -20,7 +18,7 @@ return {
 		Copy:QueuePreserve(keyTable)
 		local newTable = Copy(someTable)
 
-		assert(newTable[keyTable] == 4, DEFAULT_ERROR)
+		assert(newTable[keyTable] == 4)
 	end,
 
 	Metatables = function(Copy)
@@ -34,7 +32,7 @@ return {
 		Copy:QueuePreserve(mt)
 		local newObj = Copy(obj)
 
-		assert(getmetatable(newObj) == getmetatable(obj), DEFAULT_ERROR)
+		assert(getmetatable(newObj) == getmetatable(obj))
 	end,
 
 	MultipleValues = function(Copy)
@@ -47,9 +45,9 @@ return {
 		Copy:QueuePreserve(someTable.shared, someTable.sharedToo)
 		local newTable = Copy(someTable)
 
-		assert(newTable.shared == someTable.shared, DEFAULT_ERROR)
-		assert(newTable.sharedToo == someTable.sharedToo, DEFAULT_ERROR)
-		assert(newTable.notShared ~= someTable.notShared, DEFAULT_ERROR)
+		assert(newTable.shared == someTable.shared)
+		assert(newTable.sharedToo == someTable.sharedToo)
+		assert(newTable.notShared ~= someTable.notShared)
 	end,
 
 	AvoidNil = function(Copy)

@@ -1,5 +1,3 @@
-local DEFAULT_ERROR = "assertion failed!"
-
 local ITER = 10_000
 
 -- removing 1 iteration because TestLoader implementation
@@ -20,7 +18,7 @@ return {
 		local newTable = Copy(someTable)
 
 		local finish = os.clock() - t
-		assert(#newTable == ITER, DEFAULT_ERROR)
+		assert(#newTable == ITER)
 		return "Primitives", string.format("%.6f", finish)
 	end,
 
@@ -36,7 +34,7 @@ return {
 		local newTable = Copy(someTable)
 
 		local finish = os.clock() - t
-		assert(#newTable == ITER, DEFAULT_ERROR)
+		assert(#newTable == ITER)
 		return "Tables", string.format("%.6f", finish)
 	end,
 
@@ -52,7 +50,7 @@ return {
 		local newTable = Copy(someTable)
 
 		local finish = os.clock() - t
-		assert(#newTable == ITER, DEFAULT_ERROR)
+		assert(#newTable == ITER)
 		return "Symbols", string.format("%.6f", finish)
 	end,
 
@@ -68,7 +66,7 @@ return {
 		local newTable = Copy(someTable)
 
 		local finish = os.clock() - t
-		assert(#newTable == ITER, DEFAULT_ERROR)
+		assert(#newTable == ITER)
 		return "Userdatas", string.format("%.6f", finish)
 	end,
 
@@ -93,7 +91,7 @@ return {
 				current = current[1]
 			end
 
-			assert(current ~= nil, DEFAULT_ERROR)
+			assert(current ~= nil)
 		end
 
 		return "NestedTables", string.format("%.6f", finish)
@@ -111,7 +109,7 @@ return {
 		do
 			local newSubTable = newTable[1]
 			for i = 2, ITER do
-				assert(newTable[i] == newSubTable, DEFAULT_ERROR)
+				assert(newTable[i] == newSubTable)
 			end
 		end
 

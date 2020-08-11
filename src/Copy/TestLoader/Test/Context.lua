@@ -1,5 +1,3 @@
-local DEFAULT_ERROR = "assertion failed!"
-
 return {
 
 	Values = function(Copy)
@@ -12,7 +10,7 @@ return {
 		end)
 		local newArray = Copy(array)
 
-		assert(newArray[1] == "some other value", DEFAULT_ERROR)
+		assert(newArray[1] == "some other value")
 	end,
 
 	Keys = function(Copy)
@@ -25,8 +23,8 @@ return {
 		end)
 		local newDict = Copy(dict)
 
-		assert(newDict.key == nil, DEFAULT_ERROR)
-		assert(newDict.someOtherKey == "value", DEFAULT_ERROR)
+		assert(newDict.key == nil)
+		assert(newDict.someOtherKey == "value")
 	end,
 
 	Metatables = function(Copy)
@@ -48,9 +46,9 @@ return {
 		end)
 		local newTable = Copy(someTable)
 
-		assert(someTable + otherTable == 11, DEFAULT_ERROR)
+		assert(someTable + otherTable == 11)
 		-- 2 * (   3     +     8    ) == 22
-		assert(newTable + otherTable == 22, DEFAULT_ERROR)
+		assert(newTable + otherTable == 22)
 	end,
 
 	-- transforming values in subsequent tables
@@ -71,8 +69,8 @@ return {
 		end)
 		local newObj = Copy(obj)
 
-		assert(newObj.key == "value", DEFAULT_ERROR)
-		assert(newObj.sub.key == "some other value", DEFAULT_ERROR)
+		assert(newObj.key == "value")
+		assert(newObj.sub.key == "some other value")
 	end,
 
 	MetatableValues = function(Copy)
@@ -86,7 +84,7 @@ return {
 		end)
 		local newObj = Copy(obj)
 
-		assert(getmetatable(newObj).key == "some other value", DEFAULT_ERROR)
+		assert(getmetatable(newObj).key == "some other value")
 	end,
 
 	-- preserving a value using Copy.Transform
@@ -102,7 +100,7 @@ return {
 		end)
 		local newDict = Copy(dict)
 
-		assert(newDict.shared == dict.shared, DEFAULT_ERROR)
+		assert(newDict.shared == dict.shared)
 	end,
 
 	AltValues = function(Copy)
@@ -113,7 +111,7 @@ return {
 		}
 		local newArray = Copy(array)
 
-		assert(newArray[1] == "some other value", DEFAULT_ERROR)
+		assert(newArray[1] == "some other value")
 	end,
 
 	AltValues2 = function(Copy)
@@ -127,7 +125,7 @@ return {
 		}
 		local newArray = Copy(array)
 
-		assert(newArray[1] == "some other value", DEFAULT_ERROR)
+		assert(newArray[1] == "some other value")
 	end,
 
 }

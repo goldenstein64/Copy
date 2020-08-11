@@ -1,5 +1,3 @@
-local DEFAULT_ERROR = "assertion failed!"
-
 local function getDictLen(dict)
 	local result = 0
 	for _ in pairs(dict) do
@@ -32,7 +30,7 @@ return {
 		local newArray = Copy(array)
 
 		-- these tables are not the same!
-		assert(array ~= newArray, DEFAULT_ERROR)
+		assert(array ~= newArray)
 	end,
 
 	TechnicalSample = function(Copy)
@@ -63,23 +61,23 @@ return {
 
 		local newDict = Copy(dict)
 
-		assert(dict ~= newDict, DEFAULT_ERROR) --> This table was copied!
+		assert(dict ~= newDict) --> This table was copied!
 
-		assert(newDict.member == 8, DEFAULT_ERROR) --> Copies stateless members
-		assert(newDict.cyclic == newDict, DEFAULT_ERROR) --> Retains cyclic behavior
-		assert(dict.part ~= newDict.part, DEFAULT_ERROR) --> Clones parts
-		assert(dict.greet == newDict.greet, DEFAULT_ERROR) --> Retains functions
+		assert(newDict.member == 8) --> Copies stateless members
+		assert(newDict.cyclic == newDict) --> Retains cyclic behavior
+		assert(dict.part ~= newDict.part) --> Clones parts
+		assert(dict.greet == newDict.greet) --> Retains functions
 
-		assert(newDict[key] == "value", DEFAULT_ERROR) --> Retains keys
+		assert(newDict[key] == "value") --> Retains keys
 
 		assert(getmetatable(dict) ~= getmetatable(newDict)) --> Copies metatables
-		assert(newDict.fakeMember == "does not exist!", DEFAULT_ERROR) --> Retains metamethods
+		assert(newDict.fakeMember == "does not exist!") --> Retains metamethods
 
-		assert(dict.userdata ~= newDict.userdata, DEFAULT_ERROR) --> Copies userdatas
-		assert(newDict.userdata.key == "indexed with key", DEFAULT_ERROR) --> Retains metamethods
+		assert(dict.userdata ~= newDict.userdata) --> Copies userdatas
+		assert(newDict.userdata.key == "indexed with key") --> Retains metamethods
 
-		assert(newDict.folder.Part == newDict.part, DEFAULT_ERROR) --> Retains hierarchy
-		assert(newDict.folder.Parent == nil, DEFAULT_ERROR) --> Root ancestors are not parented
+		assert(newDict.folder.Part == newDict.part) --> Retains hierarchy
+		assert(newDict.folder.Parent == nil) --> Root ancestors are not parented
 	end,
 
 	-- Copying Copy
@@ -97,7 +95,7 @@ return {
 			for k, v in pairs(Copy) do
 				local type_v = type(v)
 				if type_v == "function" then
-					assert(newCopy[k] == v, DEFAULT_ERROR)
+					assert(newCopy[k] == v)
 				elseif type_v == "table" then
 					if getDictLen(newCopy[k]) ~= getDictLen(v) and v ~= Copy.Transform then
 						error("Test failed for " .. toBinary(i) .. " at " .. tostring(k)
@@ -140,7 +138,7 @@ return {
 		}
 
 		-- nil is tested separately since it can't be stored in a table
-		assert(nilValue == Copy(nilValue), DEFAULT_ERROR)
+		assert(nilValue == Copy(nilValue))
 		for key, value in pairs(returnedValues) do
 			assert(rawequal(value, Copy(value)) == true, "value failed for " .. key)
 		end
@@ -157,7 +155,7 @@ return {
 
 		local newTable = Copy(someTable)
 
-		assert(newTable.folder.Part == newTable.part, DEFAULT_ERROR)
+		assert(newTable.folder.Part == newTable.part)
 	end,
 
 	TransformSafeguard = function(Copy)
@@ -165,7 +163,7 @@ return {
 
 		local newTransform = Copy(Copy.Transform)
 
-		assert(newTransform["value"] == nil, DEFAULT_ERROR)
+		assert(newTransform["value"] == nil)
 	end,
 
 	-- for Copy:Extend
@@ -177,7 +175,7 @@ return {
 
 		Copy:Extend(newTransform, Copy.Transform)
 
-		assert(newTransform["value"] == nil, DEFAULT_ERROR)
+		assert(newTransform["value"] == nil)
 	end,
 
 	-- proper Transform duplication
@@ -188,7 +186,7 @@ return {
 		Copy.Transform, oldTransform = {}, Copy.Transform
 		local newTransform = Copy(oldTransform)
 
-		assert(newTransform["value"] == "other value", DEFAULT_ERROR)
+		assert(newTransform["value"] == "other value")
 	end,
 
 	Cyclic = function(Copy)
@@ -197,7 +195,7 @@ return {
 
 		local newTable = Copy(someTable)
 
-		assert(newTable == newTable.cyclic, DEFAULT_ERROR)
+		assert(newTable == newTable.cyclic)
 	end,
 
 	DuplicateValues = function(Copy)
@@ -206,7 +204,7 @@ return {
 
 		local newTable = Copy(someTable)
 
-		assert(newTable[1] == newTable[2], DEFAULT_ERROR)
+		assert(newTable[1] == newTable[2])
 	end,
 
 	DuplicateKeys = function(Copy)
@@ -220,7 +218,7 @@ return {
 
 		local key1 = next(newTable[1])
 
-		assert(newTable[2][key1] == true, DEFAULT_ERROR)
+		assert(newTable[2][key1] == true)
 	end,
 
 	DuplicateMetatables = function(Copy)
@@ -235,6 +233,6 @@ return {
 		local meta1 = getmetatable(newTable[1])
 		local meta2 = getmetatable(newTable[2])
 
-		assert(meta1 == meta2, DEFAULT_ERROR)
+		assert(meta1 == meta2)
 	end,
 }

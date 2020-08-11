@@ -7,7 +7,11 @@ return {
 		local someTable = { [key] = "value" }
 
 		Copy.Flags.Flush = false
-		Copy:QueueForce(key)
+		Copy:ApplyContext(function(replace)
+			return {
+				[key] = replace({ key = Copy(key) })
+			}
+		end)
 		local newTable = Copy(someTable)
 		local newKey = Copy.Transform[key]
 
@@ -27,7 +31,17 @@ return {
 		}
 
 		Copy.Flags.Flush = false
-		Copy:QueueForce(key)
+		Copy:ApplyContext(function(replace)
+			local newKey = Copy(key)
+			return {
+				{
+					[key] = replace({ key = newKey })
+				},
+				{
+					[key] = replace({ key = newKey })
+				}
+			}
+		end)
 		local newTable = Copy(someTable)
 		local newKey = Copy.Transform[key]
 
@@ -41,7 +55,9 @@ return {
 		local someTable = setmetatable({}, meta)
 
 		Copy.Flags.Flush = false
-		Copy:QueueForce(meta)
+		Copy:ApplyContext(function(replace)
+			return setmetatable({}, replace({ value = Copy(meta) }))
+		end)
 		local newTable = Copy(someTable)
 		local newMeta = getmetatable(newTable)
 		local newMeta2 = Copy.Transform[meta]
@@ -50,7 +66,4 @@ return {
 		assert(newMeta == newMeta2, DEFAULT_ERROR)
 	end,
 
-	AvoidNil = function(Copy)
-		Copy:QueueForce(1, nil, 3)
-	end,
 }

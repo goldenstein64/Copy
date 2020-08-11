@@ -1,3 +1,5 @@
+local DEFAULT_ERROR = "assertion failed!"
+
 local R = Random.new()
 
 local function isEmpty(t)
@@ -5,90 +7,42 @@ local function isEmpty(t)
 end
 
 return {
-	
-	-- CopyKeys
-	CopyKeysOn = function(Copy)
-		local key = newproxy(false)
-		local dict = {
-			[key] = "value"
-		}
-
-		Copy.Flags.CopyKeys = true
-		local newDict = Copy(dict)
-		local newKey = next(newDict)
-
-		assert(key ~= newKey)
-	end,
-	CopyKeysOff = function(Copy)
-		local key = newproxy(false)
-		local dict = {
-			[key] = "value"
-		}
-		
-		Copy.Flags.CopyKeys = false
-		local newDict = Copy(dict)
-		local newKey = next(newDict)
-		
-		assert(key == newKey)
-	end,
-
-	-- CopyMeta
-	CopyMetaOn = function(Copy)
-		local meta = {}
-		local dict = setmetatable({}, meta)
-		
-		Copy.Flags.CopyMeta = true
-		local newDict = Copy(dict)
-		local newMeta = getmetatable(newDict)
-		
-		assert(meta ~= newMeta)
-	end,
-	CopyMetaOff = function(Copy)
-		local meta = {}
-		local dict = setmetatable({}, meta)
-		
-		Copy.Flags.CopyMeta = false
-		local newDict = Copy(dict)
-		local newMeta = getmetatable(newDict)
-		
-		assert(meta == newMeta)
-	end,
 
 	-- Flush
 	FlushOn = function(Copy)
 		local dict = {
 			sub = {}
 		}
-		
+
 		Copy.Flags.Flush = true
 		local _ = Copy(dict)
-		
+
 		assert( isEmpty(Copy.Transform) )
 	end,
 	FlushOff = function(Copy)
 		local dict = {
 			sub = {}
 		}
-		
+
 		Copy.Flags.Flush = false
 		local _ = Copy(dict)
-		
-		assert( not isEmpty(Copy.Transform) )
+
+		assert(not isEmpty(Copy.Transform), DEFAULT_ERROR)
 	end,
 
 	-- relationship between tables and subtables
 	FlushRelation = function(Copy)
-		local someTable = { 
+		local someTable = {
 			sub = {}
 		}
-		
+
 		Copy.Flags.Flush = false
 		local newSubTable = Copy(someTable.sub)
 		local newTable = Copy(someTable)
-		
-		assert(newTable.sub == newSubTable)
+
+		assert(newTable.sub == newSubTable, DEFAULT_ERROR)
 	end,
-	
+
 	-- SetParent
 	SetParentOn = function(Copy)
 		local array = {}
@@ -99,12 +53,12 @@ return {
 			newPart.Parent = parent
 			array[i] = newPart
 		end
-		
+
 		Copy.Flags.SetParent = true
 		local newArray = Copy(array)
-		
+
 		for i = 1, 5 do
-			assert(newArray[i].Parent == array[i].Parent)
+			assert(newArray[i].Parent == array[i].Parent, DEFAULT_ERROR)
 		end
 	end,
 	SetParentOff = function(Copy)
@@ -116,12 +70,12 @@ return {
 			newPart.Parent = parent
 			array[i] = newPart
 		end
-		
+
 		Copy.Flags.SetParent = false
 		local newArray = Copy(array)
-		
+
 		for i = 1, 5 do
-			assert(newArray[i].Parent == nil)
+			assert(newArray[i].Parent == nil, DEFAULT_ERROR)
 		end
 	end,
 
@@ -129,7 +83,7 @@ return {
 		local ok = pcall(function()
 			Copy.Flags.NonFlag = true
 		end)
-		assert(not ok)
+		assert(not ok, DEFAULT_ERROR)
 	end,
 
 }

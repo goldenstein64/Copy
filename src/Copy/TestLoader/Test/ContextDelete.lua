@@ -6,7 +6,11 @@ return {
 		local someVar = newproxy(false)
 		local someTable = { key = someVar }
 
-		Copy:QueueDelete(someVar)
+		Copy:ApplyContext(function(replace)
+			return {
+				key = replace({ value = Copy.NIL })
+			}
+		end)
 		local newTable = Copy(someTable)
 
 		assert(newTable.key == nil, DEFAULT_ERROR)
@@ -17,7 +21,9 @@ return {
 		local someMeta = {}
 		setmetatable(someTable, someMeta)
 
-		Copy:QueueDelete(someMeta)
+		Copy:ApplyContext(function(replace)
+			return setmetatable({}, replace({ value = Copy.NIL }))
+		end)
 		local newTable = Copy(someTable)
 
 		assert(getmetatable(newTable) == nil, DEFAULT_ERROR)
@@ -27,13 +33,14 @@ return {
 	DeleteKeySafeguard = function(Copy)
 		local someTable = { key = "value" }
 
-		Copy:QueueDelete("key")
+		Copy:ApplyContext(function(replace)
+			return {
+				key = replace({ key = Copy.NIL })
+			}
+		end)
 		local newTable = Copy(someTable)
 
 		assert(newTable.key == "value", DEFAULT_ERROR)
 	end,
 
-	AvoidNil = function(Copy)
-		Copy:QueueDelete(1, nil, 3)
-	end,
 }

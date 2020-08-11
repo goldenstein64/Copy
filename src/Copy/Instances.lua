@@ -1,4 +1,41 @@
 -- Private Functions
+local function getContext(copy, context, returnType)
+	if context.allowed and rawget(context.current, copy.Tag) then
+		local result = context.current[returnType]
+
+		if result == copy.NIL then
+			return true, nil
+		else
+			return result ~= nil, result
+		end
+	else
+		return false, nil
+	end
+end
+
+local function getTransform(copy, value)
+	local result = copy.Transform[value]
+
+	if result == copy.NIL then
+		return true, nil
+	else
+		return result ~= nil, result
+	end
+end
+
+local function searchForValue(copy, context, returnType, value)
+	local contextSuccess, contextCopy = getContext(copy, context, returnType)
+	local transformSuccess, transformCopy = getTransform(copy, value)
+
+	if contextSuccess then
+		return true, contextCopy
+	elseif transformSuccess then
+		return true, transformCopy
+	else
+		return false, nil
+	end
+end
+
 local function safeClone(instance, setParent)
 	local oldArchivable = instance.Archivable
 	instance.Archivable = true
@@ -26,21 +63,32 @@ local function indexSubValue(state, var)
 end
 function indexSubTable(state, tabl)
 	state.Explored[tabl] = true
+	local lastAllowed = state.Context.allowed
+	local lastCurrent = state.Context.current
 	for k, v in pairs(tabl) do
-		if state.Copy.Flags.CopyKeys or state.Copy.Operations.Force[k] then
-			indexSubValue(state, k)
+		state.Context.allowed = lastAllowed and lastCurrent[k] ~= nil
+		if state.Context.allowed then
+			state.Context.current = lastCurrent[k]
 		end
-		indexSubValue(state, v)
+		-- ignore k
+		local success_v = searchForValue(state.Copy, state.Context, "value", v)
+		if not success_v then
+			indexSubValue(state, v)
+		end
 	end
-	local meta = getmetatable(tabl)
-	if (state.Copy.Flags.CopyMeta or state.Copy.Operations.Force[meta]) and type(meta) == "table" then
-		indexSubValue(state, meta)
-	end
+	-- ignore meta
+
+	state.Context.allowed = lastAllowed
+	state.Context.current = lastCurrent
 end
 
 local function indexValue(copy, value)
 	local state = {
 		Copy = copy,
+		Context = {
+			allowed = type(copy.Context) == "table",
+			current = copy.Context
+		},
 		Instances = {},
 		Explored = {}
 	}

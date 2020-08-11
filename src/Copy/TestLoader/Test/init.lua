@@ -32,20 +32,18 @@ function Test.MakeFactory(copy)
 	return function()
 		local newCopy = setmetatable({
 			Flags = setmetatable({
-				CopyKeys = copy.Flags.CopyKeys,
-				CopyMeta = copy.Flags.CopyMeta,
 				Flush = copy.Flags.Flush,
 				SetParent = copy.Flags.SetParent,
 			}, {
 				__newindex = getmetatable(copy.Flags).__newindex
 			}),
+			Context = nil,
 			Transform = {},
-			
-			Operations = {
-				Delete = {},
-				Force = {},
-			},
-			
+			NIL = newproxy(false),
+			Tag = newproxy(false),
+
+			Replace = copy.Replace,
+			ApplyContext = copy.ApplyContext,
 			Extend = copy.Extend,
 			QueuePreserve = copy.QueuePreserve,
 			QueueDelete = copy.QueueDelete,
@@ -72,12 +70,12 @@ function testMt:__call(testDict, copy)
 			if not test then
 				error(string.format("This test (%s) does not exist!", tostring(index)))
 			end
-			
+
 			local result = table.pack(xpcall(test, function(msg)
 				warn(debug.traceback("false " .. msg))
 			end, factory()))
 			local ok = result[1]
-			if ok then 
+			if ok then
 				print(ok, table.unpack(result, 2, result.n))
 			end
 		end

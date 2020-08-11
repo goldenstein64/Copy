@@ -1,3 +1,5 @@
+local DEFAULT_ERROR = "assertion failed!"
+
 local base = {
 	Key = "base value",
 	BaseKey = "inherited value"
@@ -14,79 +16,57 @@ local modifier2 = {
 }
 
 return {
-	
+
 	ErrorNonTable = function(Copy)
 		local userdata = newproxy(true)
 		local otherUserdata = newproxy(true)
 		local otherMt = getmetatable(otherUserdata)
 		otherMt.__index = {}
-		
+
 		local ok = pcall(function()
 			Copy:Extend(userdata, otherUserdata)
 		end)
-		
-		assert(not ok)
+
+		assert(not ok, DEFAULT_ERROR)
 	end,
-	
+
 	Arrays = function(Copy)
 		local completeArray = { "a", "b", "c" }
 		local array = { nil, "b", nil }
-		
+
 		Copy:Extend(array, completeArray)
 
-		assert(array[1] == "a" and array[2] == "b" and array[3] == "c")
+		assert(array[1] == "a", DEFAULT_ERROR)
+		assert(array[2] == "b", DEFAULT_ERROR)
+		assert(array[3] == "c", DEFAULT_ERROR)
 	end,
-	
+
 	Dictionaries = function(Copy)
 		local namespace = {}
 		function namespace.Method()
 			return "method"
 		end
-		
+
 		local otherNamespace = {}
 		function otherNamespace.OtherMethod()
 			return "other method"
 		end
-		
+
 		Copy:Extend(namespace, otherNamespace)
 
-		assert(namespace.OtherMethod ~= nil)
-		assert(namespace.OtherMethod() == "other method")
+		assert(namespace.OtherMethod ~= nil, DEFAULT_ERROR)
+		assert(namespace.OtherMethod() == "other method", DEFAULT_ERROR)
 	end,
-	
+
 	Metatables = function(Copy)
 		local someTable = setmetatable({}, { key = "value" })
 		local otherTable = setmetatable({}, { otherKey = "other value" })
-		
-		Copy.Flags.CopyMeta = true
+
 		Copy:Extend(otherTable, someTable)
 
 		local otherMt = getmetatable(otherTable)
-		assert(otherMt.key == "value")
-		assert(otherMt.otherKey == nil)
-	end,
-
-	CheckMetaFlagOn = function(Copy)
-		local mt = {}
-		local someTable = setmetatable({}, mt)
-		local otherTable = setmetatable({}, {})
-
-		Copy.Flags.CopyMeta = true
-		Copy:Extend(otherTable, someTable)
-
-		local otherMt = getmetatable(otherTable)
-		assert(otherMt ~= mt)
-	end,
-	CheckMetaFlagOff = function(Copy)
-		local mt = {}
-		local someTable = setmetatable({}, mt)
-		local otherTable = setmetatable({}, {})
-
-		Copy.Flags.CopyMeta = false
-		Copy:Extend(otherTable, someTable)
-
-		local otherMt = getmetatable(otherTable)
-		assert(otherMt == mt)
+		assert(otherMt.key == "value", DEFAULT_ERROR)
+		assert(otherMt.otherKey == nil, DEFAULT_ERROR)
 	end,
 
 	ExtendTwice = function(Copy)
@@ -96,11 +76,11 @@ return {
 
 		Copy:Extend(object, base, modifier, modifier2)
 
-		assert(object.objectKey == "object value")
-		assert(object.Key == "modified 2 value")
-		assert(object.BaseKey == "inherited value")
-		assert(object.ModKey == "extended value")
-		assert(object.Mod2Key == "extended 2 value")
+		assert(object.objectKey == "object value", DEFAULT_ERROR)
+		assert(object.Key == "modified 2 value", DEFAULT_ERROR)
+		assert(object.BaseKey == "inherited value", DEFAULT_ERROR)
+		assert(object.ModKey == "extended value", DEFAULT_ERROR)
+		assert(object.Mod2Key == "extended 2 value", DEFAULT_ERROR)
 	end,
 
 }

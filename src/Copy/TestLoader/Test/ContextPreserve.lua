@@ -7,7 +7,11 @@ return {
 			shared = {}
 		}
 
-		Copy:QueuePreserve(dict.shared)
+		Copy:ApplyContext(function(replace)
+			return {
+				shared = replace({ value = dict.shared })
+			}
+		end)
 		local newDict = Copy(dict)
 
 		assert(newDict.shared == dict.shared, DEFAULT_ERROR)
@@ -17,7 +21,11 @@ return {
 		local keyTable = {}
 		local someTable = { [keyTable] = 4 }
 
-		Copy:QueuePreserve(keyTable)
+		Copy:ApplyContext(function(replace)
+			return {
+				[keyTable] = replace({ key = keyTable })
+			}
+		end)
 		local newTable = Copy(someTable)
 
 		assert(newTable[keyTable] == 4, DEFAULT_ERROR)
@@ -25,16 +33,18 @@ return {
 
 	Metatables = function(Copy)
 		local obj = {}
-		local mt = {}
-		function mt:__index(k)
+		local meta = {}
+		function meta:__index(k)
 			return "indexed " .. tostring(self) ..  " with " .. k
 		end
-		setmetatable(obj, mt)
+		setmetatable(obj, meta)
 
-		Copy:QueuePreserve(mt)
+		Copy:ApplyContext(function(replace)
+			return setmetatable({}, replace({ value = meta }))
+		end)
 		local newObj = Copy(obj)
 
-		assert(getmetatable(newObj) == getmetatable(obj), DEFAULT_ERROR)
+		assert(getmetatable(newObj) == getmetatable(obj))
 	end,
 
 	MultipleValues = function(Copy)
@@ -44,16 +54,17 @@ return {
 			notShared = {}
 		}
 
-		Copy:QueuePreserve(someTable.shared, someTable.sharedToo)
+		Copy:ApplyContext(function(replace)
+			return {
+				shared = replace({ value = someTable.shared }),
+				sharedToo = replace({ value = someTable.sharedToo })
+			}
+		end)
 		local newTable = Copy(someTable)
 
 		assert(newTable.shared == someTable.shared, DEFAULT_ERROR)
 		assert(newTable.sharedToo == someTable.sharedToo, DEFAULT_ERROR)
 		assert(newTable.notShared ~= someTable.notShared, DEFAULT_ERROR)
-	end,
-
-	AvoidNil = function(Copy)
-		Copy:QueuePreserve(1, nil, 3)
 	end,
 
 }

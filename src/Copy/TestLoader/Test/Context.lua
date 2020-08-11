@@ -77,6 +77,7 @@ return {
 		local meta = { key = "value" }
 		local obj = setmetatable({}, meta)
 
+		Copy.GlobalBehavior.Meta = true
 		Copy:ApplyContext(function(replace)
 			return setmetatable({}, {
 				key = replace({ value = "some other value" })

@@ -32,11 +32,17 @@ function Test.MakeFactory(copy)
 	return function()
 		local newCopy = setmetatable({
 			Flags = setmetatable({
-				Flush = copy.Flags.Flush,
+				FlushTransform = copy.Flags.FlushTransform,
+				FlushContext = copy.Flags.FlushContext,
 				SetParent = copy.Flags.SetParent,
 			}, {
 				__newindex = getmetatable(copy.Flags).__newindex
 			}),
+			GlobalBehavior = {
+				Keys = false,
+				Values = true,
+				Meta = false,
+			},
 			Context = nil,
 			Transform = {},
 			NIL = newproxy(false),
@@ -48,6 +54,7 @@ function Test.MakeFactory(copy)
 			QueuePreserve = copy.QueuePreserve,
 			QueueDelete = copy.QueueDelete,
 			QueueForce = copy.QueueForce,
+			FlushTransform = copy.FlushTransform,
 			Flush = copy.Flush,
 		}, {
 			__call = getmetatable(copy).__call

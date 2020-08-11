@@ -12,7 +12,7 @@ return {
 			sub = {}
 		}
 
-		Copy.Flags.Flush = true
+		Copy.Flags.FlushTransform = true
 		local _ = Copy(dict)
 
 		assert( isEmpty(Copy.Transform) )
@@ -22,7 +22,7 @@ return {
 			sub = {}
 		}
 
-		Copy.Flags.Flush = false
+		Copy.Flags.FlushTransform = false
 		local _ = Copy(dict)
 
 		assert(not isEmpty(Copy.Transform))
@@ -34,7 +34,7 @@ return {
 			sub = {}
 		}
 
-		Copy.Flags.Flush = false
+		Copy.Flags.FlushTransform = false
 		local newSubTable = Copy(someTable.sub)
 		local newTable = Copy(someTable)
 

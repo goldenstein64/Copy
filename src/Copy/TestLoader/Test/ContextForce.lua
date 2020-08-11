@@ -4,7 +4,7 @@ return {
 		local key = newproxy(false)
 		local someTable = { [key] = "value" }
 
-		Copy.Flags.Flush = false
+		Copy.Flags.FlushTransform = false
 		Copy:ApplyContext(function(replace)
 			return {
 				[key] = replace({ key = Copy(key) })
@@ -28,7 +28,7 @@ return {
 			}
 		}
 
-		Copy.Flags.Flush = false
+		Copy.Flags.FlushTransform = false
 		Copy:ApplyContext(function(replace)
 			local newKey = Copy(key)
 			return {
@@ -52,7 +52,7 @@ return {
 		local meta = {}
 		local someTable = setmetatable({}, meta)
 
-		Copy.Flags.Flush = false
+		Copy.Flags.FlushTransform = false
 		Copy:ApplyContext(function(replace)
 			return setmetatable({}, replace({ value = Copy(meta) }))
 		end)

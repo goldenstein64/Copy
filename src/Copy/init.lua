@@ -40,19 +40,21 @@ local function getTransform(self, value)
 	end
 end
 
-local function searchForValue(self, context, returnType, value)
+local copyAny
+local function handleValue(self, context, returnType, behaviorScope, value)
 	local contextSuccess, contextCopy = getContext(self, context, returnType)
 	local transformSuccess, transformCopy = getTransform(self, value)
 	if contextSuccess then
-		return true, contextCopy
+		return contextCopy
 	elseif transformSuccess then
-		return true, transformCopy
+		return transformCopy
+	elseif self.GlobalBehavior[behaviorScope] then
+		return copyAny(self, context, value)
 	else
-		return false, nil
+		return value
 	end
 end
 
-local copyAny
 local function copyTable(self, context, oldTable, newTable)
 	newTable = newTable or {}
 	if self.Transform[oldTable] ~= nil then return newTable end
@@ -65,22 +67,11 @@ local function copyTable(self, context, oldTable, newTable)
 			context.current = subCurrent
 		end
 
-		local newKey
-		local success_k, copy_k = searchForValue(self, context, "key", k)
-		if success_k and copy_k ~= nil then
-			newKey = copy_k
-		else
+		local newKey = handleValue(self, context, "key", "Keys", k)
+		if newKey == nil then
 			newKey = k
 		end
-
-		local newValue
-		local success_v, copy_v = searchForValue(self, context, "value", v)
-		if success_v then
-			newValue = copy_v
-		else
-			newValue = copyAny(self, context, v)
-		end
-
+		local newValue = handleValue(self, context, "value", "Values", v)
 		rawset(newTable, newKey, newValue)
 	end
 
@@ -91,13 +82,7 @@ local function copyTable(self, context, oldTable, newTable)
 		if context.allowed then
 			context.current = metaCurrent
 		end
-		local newMeta
-		local success_meta, copy_meta = searchForValue(self, context, "value", meta)
-		if success_meta then
-			newMeta = copy_meta
-		else
-			newMeta = copyTable(self, context, meta)
-		end
+		local newMeta = handleValue(self, context, "value", "Meta", meta)
 		setmetatable(newTable, newMeta)
 	end
 
@@ -135,8 +120,11 @@ function copyAny(self, context, value)
 end
 
 local function attemptFlush(self)
-	if self.Flags.Flush then
-		self:Flush()
+	if self.Flags.FlushTransform then
+		self:FlushTransform()
+	end
+	if self.Flags.FlushContext then
+		self.Context = nil
 	end
 end
 
@@ -146,8 +134,14 @@ local allFlags = {}
 -- Module
 local Copy = {
 	Flags = {
-		Flush = true,
+		FlushTransform = true,
+		FlushContext = true,
 		SetParent = false,
+	},
+	GlobalBehavior = {
+		Keys = false,
+		Values = true,
+		Meta = false,
 	},
 	Transform = {},
 	Context = nil,
@@ -175,17 +169,11 @@ end
 function CopyMt:__call(value)
 	local context = {
 		allowed = type(self.Context) == "table",
-		current = self.Context
+		current = self.Context,
 	}
 	Instances.ApplyTransform(self, value)
 
-	local result
-	local success, copy = searchForValue(self, context, "value", value)
-	if success then
-		result = copy
-	else
-		result = copyAny(self, context, value)
-	end
+	local result = handleValue(self, context, "value", "Values", value)
 	attemptFlush(self)
 	return result
 end
@@ -194,9 +182,8 @@ function Copy:Extend(object, ...)
 	assert(type(object) == "table",
 		"`base` can only be of type 'table'")
 	local context = {
-		explored = {},
 		allowed = type(self.Context) == "table",
-		current = self.Context
+		current = self.Context,
 	}
 	for i = 1, select("#", ...) do
 		local modifier = select(i, ...)
@@ -246,10 +233,14 @@ function Copy:QueueForce(...)
 	end
 end
 
-function Copy:Flush()
+function Copy:FlushTransform()
 	for value in pairs(self.Transform) do
 		rawset(self.Transform, value, nil)
 	end
+end
+
+function Copy:Flush()
+	self:FlushTransform()
 	self.Context = nil
 end
 

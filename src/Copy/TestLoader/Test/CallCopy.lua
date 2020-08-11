@@ -70,7 +70,7 @@ return {
 
 		assert(newDict[key] == "value") --> Retains keys
 
-		assert(getmetatable(dict) ~= getmetatable(newDict)) --> Copies metatables
+		assert(getmetatable(dict) == getmetatable(newDict)) --> Retains metatables
 		assert(newDict.fakeMember == "does not exist!") --> Retains metamethods
 
 		assert(dict.userdata ~= newDict.userdata) --> Copies userdatas

@@ -1,7 +1,7 @@
 local ITER = 10_000
 
 -- removing 1 iteration because TestLoader implementation
-local NESTED_ITER = 8_186
+local NESTED_ITER = 5_458
 
 return {
 

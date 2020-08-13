@@ -144,51 +144,6 @@ return {
 		end
 	end,
 
-	-- Preserving hierarchy among Instances
-	InstanceHierarchy = function(Copy)
-		local folder = Instance.new("Folder")
-		local someTable = {
-			folder = folder,
-			part = Instance.new("Part")
-		}
-		someTable.part.Parent = folder
-
-		local newTable = Copy(someTable)
-
-		assert(newTable.folder.Part == newTable.part)
-	end,
-
-	TransformSafeguard = function(Copy)
-		Copy.Transform["value"] = "other value"
-
-		local newTransform = Copy(Copy.Transform)
-
-		assert(newTransform["value"] == nil)
-	end,
-
-	-- for Copy:Extend
-	TransformSafeguardAcross = function(Copy)
-		Copy.Transform["value"] = "other value"
-		local newTransform = {
-			["different value"] = "separate value"
-		}
-
-		Copy:Extend(newTransform, Copy.Transform)
-
-		assert(newTransform["value"] == nil)
-	end,
-
-	-- proper Transform duplication
-	TransformSafeguardBypass = function(Copy)
-		Copy.Transform["value"] = "other value"
-
-		local oldTransform
-		Copy.Transform, oldTransform = {}, Copy.Transform
-		local newTransform = Copy(oldTransform)
-
-		assert(newTransform["value"] == "other value")
-	end,
-
 	Cyclic = function(Copy)
 		local someTable = {}
 		someTable.cyclic = someTable

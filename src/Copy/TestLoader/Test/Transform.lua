@@ -3,6 +3,7 @@ return {
 	Values = function(Copy)
 		local array = { "value" }
 
+		Copy.GlobalBehavior.Values = true
 		Copy.Transform["value"] = "some other value"
 		local newArray = Copy(array)
 
@@ -12,6 +13,7 @@ return {
 	Keys = function(Copy)
 		local dict = { key = "value" }
 
+		Copy.GlobalBehavior.Keys = true
 		Copy.Transform["key"] = "someOtherKey"
 		local newDict = Copy(dict)
 
@@ -33,6 +35,7 @@ return {
 		local someTable = setmetatable({ Value = 3 }, addMeta)
 		local otherTable = { Value = 8 }
 
+		Copy.GlobalBehavior.Meta = true
 		Copy.Transform[addMeta] = otherMeta
 		local newTable = Copy(someTable)
 
@@ -64,11 +67,42 @@ return {
 		local dict = {
 			shared = {}
 		}
-
+		
 		Copy.Transform[dict.shared] = dict.shared
 		local newDict = Copy(dict)
 
 		assert(newDict.shared == dict.shared)
+	end,
+
+	Safeguard = function(Copy)
+		Copy.Transform["value"] = "other value"
+
+		local newTransform = Copy(Copy.Transform)
+
+		assert(newTransform["value"] == nil)
+	end,
+
+	-- for Copy:Extend
+	SafeguardExtend = function(Copy)
+		Copy.Transform["value"] = "other value"
+		local newTransform = {
+			["different value"] = "separate value"
+		}
+
+		Copy:Extend(newTransform, Copy.Transform)
+
+		assert(newTransform["value"] == nil)
+	end,
+
+	-- proper Transform duplication
+	SafeguardBypass = function(Copy)
+		Copy.Transform["value"] = "other value"
+
+		local oldTransform
+		Copy.Transform, oldTransform = {}, Copy.Transform
+		local newTransform = Copy(oldTransform)
+
+		assert(newTransform["value"] == "other value")
 	end,
 
 }

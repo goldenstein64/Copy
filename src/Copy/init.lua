@@ -40,16 +40,21 @@ local function getTransform(self, value)
 	end
 end
 
-local copyAny
+local switchCopy
 local function handleValue(self, context, returnType, behaviorScope, value)
 	local contextSuccess, contextCopy = getContext(self, context, returnType)
-	local transformSuccess, transformCopy = getTransform(self, value)
 	if contextSuccess then
 		return contextCopy
-	elseif transformSuccess then
-		return transformCopy
 	elseif self.GlobalBehavior[behaviorScope] then
-		return copyAny(self, context, value)
+		local transformSuccess, transformCopy = getTransform(self, value)
+		local handler = switchCopy[typeof(value)]
+		if transformSuccess then
+			return transformCopy
+		elseif handler then
+			return handler(self, context, value)
+		else
+			return value 
+		end
 	else
 		return value
 	end
@@ -57,7 +62,7 @@ end
 
 local function copyTable(self, context, oldTable, newTable)
 	newTable = newTable or {}
-	if self.Transform[oldTable] ~= nil then return newTable end
+	if oldTable == self.Transform then return newTable end
 	self.Transform[oldTable] = newTable
 	local lastCurrent, lastAllowed = context.current, context.allowed
 	for k, v in pairs(oldTable) do
@@ -109,15 +114,11 @@ local function copyRandom(self, _, random)
 	return newRandom
 end
 
-local switchCopy = {
+switchCopy = {
 	table = copyTable,
 	userdata = copyUserdata,
 	Random = copyRandom
 }
-function copyAny(self, context, value)
-	local handler = switchCopy[typeof(value)]
-	return handler and handler(self, context, value) or value
-end
 
 local function attemptFlush(self)
 	if self.Flags.FlushTransform then
@@ -196,17 +197,9 @@ function Copy:Extend(object, ...)
 	return object
 end
 
-function Copy:Replace(dict)
+function Copy:repl(dict)
 	dict[self.Tag] = true
 	return dict
-end
-
-function Copy:ApplyContext(modifier)
-	local function context(dict)
-		return self:Replace(dict)
-	end
-
-	self.Context = modifier(context)
 end
 
 function Copy:QueuePreserve(...)

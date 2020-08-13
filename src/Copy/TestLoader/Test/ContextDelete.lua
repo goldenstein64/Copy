@@ -4,11 +4,9 @@ return {
 		local someVar = newproxy(false)
 		local someTable = { key = someVar }
 
-		Copy:ApplyContext(function(replace)
-			return {
-				key = replace({ value = Copy.NIL })
-			}
-		end)
+		Copy.Context = {
+			key = Copy:repl{ value = Copy.NIL }
+		}
 		local newTable = Copy(someTable)
 
 		assert(newTable.key == nil)
@@ -19,9 +17,9 @@ return {
 		local someMeta = {}
 		setmetatable(someTable, someMeta)
 
-		Copy:ApplyContext(function(replace)
-			return setmetatable({}, replace({ value = Copy.NIL }))
-		end)
+		Copy.Context = setmetatable({}, 
+			Copy:repl{ value = Copy.NIL }
+		)
 		local newTable = Copy(someTable)
 
 		assert(getmetatable(newTable) == nil)
@@ -31,11 +29,9 @@ return {
 	DeleteKeySafeguard = function(Copy)
 		local someTable = { key = "value" }
 
-		Copy:ApplyContext(function(replace)
-			return {
-				key = replace({ key = Copy.NIL })
-			}
-		end)
+		Copy.Context = {
+			key = Copy:repl{ key = Copy.NIL }
+		}
 		local newTable = Copy(someTable)
 
 		assert(newTable.key == "value")

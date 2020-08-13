@@ -7,7 +7,7 @@ end
 return {
 
 	-- Flush
-	FlushOn = function(Copy)
+	FlushTransformOn = function(Copy)
 		local dict = {
 			sub = {}
 		}
@@ -17,7 +17,7 @@ return {
 
 		assert( isEmpty(Copy.Transform) )
 	end,
-	FlushOff = function(Copy)
+	FlushTransformOff = function(Copy)
 		local dict = {
 			sub = {}
 		}
@@ -29,7 +29,7 @@ return {
 	end,
 
 	-- relationship between tables and subtables
-	FlushRelation = function(Copy)
+	FlushTransformRelation = function(Copy)
 		local someTable = {
 			sub = {}
 		}
@@ -39,6 +39,26 @@ return {
 		local newTable = Copy(someTable)
 
 		assert(newTable.sub == newSubTable)
+	end,
+
+	FlushContextOn = function(Copy)
+		local someTable = {}
+
+		Copy.Flags.FlushContext = true
+		Copy.Context = Copy:repl{ value = 2 }
+		local _2 = Copy(someTable)
+
+		assert(Copy.Context == nil)
+	end,
+
+	FlushContextOff = function(Copy)
+		local someTable = {}
+
+		Copy.Flags.FlushContext = false
+		Copy.Context = Copy:repl{ value = 2 }
+		local _2 = Copy(someTable)
+
+		assert(Copy.Context ~= nil)
 	end,
 
 	-- SetParent

@@ -4,6 +4,7 @@ return {
 		local someVar = newproxy(false)
 		local someTable = { key = someVar }
 
+		Copy.GlobalBehavior.Values = true
 		Copy:QueueDelete(someVar)
 		local newTable = Copy(someTable)
 
@@ -15,6 +16,7 @@ return {
 		local someMeta = {}
 		setmetatable(someTable, someMeta)
 
+		Copy.GlobalBehavior.Meta = true
 		Copy:QueueDelete(someMeta)
 		local newTable = Copy(someTable)
 
@@ -25,6 +27,7 @@ return {
 	DeleteKeySafeguard = function(Copy)
 		local someTable = { key = "value" }
 
+		Copy.GlobalBehavior.Keys = true
 		Copy:QueueDelete("key")
 		local newTable = Copy(someTable)
 

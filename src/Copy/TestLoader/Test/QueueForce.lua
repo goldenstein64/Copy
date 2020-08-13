@@ -4,6 +4,7 @@ return {
 		local key = newproxy(false)
 		local someTable = { [key] = "value" }
 
+		Copy.GlobalBehavior.Keys = true
 		Copy.Flags.FlushTransform = false
 		Copy:QueueForce(key)
 		local newTable = Copy(someTable)
@@ -24,6 +25,7 @@ return {
 			}
 		}
 
+		Copy.GlobalBehavior.Keys = true
 		Copy.Flags.FlushTransform = false
 		Copy:QueueForce(key)
 		local newTable = Copy(someTable)
@@ -38,6 +40,7 @@ return {
 		local meta = {}
 		local someTable = setmetatable({}, meta)
 
+		Copy.GlobalBehavior.Meta = true
 		Copy.Flags.FlushTransform = false
 		Copy:QueueForce(meta)
 		local newTable = Copy(someTable)

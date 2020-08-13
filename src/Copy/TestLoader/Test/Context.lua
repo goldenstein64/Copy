@@ -3,11 +3,9 @@ return {
 	Values = function(Copy)
 		local array = { "value" }
 
-		Copy:ApplyContext(function(replace)
-			return {
-				replace({ value = "some other value" })
-			}
-		end)
+		Copy.Context = {
+			Copy:repl{ value = "some other value" }
+		}
 		local newArray = Copy(array)
 
 		assert(newArray[1] == "some other value")
@@ -16,11 +14,9 @@ return {
 	Keys = function(Copy)
 		local dict = { key = "value" }
 
-		Copy:ApplyContext(function(replace)
-			return {
-				key = replace({ key = "someOtherKey" })
-			}
-		end)
+		Copy.Context = {
+			key = Copy:repl{ key = "someOtherKey" }
+		}
 		local newDict = Copy(dict)
 
 		assert(newDict.key == nil)
@@ -40,12 +36,12 @@ return {
 		}
 		local someTable = setmetatable({ Value = 3 }, addMeta)
 		local otherTable = { Value = 8 }
-
-		Copy:ApplyContext(function(replace)
-			return setmetatable({}, replace({ value = otherMeta }))
-		end)
+		
+		Copy.Context = setmetatable({},
+			Copy:repl{ value = otherMeta }
+		)
 		local newTable = Copy(someTable)
-
+		
 		assert(someTable + otherTable == 11)
 		-- 2 * (   3     +     8    ) == 22
 		assert(newTable + otherTable == 22)
@@ -60,13 +56,11 @@ return {
 			key = "value"
 		}
 
-		Copy:ApplyContext(function(replace)
-			return {
-				sub = {
-					key = replace({ value = "some other value"})
-				}
+		Copy.Context = {
+			sub = {
+				key = Copy:repl{ value = "some other value" }
 			}
-		end)
+		}
 		local newObj = Copy(obj)
 
 		assert(newObj.key == "value")
@@ -78,11 +72,9 @@ return {
 		local obj = setmetatable({}, meta)
 
 		Copy.GlobalBehavior.Meta = true
-		Copy:ApplyContext(function(replace)
-			return setmetatable({}, {
-				key = replace({ value = "some other value" })
-			})
-		end)
+		Copy.Context = setmetatable({}, {
+			key = Copy:repl{ value = "some other value" }
+		})
 		local newObj = Copy(obj)
 
 		assert(getmetatable(newObj).key == "some other value")
@@ -94,28 +86,15 @@ return {
 			shared = {}
 		}
 
-		Copy:ApplyContext(function(replace)
-			return {
-				shared = replace({ value = dict.shared })
-			}
-		end)
+		Copy.Context = {
+			shared = Copy:repl{ value = dict.shared }
+		}
 		local newDict = Copy(dict)
 
 		assert(newDict.shared == dict.shared)
 	end,
 
 	AltValues = function(Copy)
-		local array = { "value" }
-
-		Copy.Context = {
-			Copy:Replace({ value = "some other value" })
-		}
-		local newArray = Copy(array)
-
-		assert(newArray[1] == "some other value")
-	end,
-
-	AltValues2 = function(Copy)
 		local array = { "value" }
 
 		Copy.Context = {

@@ -5,11 +5,9 @@ return {
 			shared = {}
 		}
 
-		Copy:ApplyContext(function(replace)
-			return {
-				shared = replace({ value = dict.shared })
-			}
-		end)
+		Copy.Context = {
+			shared = Copy:repl{ value = dict.shared }
+		}
 		local newDict = Copy(dict)
 
 		assert(newDict.shared == dict.shared)
@@ -19,11 +17,9 @@ return {
 		local keyTable = {}
 		local someTable = { [keyTable] = 4 }
 
-		Copy:ApplyContext(function(replace)
-			return {
-				[keyTable] = replace({ key = keyTable })
-			}
-		end)
+		Copy.Context = {
+			[keyTable] = Copy:repl{ key = keyTable }
+		}
 		local newTable = Copy(someTable)
 
 		assert(newTable[keyTable] == 4)
@@ -37,9 +33,9 @@ return {
 		end
 		setmetatable(obj, meta)
 
-		Copy:ApplyContext(function(replace)
-			return setmetatable({}, replace({ value = meta }))
-		end)
+		Copy.Context = setmetatable({}, 
+			Copy:repl{ value = meta }
+		)
 		local newObj = Copy(obj)
 
 		assert(getmetatable(newObj) == getmetatable(obj))
@@ -52,12 +48,10 @@ return {
 			notShared = {}
 		}
 
-		Copy:ApplyContext(function(replace)
-			return {
-				shared = replace({ value = someTable.shared }),
-				sharedToo = replace({ value = someTable.sharedToo })
-			}
-		end)
+		Copy.Context = {
+			shared = Copy:repl{ value = someTable.shared },
+			sharedToo = Copy:repl{ value = someTable.sharedToo }
+		}
 		local newTable = Copy(someTable)
 
 		assert(newTable.shared == someTable.shared)

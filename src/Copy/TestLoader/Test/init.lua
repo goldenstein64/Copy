@@ -4,7 +4,9 @@ local Test = {
 	AllTests = {}
 }
 local testMt = {}
+local allTestsMt = {}
 setmetatable(Test, testMt)
+setmetatable(Test.AllTests, allTestsMt)
 
 -- Setup
 for _, mod in ipairs(script:GetChildren()) do
@@ -18,14 +20,14 @@ for _, mod in ipairs(script:GetChildren()) do
 end
 
 -- Public Functions
-function Test.PrintTests()
-	local result = "RUNNING_TESTS = {\n"
-	for name, array in pairs(Test.AllTests) do
+function allTestsMt:__tostring()
+	local result = "{\n"
+	for name, array in pairs(self) do
 		local formatString = "\t%s = {\n" .. string.rep("\t\t%q,\n", #array) .. "\t},\n"
 		result ..= string.format(formatString, name, table.unpack(array))
 	end
 	result ..= "}"
-	print(result)
+	return result
 end
 
 function Test.MakeFactory(copy)
@@ -39,17 +41,16 @@ function Test.MakeFactory(copy)
 				__newindex = getmetatable(copy.Flags).__newindex
 			}),
 			GlobalBehavior = {
-				Keys = false,
-				Values = true,
-				Meta = false,
+				Keys = copy.GlobalBehavior.Keys,
+				Values = copy.GlobalBehavior.Values,
+				Meta = copy.GlobalBehavior.Meta,
 			},
 			Context = nil,
 			Transform = {},
 			NIL = newproxy(false),
 			Tag = newproxy(false),
 
-			Replace = copy.Replace,
-			ApplyContext = copy.ApplyContext,
+			repl = copy.repl,
 			Extend = copy.Extend,
 			QueuePreserve = copy.QueuePreserve,
 			QueueDelete = copy.QueueDelete,

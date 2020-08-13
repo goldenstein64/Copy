@@ -5,11 +5,9 @@ return {
 		local someTable = { [key] = "value" }
 
 		Copy.Flags.FlushTransform = false
-		Copy:ApplyContext(function(replace)
-			return {
-				[key] = replace({ key = Copy(key) })
-			}
-		end)
+		Copy.Context = {
+			[key] = Copy:repl{ key = Copy(key) }
+		}
 		local newTable = Copy(someTable)
 		local newKey = Copy.Transform[key]
 
@@ -29,23 +27,21 @@ return {
 		}
 
 		Copy.Flags.FlushTransform = false
-		Copy:ApplyContext(function(replace)
-			local newKey = Copy(key)
-			return {
-				{
-					[key] = replace({ key = newKey })
-				},
-				{
-					[key] = replace({ key = newKey })
-				}
+		local newKey = Copy(key)
+		Copy.Context = {
+			{
+				[key] = Copy:repl{ key = newKey }
+			},
+			{
+				[key] = Copy:repl{ key = newKey }
 			}
-		end)
+		}
 		local newTable = Copy(someTable)
-		local newKey = Copy.Transform[key]
+		local newKey2 = Copy.Transform[key]
 
-		assert(newKey ~= key)
-		assert(newTable[1][newKey] == "value 1")
-		assert(newTable[2][newKey] == "value 2")
+		assert(newKey2 ~= key)
+		assert(newTable[1][newKey2] == "value 1")
+		assert(newTable[2][newKey2] == "value 2")
 	end,
 
 	ForceMeta = function(Copy)
@@ -53,9 +49,9 @@ return {
 		local someTable = setmetatable({}, meta)
 
 		Copy.Flags.FlushTransform = false
-		Copy:ApplyContext(function(replace)
-			return setmetatable({}, replace({ value = Copy(meta) }))
-		end)
+		Copy.Context = setmetatable({}, 
+			Copy:repl{ value = Copy(meta) }
+		)
 		local newTable = Copy(someTable)
 		local newMeta = getmetatable(newTable)
 		local newMeta2 = Copy.Transform[meta]

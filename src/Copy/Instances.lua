@@ -75,7 +75,7 @@ function indexSubTable(state, tabl)
 			indexSubValue(state, v)
 		end
 	end
-	
+
 	local metaCurrent = getmetatable(lastCurrent)
 	state.Context.allowed = lastAllowed and metaCurrent ~= nil
 	if state.Context.allowed then

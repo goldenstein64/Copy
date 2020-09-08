@@ -53,7 +53,7 @@ local function handleValue(self, context, returnType, behaviorScope, value)
 		elseif handler then
 			return handler(self, context, value)
 		else
-			return value 
+			return value
 		end
 	else
 		return value

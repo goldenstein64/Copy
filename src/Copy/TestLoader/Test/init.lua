@@ -47,9 +47,9 @@ function Test.MakeFactory(copy)
 			Transform = {},
 
 			NIL = newproxy(false),
-			struct = newproxy(false),
 
 			Extend = copy.Extend,
+			Struct = copy.Struct,
 			Flush = copy.Flush,
 		}, {
 			__call = getmetatable(copy).__call

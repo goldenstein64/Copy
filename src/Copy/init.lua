@@ -66,9 +66,9 @@ function switchCopy.table(self, oldTable, newTable)
 		end
 
 		local newTableValue = rawget(newTable, k)
-		local isStruct = type(v) == "table" and rawget(v, self.struct)
+		local isStruct = type(v) == "table" and rawget(v, self.Struct)
 		if isStruct then
-			rawset(v, self.struct, nil)
+			rawset(v, self.Struct, nil)
 			handle.Values(self, v, newTableValue)
 		else
 			local newValue = handle.Values(self, v)
@@ -79,9 +79,9 @@ function switchCopy.table(self, oldTable, newTable)
 	local meta = getmetatable(oldTable)
 	local newTableMeta = getmetatable(newTable)
 	if type(meta) == "table" then
-		local isStruct = rawget(meta, self.struct)
+		local isStruct = rawget(meta, self.Struct)
 		if isStruct then
-			rawset(newTableMeta, self.struct, nil)
+			rawset(newTableMeta, self.Struct, nil)
 			handle.Meta(self, meta, newTableMeta)
 		else
 			local newMeta = handle.Meta(self, meta, newTableMeta)
@@ -132,8 +132,7 @@ local Copy = {
 	},
 	Transform = {},
 
-	NIL = newproxy(false),
-	struct = newproxy(false),
+	NIL = newproxy(false)
 }
 local CopyMt = {}
 local flagsMt = {}
@@ -153,7 +152,6 @@ end
 
 -- Public Functions
 function CopyMt:__call(value)
-
 	Instances.ApplyTransform(self, value)
 	local result = handle.Values(self, value)
 	attemptFlush(self)
@@ -177,6 +175,11 @@ function Copy:Extend(object, ...)
 	attemptFlush(self)
 
 	return object
+end
+
+function Copy:Struct(value)
+	value[self.Struct] = true
+	return value
 end
 
 function Copy:Flush()

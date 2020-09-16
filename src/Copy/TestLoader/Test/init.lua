@@ -45,6 +45,7 @@ function Test.MakeFactory(copy)
 				Meta = copy.GlobalBehavior.Meta,
 			},
 			Transform = {},
+			StructMap = {},
 
 			NIL = newproxy(false),
 

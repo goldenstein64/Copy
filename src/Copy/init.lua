@@ -65,28 +65,24 @@ function switchCopy.table(self, oldTable, newTable)
 			newKey = k
 		end
 
-		local newTableValue = rawget(newTable, k)
-		local isStruct = type(v) == "table" and rawget(v, self.Struct)
-		if isStruct then
-			rawset(v, self.Struct, nil)
-			handle.Values(self, v, newTableValue)
+		local newValue
+		if self.StructMap[v] then
+			newValue = handle.Values(self, v, rawget(newTable, k))
 		else
-			local newValue = handle.Values(self, v)
-			rawset(newTable, newKey, newValue)
+			newValue = handle.Values(self, v)
 		end
+		rawset(newTable, newKey, newValue)
 	end
 
 	local meta = getmetatable(oldTable)
-	local newTableMeta = getmetatable(newTable)
 	if type(meta) == "table" then
-		local isStruct = rawget(meta, self.Struct)
-		if isStruct then
-			rawset(newTableMeta, self.Struct, nil)
-			handle.Meta(self, meta, newTableMeta)
+		local newMeta
+		if self.StructMap[meta] then
+			newMeta = handle.Meta(self, meta, getmetatable(newTable))
 		else
-			local newMeta = handle.Meta(self, meta, newTableMeta)
-			setmetatable(newTable, newMeta)
+			newMeta = handle.Meta(self, meta)
 		end
+		setmetatable(newTable, newMeta)
 	end
 
 	return newTable
@@ -111,6 +107,9 @@ function switchCopy.Random(self, random)
 end
 
 local function attemptFlush(self)
+	for k in pairs(self.StructMap) do
+		rawset(self.StructMap, k, nil)
+	end
 	if self.Flags.FlushTransform then
 		self:Flush()
 	end
@@ -131,6 +130,7 @@ local Copy = {
 		Meta = false,
 	},
 	Transform = {},
+	StructMap = {},
 
 	NIL = newproxy(false)
 }
@@ -178,7 +178,7 @@ function Copy:Extend(object, ...)
 end
 
 function Copy:Struct(value)
-	value[self.Struct] = true
+	self.StructMap[value] = true
 	return value
 end
 

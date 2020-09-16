@@ -1,7 +1,6 @@
-local ITER = 10_000
-
 -- removing 1 iteration because TestLoader implementation
-local NESTED_ITER = 8_186
+local NESTED_ITER = 8_187 - 1
+local ITER = NESTED_ITER
 
 return {
 
@@ -70,7 +69,7 @@ return {
 		return "Userdatas", string.format("%.6f", finish)
 	end,
 
-	-- Nested stress test
+	--[ Nested stress test
 	NestedTables = function(Copy)
 		local someTable = {} do
 			local current = someTable
@@ -96,6 +95,7 @@ return {
 
 		return "NestedTables", string.format("%.6f", finish)
 	end,
+	--]]
 
 	-- Identical subtables
 	IdenticalTables = function(Copy)

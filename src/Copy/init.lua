@@ -16,20 +16,6 @@ ver 1
 local Instances = require(script.Instances)
 
 -- Private Functions
-local function getContext(self, context, returnType)
-	if context.allowed and rawget(context.current, self.Tag) ~= nil then
-		local result = rawget(context.current, returnType)
-
-		if result == self.NIL then
-			return true, nil
-		else
-			return result ~= nil, result
-		end
-	else
-		return false, nil
-	end
-end
-
 local function getTransform(self, value)
 	local result = rawget(self.Transform, value)
 
@@ -40,92 +26,93 @@ local function getTransform(self, value)
 	end
 end
 
-local switchCopy
-local function handleValue(self, context, returnType, behaviorScope, value)
-	local contextSuccess, contextCopy = getContext(self, context, returnType)
-	if contextSuccess then
-		return contextCopy
-	elseif self.GlobalBehavior[behaviorScope] then
-		local transformSuccess, transformCopy = getTransform(self, value)
-		local handler = switchCopy[typeof(value)]
-		if transformSuccess then
-			return transformCopy
-		elseif handler then
-			return handler(self, context, value)
+local switchCopy = {}
+
+local handle = {}
+
+for _, behaviorScope in ipairs{"Values", "Keys", "Meta"} do
+	handle[behaviorScope] = function(self, value, newValue)
+		if self.GlobalBehavior[behaviorScope] then
+			local transformSuccess, transformCopy = getTransform(self, value)
+			local handler = switchCopy[typeof(value)]
+			if transformSuccess then
+				return transformCopy
+			elseif handler then
+				if newValue == nil or typeof(value) ~= typeof(newValue) then
+					return handler(self, value)
+				else
+					return handler(self, value, newValue)
+				end
+			else
+				return value
+			end
 		else
 			return value
 		end
-	else
-		return value
 	end
 end
 
-local function copyTable(self, context, oldTable, newTable)
-	newTable = newTable or {}
+function switchCopy.table(self, oldTable, newTable)
+	if newTable == nil then
+		newTable = {}
+	end
 	if oldTable == self.Transform then return newTable end
 	self.Transform[oldTable] = newTable
-	local lastCurrent, lastAllowed = context.current, context.allowed
-	for k, v in pairs(oldTable) do
-		local subCurrent = lastAllowed and rawget(lastCurrent, k)
-		context.allowed = lastAllowed and subCurrent ~= nil
-		if context.allowed then
-			context.current = subCurrent
-		end
 
-		local newKey = handleValue(self, context, "key", "Keys", k)
+	for k, v in pairs(oldTable) do
+		local newKey = handle.Keys(self, k)
 		if newKey == nil then
 			newKey = k
 		end
-		local newValue = handleValue(self, context, "value", "Values", v)
-		rawset(newTable, newKey, newValue)
+
+		local newTableValue = rawget(newTable, k)
+		local isStruct = type(v) == "table" and rawget(v, self.struct)
+		if isStruct then
+			rawset(v, self.struct, nil)
+			handle.Values(self, v, newTableValue)
+		else
+			local newValue = handle.Values(self, v)
+			rawset(newTable, newKey, newValue)
+		end
 	end
 
 	local meta = getmetatable(oldTable)
+	local newTableMeta = getmetatable(newTable)
 	if type(meta) == "table" then
-		local metaCurrent = lastAllowed and getmetatable(lastCurrent)
-		context.allowed = lastAllowed and metaCurrent ~= nil
-		if context.allowed then
-			context.current = metaCurrent
+		local isStruct = rawget(meta, self.struct)
+		if isStruct then
+			rawset(newTableMeta, self.struct, nil)
+			handle.Meta(self, meta, newTableMeta)
+		else
+			local newMeta = handle.Meta(self, meta, newTableMeta)
+			setmetatable(newTable, newMeta)
 		end
-		local newMeta = handleValue(self, context, "value", "Meta", meta)
-		setmetatable(newTable, newMeta)
 	end
-
-	context.current, context.allowed = lastCurrent, lastAllowed
 
 	return newTable
 end
 
-local function copyUserdata(self, context, userdata)
+function switchCopy.userdata(self, userdata)
 	local meta = getmetatable(userdata)
 	local hasMeta = type(meta) == "table"
 	local newUserdata = newproxy(hasMeta)
 	self.Transform[userdata] = newUserdata
 	if hasMeta then
 		local newMeta = getmetatable(newUserdata)
-		copyTable(self, context, meta, newMeta)
+		switchCopy.table(self, meta, newMeta)
 	end
 	return newUserdata
 end
 
-local function copyRandom(self, _, random)
+function switchCopy.Random(self, random)
 	local newRandom = random:Clone()
 	self.Transform[random] = newRandom
 	return newRandom
 end
 
-switchCopy = {
-	table = copyTable,
-	userdata = copyUserdata,
-	Random = copyRandom
-}
-
 local function attemptFlush(self)
 	if self.Flags.FlushTransform then
-		self:FlushTransform()
-	end
-	if self.Flags.FlushContext then
-		self.Context = nil
+		self:Flush()
 	end
 end
 
@@ -136,7 +123,6 @@ local allFlags = {}
 local Copy = {
 	Flags = {
 		FlushTransform = true,
-		FlushContext = true,
 		SetParent = false,
 	},
 	GlobalBehavior = {
@@ -145,10 +131,9 @@ local Copy = {
 		Meta = false,
 	},
 	Transform = {},
-	Context = nil,
 
 	NIL = newproxy(false),
-	Tag = newproxy(false),
+	struct = newproxy(false),
 }
 local CopyMt = {}
 local flagsMt = {}
@@ -168,73 +153,36 @@ end
 
 -- Public Functions
 function CopyMt:__call(value)
-	local context = {
-		allowed = type(self.Context) == "table",
-		current = self.Context,
-	}
-	Instances.ApplyTransform(self, value)
 
-	local result = handleValue(self, context, "value", "Values", value)
+	Instances.ApplyTransform(self, value)
+	local result = handle.Values(self, value)
 	attemptFlush(self)
+
 	return result
 end
 
 function Copy:Extend(object, ...)
 	assert(type(object) == "table",
 		"`base` can only be of type 'table'")
-	local context = {
-		allowed = type(self.Context) == "table",
-		current = self.Context,
-	}
+
 	for i = 1, select("#", ...) do
 		local modifier = select(i, ...)
-		assert(type(modifier) == "table", 
+		assert(type(modifier) == "table",
 			"All modifier arguments provided can only be of type 'table'")
+
 		Instances.ApplyTransform(self, modifier)
-		copyTable(self, context, modifier, object)
+		switchCopy.table(self, modifier, object)
+
 	end
 	attemptFlush(self)
+
 	return object
 end
 
-function Copy:repl(dict)
-	dict[self.Tag] = true
-	return dict
-end
-
-function Copy:QueuePreserve(...)
-	for i = 1, select("#", ...) do
-		local value = select(i, ...)
-		if value == nil then continue end
-		rawset(self.Transform, value, value)
-	end
-end
-
-function Copy:QueueDelete(...)
-	for i = 1, select("#", ...) do
-		local value = select(i, ...)
-		if value == nil then continue end
-		rawset(self.Transform, value, self.NIL)
-	end
-end
-
-function Copy:QueueForce(...)
-	for i = 1, select("#", ...) do
-		local value = select(i, ...)
-		if value == nil then continue end
-		rawset(self.Transform, value, CopyMt.__call(self, value))
-	end
-end
-
-function Copy:FlushTransform()
+function Copy:Flush()
 	for value in pairs(self.Transform) do
 		rawset(self.Transform, value, nil)
 	end
-end
-
-function Copy:Flush()
-	self:FlushTransform()
-	self.Context = nil
 end
 
 return Copy

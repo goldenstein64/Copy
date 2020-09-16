@@ -35,7 +35,6 @@ function Test.MakeFactory(copy)
 		local newCopy = setmetatable({
 			Flags = setmetatable({
 				FlushTransform = copy.Flags.FlushTransform,
-				FlushContext = copy.Flags.FlushContext,
 				SetParent = copy.Flags.SetParent,
 			}, {
 				__newindex = getmetatable(copy.Flags).__newindex
@@ -45,17 +44,12 @@ function Test.MakeFactory(copy)
 				Values = copy.GlobalBehavior.Values,
 				Meta = copy.GlobalBehavior.Meta,
 			},
-			Context = nil,
 			Transform = {},
-			NIL = newproxy(false),
-			Tag = newproxy(false),
 
-			repl = copy.repl,
+			NIL = newproxy(false),
+			struct = newproxy(false),
+
 			Extend = copy.Extend,
-			QueuePreserve = copy.QueuePreserve,
-			QueueDelete = copy.QueueDelete,
-			QueueForce = copy.QueueForce,
-			FlushTransform = copy.FlushTransform,
 			Flush = copy.Flush,
 		}, {
 			__call = getmetatable(copy).__call

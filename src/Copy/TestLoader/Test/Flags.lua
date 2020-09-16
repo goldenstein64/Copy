@@ -41,26 +41,6 @@ return {
 		assert(newTable.sub == newSubTable)
 	end,
 
-	FlushContextOn = function(Copy)
-		local someTable = {}
-
-		Copy.Flags.FlushContext = true
-		Copy.Context = Copy:repl{ value = 2 }
-		local _2 = Copy(someTable)
-
-		assert(Copy.Context == nil)
-	end,
-
-	FlushContextOff = function(Copy)
-		local someTable = {}
-
-		Copy.Flags.FlushContext = false
-		Copy.Context = Copy:repl{ value = 2 }
-		local _2 = Copy(someTable)
-
-		assert(Copy.Context ~= nil)
-	end,
-
 	-- SetParent
 	SetParentOn = function(Copy)
 		local array = {}

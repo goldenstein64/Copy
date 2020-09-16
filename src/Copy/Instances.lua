@@ -1,18 +1,4 @@
 -- Private Functions
-local function getContext(copy, context, returnType)
-	if context.allowed and rawget(context.current, copy.Tag) then
-		local result = context.current[returnType]
-
-		if result == copy.NIL then
-			return true, nil
-		else
-			return result ~= nil, result
-		end
-	else
-		return false, nil
-	end
-end
-
 local function getTransform(copy, value)
 	local result = copy.Transform[value]
 
@@ -21,13 +7,6 @@ local function getTransform(copy, value)
 	else
 		return result ~= nil, result
 	end
-end
-
-local function searchForValue(copy, context, returnType, value)
-	local contextSuccess = getContext(copy, context, returnType)
-	local transformSuccess = getTransform(copy, value)
-
-	return contextSuccess or transformSuccess
 end
 
 local function safeClone(instance, setParent)
@@ -49,55 +28,38 @@ end
 local indexSubTable
 local function indexSubValue(state, var)
 	local type_var = typeof(var)
-	if type_var == "Instance" and state.Copy.Transform[var] == nil then
+	if type_var == "Instance" and not getTransform(state.Copy, var) then
 		state.Instances[var] = true
 	elseif type_var == "table" and not state.Explored[var] then
 		indexSubTable(state, var)
+	elseif type_var == "userdata" then
+		indexSubValue(state, getmetatable(var))
 	end
 end
+
 function indexSubTable(state, tabl)
 	state.Explored[tabl] = true
 	if tabl == state.Copy.Transform then return end
-	local lastAllowed = state.Context.allowed
-	local lastCurrent = state.Context.current
 	for k, v in pairs(tabl) do
-		state.Context.allowed = lastAllowed and lastCurrent[k] ~= nil
-		if state.Context.allowed then
-			state.Context.current = lastCurrent[k]
-		end
-
-		local success_k = searchForValue(state.Copy, state.Context, "key", k)
-		if not success_k and state.Copy.GlobalBehavior.Keys then
+		if state.Copy.GlobalBehavior.Keys and not getTransform(state.Copy, k) then
 			indexSubValue(state, k)
 		end
-		local success_v = searchForValue(state.Copy, state.Context, "value", v)
-		if not success_v and state.Copy.GlobalBehavior.Values then
+		if state.Copy.GlobalBehavior.Values and not getTransform(state.Copy, v) then
 			indexSubValue(state, v)
 		end
 	end
 
-	local metaCurrent = getmetatable(lastCurrent)
-	state.Context.allowed = lastAllowed and metaCurrent ~= nil
-	if state.Context.allowed then
-		state.Context.current = metaCurrent
-	end
 	local meta = getmetatable(tabl)
-	local success_meta = searchForValue(state.Copy, state.Context, "value", meta)
-	if type(meta) == "table" and not success_meta and state.Copy.GlobalBehavior.Meta then
+	if type(meta) == "table"
+		and state.Copy.GlobalBehavior.Meta and not getTransform(state.Copy, meta)
+	then
 		indexSubValue(state, meta)
 	end
-
-	state.Context.allowed = lastAllowed
-	state.Context.current = lastCurrent
 end
 
 local function indexValue(copy, value)
 	local state = {
 		Copy = copy,
-		Context = {
-			allowed = type(copy.Context) == "table",
-			current = copy.Context
-		},
 		Instances = {},
 		Explored = {}
 	}

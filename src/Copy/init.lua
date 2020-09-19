@@ -61,27 +61,20 @@ function switchCopy.table(self, oldTable, newTable)
 
 	for k, v in pairs(oldTable) do
 		local newKey = handle.Keys(self, k)
-		if newKey == nil then
+		if newKey == nil or (not self.PlainMap[k] and newKey == self.NIL) then
 			newKey = k
 		end
 
 		local newValue
-		if self.StructMap[v] then
+		if self.PlainMap[v] or v ~= self.NIL then
 			newValue = handle.Values(self, v, rawget(newTable, k))
-		else
-			newValue = handle.Values(self, v)
 		end
 		rawset(newTable, newKey, newValue)
 	end
 
 	local meta = getmetatable(oldTable)
-	if type(meta) == "table" then
-		local newMeta
-		if self.StructMap[meta] then
-			newMeta = handle.Meta(self, meta, getmetatable(newTable))
-		else
-			newMeta = handle.Meta(self, meta)
-		end
+	if type(meta) == "table" and (self.PlainMap[meta] or meta ~= self.NIL) then
+		local newMeta = handle.Meta(self, meta, getmetatable(newTable))
 		setmetatable(newTable, newMeta)
 	end
 
@@ -107,8 +100,8 @@ function switchCopy.Random(self, random)
 end
 
 local function attemptFlush(self)
-	for k in pairs(self.StructMap) do
-		rawset(self.StructMap, k, nil)
+	for k in pairs(self.PlainMap) do
+		rawset(self.PlainMap, k, nil)
 	end
 	if self.Flags.FlushTransform then
 		self:Flush()
@@ -130,7 +123,7 @@ local Copy = {
 		Meta = false,
 	},
 	Transform = {},
-	StructMap = {},
+	PlainMap = {},
 
 	NIL = newproxy(false)
 }
@@ -177,8 +170,8 @@ function Copy:Extend(object, ...)
 	return object
 end
 
-function Copy:Struct(value)
-	self.StructMap[value] = true
+function Copy:Plain(value)
+	self.PlainMap[value] = true
 	return value
 end
 

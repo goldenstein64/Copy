@@ -45,12 +45,12 @@ function Test.MakeFactory(copy)
 				Meta = copy.GlobalBehavior.Meta,
 			},
 			Transform = {},
-			StructMap = {},
+			PlainMap = {},
 
 			NIL = newproxy(false),
 
 			Extend = copy.Extend,
-			Struct = copy.Struct,
+			Plain = copy.Plain,
 			Flush = copy.Flush,
 		}, {
 			__call = getmetatable(copy).__call

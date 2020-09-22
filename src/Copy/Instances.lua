@@ -2,8 +2,14 @@
 local function getTransform(copy, value)
 	local result = copy.Transform[value]
 
-	if result == copy.NIL then
-		return true, nil
+	if copy.SymbolMap[result] then
+		if result.Name == "nil" then
+			return true, nil
+		elseif result == "replace" then
+			return true, value
+		else
+			return false, nil
+		end
 	else
 		return result ~= nil, result
 	end
@@ -41,17 +47,17 @@ function indexSubTable(state, tabl)
 	state.Explored[tabl] = true
 	if tabl == state.Copy.Transform then return end
 	for k, v in pairs(tabl) do
-		if state.Copy.GlobalBehavior.Keys and not getTransform(state.Copy, k) then
+		if state.Copy.GlobalBehavior.Keys == "copy" and not getTransform(state.Copy, k) then
 			indexSubValue(state, k)
 		end
-		if state.Copy.GlobalBehavior.Values and not getTransform(state.Copy, v) then
+		if state.Copy.GlobalBehavior.Values == "copy" and not getTransform(state.Copy, v) then
 			indexSubValue(state, v)
 		end
 	end
 
 	local meta = getmetatable(tabl)
 	if type(meta) == "table"
-		and state.Copy.GlobalBehavior.Meta and not getTransform(state.Copy, meta)
+		and state.Copy.GlobalBehavior.Meta == "copy" and not getTransform(state.Copy, meta)
 	then
 		indexSubValue(state, meta)
 	end

@@ -61,13 +61,13 @@ return {
 		local otherTable = setmetatable({}, { otherKey = "other value" })
 
 		Copy:Extend(otherTable, someTable)
-
 		local otherMt = getmetatable(otherTable)
+		
 		assert(otherMt.key == "value")
 		assert(otherMt.otherKey == nil)
 	end,
 
-	ExtendTwice = function(Copy)
+	Inheritance = function(Copy)
 		local object = {
 			objectKey = "object value"
 		}
@@ -79,6 +79,22 @@ return {
 		assert(object.BaseKey == "inherited value")
 		assert(object.ModKey == "extended value")
 		assert(object.Mod2Key == "extended 2 value")
+	end,
+
+	SubInheritance = function(Copy)
+		local object = {
+			sub = {
+				objectKey = "object value"
+			}
+		}
+
+		Copy:Extend(object, { sub = base }, { sub = modifier }, { sub = modifier2 })
+
+		assert(object.sub.objectKey == "object value")
+		assert(object.sub.Key == "modified 2 value")
+		assert(object.sub.BaseKey == "inherited value")
+		assert(object.sub.ModKey == "extended value")
+		assert(object.sub.Mod2Key == "extended 2 value")
 	end,
 
 }

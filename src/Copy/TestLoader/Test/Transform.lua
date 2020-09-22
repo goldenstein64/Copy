@@ -3,7 +3,7 @@ return {
 	Values = function(Copy)
 		local array = { "value" }
 
-		Copy.GlobalBehavior.Values = true
+		Copy.GlobalBehavior.Values = "copy"
 		Copy.Transform["value"] = "some other value"
 		local newArray = Copy(array)
 
@@ -13,7 +13,7 @@ return {
 	Keys = function(Copy)
 		local dict = { key = "value" }
 
-		Copy.GlobalBehavior.Keys = true
+		Copy.GlobalBehavior.Keys = "copy"
 		Copy.Transform["key"] = "someOtherKey"
 		local newDict = Copy(dict)
 
@@ -35,7 +35,7 @@ return {
 		local someTable = setmetatable({ Value = 3 }, addMeta)
 		local otherTable = { Value = 8 }
 
-		Copy.GlobalBehavior.Meta = true
+		Copy.GlobalBehavior.Meta = "copy"
 		Copy.Transform[addMeta] = otherMeta
 		local newTable = Copy(someTable)
 
@@ -62,6 +62,28 @@ return {
 		assert(newObj.sub.key == "some other value")
 	end,
 
+	DeleteValues = function(Copy)
+		local dict = {
+			key = "value"
+		}
+
+		Copy.Transform["value"] = Copy:Symbol("nil")
+		local newDict = Copy(dict)
+
+		assert(newDict.key == nil)
+	end,
+
+	SkipValues = function(Copy)
+		local dict = {
+			key = "value"
+		}
+
+		Copy.Transform["value"] = Copy:Symbol("pass")
+		local newDict = Copy(dict)
+
+		assert(newDict.key == nil)
+	end,
+
 	-- preserving a value using Copy.Transform
 	AltPreserve = function(Copy)
 		local dict = {
@@ -79,7 +101,7 @@ return {
 
 		local newTransform = Copy(Copy.Transform)
 
-		assert(newTransform["value"] == nil)
+		assert(next(newTransform) == nil)
 	end,
 
 	-- for Copy:Extend

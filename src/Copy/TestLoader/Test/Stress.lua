@@ -69,7 +69,7 @@ return {
 		return "Userdatas", string.format("%.6f", finish)
 	end,
 
-	--[ Nested stress test
+	--[[ Nested stress test
 	NestedTables = function(Copy)
 		local someTable = {} do
 			local current = someTable

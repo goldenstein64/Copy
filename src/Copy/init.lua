@@ -19,37 +19,89 @@ local Instances = require(script.Instances)
 local function getTransform(self, value)
 	local result = rawget(self.Transform, value)
 
-	if result == self.NIL then
-		return true, nil
+	if self.SymbolMap[result] then
+		return true, result()
 	else
-		return result ~= nil, result
+		return result ~= nil, true, result
 	end
 end
 
 local switchCopy = {}
+local handleValue
 
-local handle = {}
+local switchSymbol = {
+	["nil"] = function()
+		return true, nil
+	end,
 
-for _, behaviorScope in ipairs{"Values", "Keys", "Meta"} do
-	handle[behaviorScope] = function(self, value, newValue)
-		if self.GlobalBehavior[behaviorScope] then
-			local transformSuccess, transformCopy = getTransform(self, value)
-			local handler = switchCopy[typeof(value)]
-			if transformSuccess then
-				return transformCopy
+	pass = function()
+		return false, nil
+	end,
+
+	replace = function(_, value)
+		return true, value
+	end,
+
+	copy = function(self, value)
+		return handleValue("Values", self, value)
+	end,
+}
+
+local switchGlobalBehavior = {
+	copy = function(self, value, newValue)
+		if self.SymbolMap[value] then
+			return value()
+		else
+			local transSuccess, transDoSet, transCopy = getTransform(self, value)
+			local typeof_value = typeof(value)
+			local handler = switchCopy[typeof_value]
+			if transSuccess then
+				return transDoSet, transCopy
 			elseif handler then
-				if newValue == nil or typeof(value) ~= typeof(newValue) then
-					return handler(self, value)
+				if newValue == nil or typeof_value ~= typeof(newValue) then
+					return true, handler(self, value)
 				else
-					return handler(self, value, newValue)
+					return true, handler(self, value, newValue)
 				end
 			else
-				return value
+				return true, value
 			end
-		else
-			return value
 		end
-	end
+	end,
+
+	assign = function(_, value)
+		return true, value
+	end,
+
+	pass = function()
+		return false, nil
+	end,
+}
+
+local SYMBOL_ENUM = { "\"nil\"", "\"pass\"", "\"replace\"", "\"copy\"" }
+local GLOBAL_BEHAVIOR_ENUM = { "\"assign\"", "\"copy\"", "\"pass\"" }
+
+setmetatable(switchSymbol, {
+	__index = function(_, symbolName)
+		error(string.format(
+			"Unknown symbol (%q) found. The only allowed symbols are %s.",
+			tostring(symbolName), table.concat(SYMBOL_ENUM, ", ")
+		), 2)
+	end,
+})
+
+setmetatable(switchGlobalBehavior, {
+	__index = function(_, behavior)
+		error(string.format(
+			"Unknown global behavior (%q) found. The only allowed behaviors are %s.",
+			tostring(behavior), table.concat(GLOBAL_BEHAVIOR_ENUM, ", ")
+		), 2)
+	end,
+})
+
+function handleValue(behaviorScope, self, value, newValue)
+	local behavior = self.GlobalBehavior[behaviorScope]
+	return switchGlobalBehavior[behavior](self, value, newValue)
 end
 
 function switchCopy.table(self, oldTable, newTable)
@@ -60,22 +112,23 @@ function switchCopy.table(self, oldTable, newTable)
 	self.Transform[oldTable] = newTable
 
 	for k, v in pairs(oldTable) do
-		local newKey = handle.Keys(self, k)
-		if newKey == nil or (not self.PlainMap[k] and newKey == self.NIL) then
+		local doSet_k, newKey = handleValue("Keys", self, k)
+		if not doSet_k or newKey == nil then
 			newKey = k
 		end
 
-		local newValue
-		if self.PlainMap[v] or v ~= self.NIL then
-			newValue = handle.Values(self, v, rawget(newTable, k))
+		local doSet_v, newValue = handleValue("Values", self, v, rawget(newTable, k))
+		if doSet_v then
+			rawset(newTable, newKey, newValue)
 		end
-		rawset(newTable, newKey, newValue)
 	end
 
 	local meta = getmetatable(oldTable)
-	if type(meta) == "table" and (self.PlainMap[meta] or meta ~= self.NIL) then
-		local newMeta = handle.Meta(self, meta, getmetatable(newTable))
-		setmetatable(newTable, newMeta)
+	if type(meta) == "table" then
+		local doSet_m, newMeta = handleValue("Meta", self, meta, getmetatable(newTable))
+		if doSet_m then
+			setmetatable(newTable, newMeta)
+		end
 	end
 
 	return newTable
@@ -100,8 +153,8 @@ function switchCopy.Random(self, random)
 end
 
 local function attemptFlush(self)
-	for k in pairs(self.PlainMap) do
-		rawset(self.PlainMap, k, nil)
+	for k in pairs(self.SymbolMap) do
+		rawset(self.SymbolMap, k, nil)
 	end
 	if self.Flags.FlushTransform then
 		self:Flush()
@@ -118,14 +171,12 @@ local Copy = {
 		SetParent = false,
 	},
 	GlobalBehavior = {
-		Keys = false,
-		Values = true,
-		Meta = false,
+		Keys = "assign",
+		Values = "copy",
+		Meta = "assign",
 	},
 	Transform = {},
-	PlainMap = {},
-
-	NIL = newproxy(false)
+	SymbolMap = {},
 }
 local CopyMt = {}
 local flagsMt = {}
@@ -143,10 +194,14 @@ function flagsMt:__newindex(flagName, value)
 	end
 end
 
+function CopyMt:__tostring()
+	return "Copy object" .. tostring(self):sub(6)
+end
+
 -- Public Functions
 function CopyMt:__call(value)
 	Instances.ApplyTransform(self, value)
-	local result = handle.Values(self, value)
+	local _, result = handleValue("Values", self, value)
 	attemptFlush(self)
 
 	return result
@@ -160,6 +215,8 @@ function Copy:Extend(object, ...)
 		local modifier = select(i, ...)
 		assert(type(modifier) == "table",
 			"All modifier arguments provided can only be of type 'table'")
+		assert(not self.SymbolMap[modifier],
+			"No modifier argument can directly be a symbol")
 
 		Instances.ApplyTransform(self, modifier)
 		switchCopy.table(self, modifier, object)
@@ -170,14 +227,34 @@ function Copy:Extend(object, ...)
 	return object
 end
 
-function Copy:Plain(value)
-	self.PlainMap[value] = true
-	return value
+local symbolMt = {
+	__tostring = function(self)
+		return string.format("Symbol(%s)", self.Name)
+	end,
+
+	__call = function(self)
+		return switchSymbol[self.Name](self.Owner, self.Value)
+	end,
+}
+function Copy:Symbol(name, value)
+	local _ = switchSymbol[name]
+	local symbol = setmetatable({
+		Owner = self,
+		Name = name,
+		Value = value,
+	}, symbolMt)
+	rawset(self.SymbolMap, symbol, true)
+	return symbol
 end
 
-function Copy:Flush()
+function Copy:Flush(keepSymbols)
 	for value in pairs(self.Transform) do
 		rawset(self.Transform, value, nil)
+	end
+	if not keepSymbols then
+		for symbol in pairs(self.SymbolMap) do
+			rawset(self.SymbolMap, symbol, nil)
+		end
 	end
 end
 

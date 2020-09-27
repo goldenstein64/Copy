@@ -2,17 +2,7 @@
 local function getTransform(copy, value)
 	local result = copy.Transform[value]
 
-	if copy.SymbolMap[result] then
-		if result.Name == "nil" then
-			return true, nil
-		elseif result == "replace" then
-			return true, value
-		else
-			return false, nil
-		end
-	else
-		return result ~= nil, result
-	end
+	return result ~= nil
 end
 
 local function safeClone(instance, setParent)

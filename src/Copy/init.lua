@@ -19,37 +19,19 @@ local Instances = require(script.Instances)
 local function getTransform(self, value)
 	local result = rawget(self.Transform, value)
 
-	if self.SymbolMap[result] then
+	if self.BehaviorMap[result] then
 		return true, result()
 	else
 		return result ~= nil, true, result
 	end
 end
 
+local allBases = {}
 local switchCopy = {}
-local handleValue
 
-local switchSymbol = {
-	["nil"] = function()
-		return true, nil
-	end,
-
-	pass = function()
-		return false, nil
-	end,
-
-	replace = function(_, value)
-		return true, value
-	end,
-
-	copy = function(self, value)
-		return handleValue("Values", self, value)
-	end,
-}
-
-local switchGlobalBehavior = {
+local switchBehavior = {
 	copy = function(self, value, newValue)
-		if self.SymbolMap[value] then
+		if self.BehaviorMap[value] then
 			return value()
 		else
 			local transSuccess, transDoSet, transCopy = getTransform(self, value)
@@ -69,7 +51,7 @@ local switchGlobalBehavior = {
 		end
 	end,
 
-	assign = function(_, value)
+	set = function(_, value)
 		return true, value
 	end,
 
@@ -78,31 +60,20 @@ local switchGlobalBehavior = {
 	end,
 }
 
-local SYMBOL_ENUM = { "\"nil\"", "\"pass\"", "\"replace\"", "\"copy\"" }
-local GLOBAL_BEHAVIOR_ENUM = { "\"assign\"", "\"copy\"", "\"pass\"" }
+local BEHAVIOR_ENUM = {}
+for key in pairs(switchBehavior) do
+	table.insert(BEHAVIOR_ENUM, string.format("%q", key))
+end
+BEHAVIOR_ENUM = table.concat(BEHAVIOR_ENUM, ", ")
 
-setmetatable(switchSymbol, {
-	__index = function(_, symbolName)
-		error(string.format(
-			"Unknown symbol (%q) found. The only allowed symbols are %s.",
-			tostring(symbolName), table.concat(SYMBOL_ENUM, ", ")
-		), 2)
-	end,
-})
-
-setmetatable(switchGlobalBehavior, {
+setmetatable(switchBehavior, {
 	__index = function(_, behavior)
 		error(string.format(
-			"Unknown global behavior (%q) found. The only allowed behaviors are %s.",
-			tostring(behavior), table.concat(GLOBAL_BEHAVIOR_ENUM, ", ")
+			"Unknown behavior (%q) found. The only allowed behaviors are %s.",
+			tostring(behavior), BEHAVIOR_ENUM
 		), 2)
 	end,
 })
-
-function handleValue(behaviorScope, self, value, newValue)
-	local behavior = self.GlobalBehavior[behaviorScope]
-	return switchGlobalBehavior[behavior](self, value, newValue)
-end
 
 function switchCopy.table(self, oldTable, newTable)
 	if newTable == nil then
@@ -110,14 +81,20 @@ function switchCopy.table(self, oldTable, newTable)
 	end
 	if oldTable == self.Transform then return newTable end
 	self.Transform[oldTable] = newTable
+	allBases[newTable] = oldTable
+
+	local keyBehavior = self.GlobalBehavior.Keys
+	local valueBehavior = self.GlobalBehavior.Values
+	local metaBehavior = self.GlobalBehavior.Meta
 
 	for k, v in pairs(oldTable) do
-		local doSet_k, newKey = handleValue("Keys", self, k)
+		local doSet_k, newKey = switchBehavior[keyBehavior](self, k)
 		if not doSet_k or newKey == nil then
 			newKey = k
 		end
 
-		local doSet_v, newValue = handleValue("Values", self, v, rawget(newTable, k))
+		local doSet_v, newValue = switchBehavior[valueBehavior](self,
+			v, rawget(newTable, k))
 		if doSet_v then
 			rawset(newTable, newKey, newValue)
 		end
@@ -125,7 +102,8 @@ function switchCopy.table(self, oldTable, newTable)
 
 	local meta = getmetatable(oldTable)
 	if type(meta) == "table" then
-		local doSet_m, newMeta = handleValue("Meta", self, meta, getmetatable(newTable))
+		local doSet_m, newMeta = switchBehavior[metaBehavior](self,
+			meta, getmetatable(newTable))
 		if doSet_m then
 			setmetatable(newTable, newMeta)
 		end
@@ -139,6 +117,7 @@ function switchCopy.userdata(self, userdata)
 	local hasMeta = type(meta) == "table"
 	local newUserdata = newproxy(hasMeta)
 	self.Transform[userdata] = newUserdata
+	allBases[newUserdata] = userdata
 	if hasMeta then
 		local newMeta = getmetatable(newUserdata)
 		switchCopy.table(self, meta, newMeta)
@@ -149,14 +128,12 @@ end
 function switchCopy.Random(self, random)
 	local newRandom = random:Clone()
 	self.Transform[random] = newRandom
+	allBases[newRandom] = random
 	return newRandom
 end
 
 local function attemptFlush(self)
-	for k in pairs(self.SymbolMap) do
-		rawset(self.SymbolMap, k, nil)
-	end
-	if self.Flags.FlushTransform then
+	if self.Flags.Flush then
 		self:Flush()
 	end
 end
@@ -166,18 +143,21 @@ local allFlags = {}
 
 -- Module
 local Copy = {
+	_id = newproxy(false),
 	Flags = {
-		FlushTransform = true,
+		Flush = true,
 		SetParent = false,
+		LogBase = true,
 	},
 	GlobalBehavior = {
-		Keys = "assign",
+		Keys = "set",
 		Values = "copy",
-		Meta = "assign",
+		Meta = "set",
 	},
-	Transform = {},
-	SymbolMap = {},
+	Transform = setmetatable({}, { __mode = "k" }),
+	BehaviorMap = setmetatable({}, { __mode = "k" }),
 }
+
 local CopyMt = {}
 local flagsMt = {}
 setmetatable(Copy, CopyMt)
@@ -186,7 +166,7 @@ setmetatable(Copy.Flags, flagsMt)
 for flagName in pairs(Copy.Flags) do
 	allFlags[flagName] = true
 end
-function flagsMt:__newindex(flagName, value)
+function flagsMt.__newindex(self, flagName, value)
 	if allFlags[flagName] then
 		rawset(self, flagName, value)
 	else
@@ -194,14 +174,15 @@ function flagsMt:__newindex(flagName, value)
 	end
 end
 
-function CopyMt:__tostring()
-	return "Copy object" .. tostring(self):sub(6)
+function CopyMt.__tostring(self)
+	return "Copy object: " .. tostring(self._id):sub(11)
 end
 
 -- Public Functions
-function CopyMt:__call(value)
+function CopyMt.__call(self, value)
 	Instances.ApplyTransform(self, value)
-	local _, result = handleValue("Values", self, value)
+	local _, result = switchBehavior[self.GlobalBehavior.Values](self,
+		value)
 	attemptFlush(self)
 
 	return result
@@ -215,7 +196,7 @@ function Copy:Extend(object, ...)
 		local modifier = select(i, ...)
 		assert(type(modifier) == "table",
 			"All modifier arguments provided can only be of type 'table'")
-		assert(not self.SymbolMap[modifier],
+		assert(not self.BehaviorMap[modifier],
 			"No modifier argument can directly be a symbol")
 
 		Instances.ApplyTransform(self, modifier)
@@ -233,29 +214,32 @@ local symbolMt = {
 	end,
 
 	__call = function(self)
-		return switchSymbol[self.Name](self.Owner, self.Value)
+		return switchBehavior[self.Name](self.Owner, self.Value)
 	end,
 }
-function Copy:Symbol(name, value)
-	local _ = switchSymbol[name]
-	local symbol = setmetatable({
+
+function Copy:BehaveAs(name, value)
+	local _ = switchBehavior[name]
+	local behaviorObj = setmetatable({
 		Owner = self,
 		Name = name,
 		Value = value,
 	}, symbolMt)
-	rawset(self.SymbolMap, symbol, true)
-	return symbol
+	rawset(self.BehaviorMap, behaviorObj, true)
+	return behaviorObj
 end
 
-function Copy:Flush(keepSymbols)
+function Copy:Flush()
 	for value in pairs(self.Transform) do
 		rawset(self.Transform, value, nil)
 	end
-	if not keepSymbols then
-		for symbol in pairs(self.SymbolMap) do
-			rawset(self.SymbolMap, symbol, nil)
-		end
+	for symbol in pairs(self.BehaviorMap) do
+		rawset(self.BehaviorMap, symbol, nil)
 	end
+end
+
+function Copy.GetBase(value)
+	return allBases[value]
 end
 
 return Copy

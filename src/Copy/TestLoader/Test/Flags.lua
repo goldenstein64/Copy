@@ -7,34 +7,34 @@ end
 return {
 
 	-- Flush
-	FlushTransformOn = function(Copy)
+	FlushOn = function(Copy)
 		local dict = {
 			sub = {}
 		}
 
-		Copy.Flags.FlushTransform = true
+		Copy.Flags.Flush = true
 		local _ = Copy(dict)
 
 		assert( isEmpty(Copy.Transform) )
 	end,
-	FlushTransformOff = function(Copy)
+	FlushOff = function(Copy)
 		local dict = {
 			sub = {}
 		}
 
-		Copy.Flags.FlushTransform = false
+		Copy.Flags.Flush = false
 		local _ = Copy(dict)
 
 		assert(not isEmpty(Copy.Transform))
 	end,
 
 	-- relationship between tables and subtables
-	FlushTransformRelation = function(Copy)
+	FlushRelation = function(Copy)
 		local someTable = {
 			sub = {}
 		}
 
-		Copy.Flags.FlushTransform = false
+		Copy.Flags.Flush = false
 		local newSubTable = Copy(someTable.sub)
 		local newTable = Copy(someTable)
 

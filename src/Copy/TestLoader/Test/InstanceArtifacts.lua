@@ -4,8 +4,8 @@ return {
 		local part = Instance.new("Part")
 		local array = { part }
 
-		Copy.GlobalBehavior.Values = "assign"
-		Copy.Flags.FlushTransform = false
+		Copy.GlobalBehavior.Values = "set"
+		Copy.Flags.Flush = false
 		local _ = Copy(array)
 		local newPart = Copy.Transform[part]
 
@@ -18,8 +18,8 @@ return {
 			[part] = "value"
 		}
 
-		Copy.GlobalBehavior.Keys = "assign"
-		Copy.Flags.FlushTransform = false
+		Copy.GlobalBehavior.Keys = "set"
+		Copy.Flags.Flush = false
 		local _ = Copy(dict)
 		local newPart = Copy.Transform[part]
 
@@ -31,8 +31,8 @@ return {
 		local meta = { part }
 		local someTable = setmetatable({}, meta)
 
-		Copy.GlobalBehavior.Meta = "assign"
-		Copy.Flags.FlushTransform = false
+		Copy.GlobalBehavior.Meta = "set"
+		Copy.Flags.Flush = false
 		local _ = Copy(someTable)
 		local newPart = Copy.Transform[part]
 

@@ -67,7 +67,7 @@ return {
 			key = "value"
 		}
 
-		Copy.Transform["value"] = Copy:Symbol("nil")
+		Copy.Transform["value"] = Copy:BehaveAs("set", nil)
 		local newDict = Copy(dict)
 
 		assert(newDict.key == nil)
@@ -78,7 +78,7 @@ return {
 			key = "value"
 		}
 
-		Copy.Transform["value"] = Copy:Symbol("pass")
+		Copy.Transform["value"] = Copy:BehaveAs("pass")
 		local newDict = Copy(dict)
 
 		assert(newDict.key == nil)

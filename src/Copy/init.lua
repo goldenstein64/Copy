@@ -26,7 +26,6 @@ local function getTransform(self, value)
 	end
 end
 
-local allBases = {}
 local switchCopy = {}
 
 local switchBehavior = {
@@ -81,7 +80,6 @@ function switchCopy.table(self, oldTable, newTable)
 	end
 	if oldTable == self.Transform then return newTable end
 	self.Transform[oldTable] = newTable
-	allBases[newTable] = oldTable
 
 	local keyBehavior = self.GlobalBehavior.Keys
 	local valueBehavior = self.GlobalBehavior.Values
@@ -117,7 +115,6 @@ function switchCopy.userdata(self, userdata)
 	local hasMeta = type(meta) == "table"
 	local newUserdata = newproxy(hasMeta)
 	self.Transform[userdata] = newUserdata
-	allBases[newUserdata] = userdata
 	if hasMeta then
 		local newMeta = getmetatable(newUserdata)
 		switchCopy.table(self, meta, newMeta)
@@ -128,7 +125,6 @@ end
 function switchCopy.Random(self, random)
 	local newRandom = random:Clone()
 	self.Transform[random] = newRandom
-	allBases[newRandom] = random
 	return newRandom
 end
 
@@ -154,8 +150,8 @@ local Copy = {
 		Values = "copy",
 		Meta = "set",
 	},
-	Transform = setmetatable({}, { __mode = "k" }),
-	BehaviorMap = setmetatable({}, { __mode = "k" }),
+	Transform = {},
+	BehaviorMap = {},
 }
 
 local CopyMt = {}
@@ -236,10 +232,6 @@ function Copy:Flush()
 	for symbol in pairs(self.BehaviorMap) do
 		rawset(self.BehaviorMap, symbol, nil)
 	end
-end
-
-function Copy.GetBase(value)
-	return allBases[value]
 end
 
 return Copy

@@ -1,25 +1,12 @@
 return {
-	["nil"] = function(Copy)
+
+	setNil = function(Copy)
 		local someTable = {
 			key = "value"
 		}
 
 		local baseTable = {
-			key = Copy:Symbol("nil")
-		}
-
-		Copy:Extend(someTable, baseTable)
-
-		assert(someTable.key == nil)
-	end,
-
-	altNil = function(Copy)
-		local someTable = {
-			key = "value"
-		}
-
-		local baseTable = {
-			key = Copy:Symbol("replace", nil)
+			key = Copy:BehaveAs("set", nil)
 		}
 
 		Copy:Extend(someTable, baseTable)
@@ -35,7 +22,7 @@ return {
 		}
 
 		local baseTable = {
-			sub = Copy:Symbol("copy", {
+			sub = Copy:BehaveAs("copy", {
 				baseKey = "copied value"
 			})
 		}
@@ -59,7 +46,7 @@ return {
 			baseKey = "copied value"
 		}
 		local baseTable = {
-			sub = Copy:Symbol("replace", Copy(subBaseTable))
+			sub = Copy:BehaveAs("set", Copy(subBaseTable))
 		}
 
 		Copy:Extend(someTable, baseTable)
@@ -70,7 +57,7 @@ return {
 		assert(someTable.sub.baseKey == "copied value")
 	end,
 
-	replace = function(Copy)
+	set = function(Copy)
 		local someTable = {
 			shared = {
 				key = "value"
@@ -78,7 +65,7 @@ return {
 		}
 
 		local baseTable = {
-			shared = Copy:Symbol("replace", {
+			shared = Copy:BehaveAs("set", {
 				baseKey = "replaced value"
 			})
 		}
@@ -88,17 +75,19 @@ return {
 		assert(someTable.shared == baseTable.shared.Value)
 	end,
 
-	replaceMeta = function(Copy)
+	setMeta = function(Copy)
 		local someTable = setmetatable({}, {
 			key = "value"
 		})
 
-		local baseTable = {}
+		local baseTable = setmetatable({}, {
+			key = "base value"
+		})
 
 		Copy.GlobalBehavior.Meta = "copy"
 		Copy:Extend(someTable, baseTable)
 
-
+		assert(getmetatable(someTable).key == "base value")
 	end,
 
 	pass = function(Copy)
@@ -107,7 +96,7 @@ return {
 		}
 
 		local baseTable = {
-			key = Copy:Symbol("pass")
+			key = Copy:BehaveAs("pass")
 		}
 
 		Copy:Extend(someTable, baseTable)
@@ -126,7 +115,7 @@ return {
 			key = symbol
 		}
 
-		Copy.SymbolMap[symbol] = true
+		Copy.BehaviorMap[symbol] = true
 		Copy:Extend(someTable, baseTable)
 
 		assert(someTable.key == "some other value")
@@ -134,9 +123,10 @@ return {
 
 	ErrorInvalid = function(Copy)
 		local ok = pcall(function()
-			Copy:Symbol("not a real symbol!")
+			Copy:BehaveAs("not a real symbol!")
 		end)
 
 		assert(not ok)
 	end,
+
 }

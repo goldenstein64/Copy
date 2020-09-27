@@ -3,7 +3,7 @@ return {
 	CheckFunctionality = function(Copy)
 		local someTable = {}
 
-		Copy.Flags.FlushTransform = false
+		Copy.Flags.Flush = false
 		local newTable1 = Copy(someTable)
 		local newTable2 = Copy(someTable)
 		local storedTable = Copy.Transform[someTable]

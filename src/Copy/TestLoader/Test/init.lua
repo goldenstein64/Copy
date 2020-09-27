@@ -34,7 +34,7 @@ function Test.MakeFactory(copy)
 	return function()
 		local newCopy = setmetatable({
 			Flags = setmetatable({
-				FlushTransform = copy.Flags.FlushTransform,
+				Flush = copy.Flags.Flush,
 				SetParent = copy.Flags.SetParent,
 			}, {
 				__newindex = getmetatable(copy.Flags).__newindex
@@ -45,10 +45,10 @@ function Test.MakeFactory(copy)
 				Meta = copy.GlobalBehavior.Meta,
 			},
 			Transform = {},
-			SymbolMap = {},
+			BehaviorMap = {},
 
 			Extend = copy.Extend,
-			Symbol = copy.Symbol,
+			BehaveAs = copy.BehaveAs,
 			Flush = copy.Flush,
 		}, {
 			__call = getmetatable(copy).__call

@@ -28,25 +28,38 @@ end
 
 local switchCopy = {}
 
-local switchBehavior = {
+local function rawCopy(self, value, newValue)
+	local typeof_value = typeof(value)
+	local handler = switchCopy[typeof_value]
+	if handler then
+		if newValue == nil or typeof_value ~= typeof(newValue) then
+			return true, handler(self, value)
+		else
+			return true, handler(self, value, newValue)
+		end
+	else
+		return true, value
+	end
+end
+
+local switchBehavior
+switchBehavior = {
+	default = function(self, value, newValue)
+		local transSuccess, transDoSet, transCopy = getTransform(self, value)
+		if self.BehaviorMap[value] then
+			return value()
+		elseif transSuccess then
+			return transDoSet, transCopy
+		else
+			return rawCopy(self, value, newValue)
+		end
+	end,
+
 	copy = function(self, value, newValue)
 		if self.BehaviorMap[value] then
 			return value()
 		else
-			local transSuccess, transDoSet, transCopy = getTransform(self, value)
-			local typeof_value = typeof(value)
-			local handler = switchCopy[typeof_value]
-			if transSuccess then
-				return transDoSet, transCopy
-			elseif handler then
-				if newValue == nil or typeof_value ~= typeof(newValue) then
-					return true, handler(self, value)
-				else
-					return true, handler(self, value, newValue)
-				end
-			else
-				return true, value
-			end
+			return rawCopy(self, value, newValue)
 		end
 	end,
 
@@ -143,11 +156,10 @@ local Copy = {
 	Flags = {
 		Flush = true,
 		SetParent = false,
-		LogBase = true,
 	},
 	GlobalBehavior = {
 		Keys = "set",
-		Values = "copy",
+		Values = "default",
 		Meta = "set",
 	},
 	Transform = {},

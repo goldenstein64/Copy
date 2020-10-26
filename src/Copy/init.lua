@@ -47,7 +47,7 @@ switchBehavior = {
 	default = function(self, value, newValue)
 		local transSuccess, transDoSet, transCopy = getTransform(self, value)
 		if self.BehaviorMap[value] then
-			return value()
+			return value(newValue)
 		elseif transSuccess then
 			return transDoSet, transCopy
 		else
@@ -55,11 +55,11 @@ switchBehavior = {
 		end
 	end,
 
-	copy = function(self, value, newValue)
+	copy = function(self, value)
 		if self.BehaviorMap[value] then
 			return value()
 		else
-			return rawCopy(self, value, newValue)
+			return rawCopy(self, value)
 		end
 	end,
 
@@ -163,7 +163,7 @@ local Copy = {
 		Meta = "set",
 	},
 	Transform = {},
-	BehaviorMap = {},
+	BehaviorMap = setmetatable({}, { __mode = "k" }),
 }
 
 local CopyMt = {}
@@ -221,8 +221,8 @@ local symbolMt = {
 		return string.format("Symbol(%s)", self.Name)
 	end,
 
-	__call = function(self)
-		return switchBehavior[self.Name](self.Owner, self.Value)
+	__call = function(self, newValue)
+		return switchBehavior[self.Name](self.Owner, self.Value, newValue)
 	end,
 }
 
@@ -240,9 +240,6 @@ end
 function Copy:Flush()
 	for value in pairs(self.Transform) do
 		rawset(self.Transform, value, nil)
-	end
-	for symbol in pairs(self.BehaviorMap) do
-		rawset(self.BehaviorMap, symbol, nil)
 	end
 end
 

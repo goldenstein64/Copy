@@ -26,7 +26,7 @@ local function indexSubValue(state, var)
 	local type_var = typeof(var)
 	if type_var == "Instance" and not getTransform(state.Copy, var) then
 		state.Instances[var] = true
-	elseif type_var == "table" and not state.Explored[var] then
+	elseif type_var == "table" and not state.Explored[var] and not state.Copy.BehaviorMap[var] then
 		indexSubTable(state, var)
 	elseif type_var == "userdata" then
 		indexSubValue(state, getmetatable(var))

@@ -37,14 +37,12 @@ switchBehavior = {
 		else
 			local typeof_value = typeof(value)
 			local handler = switchCopy[typeof_value]
-			if handler then
-				if newValue == nil or typeof_value ~= typeof(newValue) then
-					return true, handler(self, value)
-				else
-					return true, handler(self, value, newValue)
-				end
-			else
+			if not handler then
 				return true, value
+			elseif newValue ~= nil and typeof_value == typeof(newValue) then
+				return true, handler(self, value, newValue)
+			else
+				return true, handler(self, value)
 			end
 		end
 	end,
@@ -52,10 +50,10 @@ switchBehavior = {
 	copy = function(self, value)
 		local typeof_value = typeof(value)
 		local handler = switchCopy[typeof_value]
-		if handler then
-			return true, handler(self, value)
-		else
+		if not handler then
 			return true, value
+		else
+			return true, handler(self, value)
 		end
 	end,
 

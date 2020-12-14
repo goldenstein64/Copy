@@ -1,9 +1,22 @@
+local Copy =  require(script.Parent)
+
 local classPrototype = {}
+
+-- recursively searches through each inherited class and appends them to a returned array
+local function _gatherSupers(class)
+	local result = { class.prototype }
+	for _, super in ipairs(class.extends) do
+		local gathered = _gatherSupers(super)
+		table.move(gathered, 1, #gathered, #result + 1, result)
+	end
+
+	return result
+end
 
 -- reverses the resulting array so that super classes are applied to an object first
 -- Note! This does not protect from cyclic inheritance
 function classPrototype:gatherSupers()
-	local result = self:_gatherSupers()
+	local result = _gatherSupers(self)
 
 	-- reverse order of result
 	local len = #result
@@ -15,17 +28,6 @@ function classPrototype:gatherSupers()
 	return table.unpack(result)
 end
 
--- recursively searches through each inherited class and appends them to a returned array
-function classPrototype:_gatherSupers()
-	local result = { self }
-	for _, super in ipairs(self.extends) do
-		local gathered = super:_gatherSupers()
-		table.move(gathered, 1, #gathered, #result + 1, result)
-	end
-
-	return result
-end
-
 local classMt = {
 	__tostring = function(self)
 		return self.name
@@ -34,10 +36,25 @@ local classMt = {
 }
 
 local function class(name, ...)
-	return setmetatable({
+	local newClass = {
 		extends = { ... },
+		prototype = {},
+
 		name = name
-	}, classMt)
+	}
+
+	function newClass.new(...)
+		local self = Copy:Extend({}, class:gatherSupers())
+		return newClass.init(self, ...)
+	end
+
+	function newClass:init(...)
+		return self
+	end
+
+	setmetatable(newClass, classMt)
+
+	return newClass
 end
 
 return class

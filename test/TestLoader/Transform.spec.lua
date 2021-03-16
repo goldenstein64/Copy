@@ -1,16 +1,14 @@
 return function()
 	local CopyFactory = require(script.Parent.Parent.CopyFactory)
-	local T = getfenv()
-	local expect = T.expect
 
 	local Copy
-	T.beforeEach(function()
+	beforeEach(function()
 		Copy = CopyFactory()
 	end)
 
-	T.describe("Copy.Transform", function()
+	describe("Copy.Transform", function()
 
-		T.it("transforms values", function()
+		it("transforms values", function()
 			local array = { "value" }
 
 			Copy.GlobalBehavior.Values = "default"
@@ -20,7 +18,7 @@ return function()
 			expect(newArray[1]).to.equal("some other value")
 		end)
 
-		T.it("transforms keys", function()
+		it("transforms keys", function()
 			local dict = { key = "value" }
 
 			Copy.GlobalBehavior.Keys = "default"
@@ -31,16 +29,16 @@ return function()
 			expect(newDict.someOtherKey).to.equal("value")
 		end)
 
-		T.it("transforms metatables", function()
+		it("transforms metatables", function()
 			local addMeta = {
 				__add = function(self, b)
 					return self.Value + b.Value
-				end
+				end,
 			}
 			local otherMeta = {
 				__add = function(self, b)
 					return 2 * (self.Value + b.Value)
-				end
+				end,
 			}
 			local someTable = setmetatable({ Value = 3 }, addMeta)
 			local otherTable = { Value = 8 }
@@ -54,12 +52,12 @@ return function()
 			expect(newTable + otherTable).to.equal(22)
 		end)
 
-		T.it("can transform sub-values", function()
+		it("can transform sub-values", function()
 			local obj = {
 				sub = {
-					key = "value"
+					key = "value",
 				},
-				key = "value"
+				key = "value",
 			}
 
 			Copy.Transform["value"] = "some other value"
@@ -71,9 +69,9 @@ return function()
 			expect(newObj.sub.key).to.equal("some other value")
 		end)
 
-		T.it("can delete values", function()
+		it("can delete values", function()
 			local dict = {
-				key = "value"
+				key = "value",
 			}
 
 			Copy.Transform["value"] = Copy:BehaveAs("set", nil)
@@ -82,9 +80,9 @@ return function()
 			expect(newDict.key).to.equal(nil)
 		end)
 
-		T.it("can skip values", function()
+		it("can skip values", function()
 			local dict = {
-				key = "value"
+				key = "value",
 			}
 
 			Copy.Transform["value"] = Copy:BehaveAs("pass")
@@ -93,9 +91,9 @@ return function()
 			expect(newDict.key).to.equal(nil)
 		end)
 
-		T.it("can preserve without a symbol", function()
+		it("can preserve without a symbol", function()
 			local dict = {
-				shared = {}
+				shared = {},
 			}
 
 			Copy.Transform[dict.shared] = dict.shared
@@ -104,7 +102,7 @@ return function()
 			expect(newDict.shared).to.equal(dict.shared)
 		end)
 
-		T.it("is safeguarded from Copy()", function()
+		it("is safeguarded from Copy()", function()
 			Copy.Transform["value"] = "other value"
 
 			local newTransform = Copy(Copy.Transform)
@@ -112,10 +110,10 @@ return function()
 			expect(next(newTransform)).to.equal(nil)
 		end)
 
-		T.it("is safeguarded from Copy:Extend", function()
+		it("is safeguarded from Copy:Extend", function()
 			Copy.Transform["value"] = "other value"
 			local newTransform = {
-				["different value"] = "separate value"
+				["different value"] = "separate value",
 			}
 
 			Copy:Extend(newTransform, Copy.Transform)
@@ -123,7 +121,7 @@ return function()
 			expect(newTransform["value"]).to.equal(nil)
 		end)
 
-		T.it("can bypass the safeguard", function()
+		it("can bypass the safeguard", function()
 			Copy.Transform["value"] = "other value"
 
 			local oldTransform

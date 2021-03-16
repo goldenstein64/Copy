@@ -1,4 +1,4 @@
 -- Dependencies
 local TestEZ: TestEZ = require(script.Parent.TestEZ)
 
-TestEZ.TestBootstrap:run({script})
+TestEZ.TestBootstrap:run({ script })

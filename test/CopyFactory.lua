@@ -8,28 +8,28 @@ return function()
 			Flush = copy.Flags.Flush,
 			SetParent = copy.Flags.SetParent,
 		}, {
-			__newindex = getmetatable(copy.Flags).__newindex
+			__newindex = getmetatable(copy.Flags).__newindex,
 		}),
 		GlobalBehavior = setmetatable({
 			[next(copy.GlobalBehavior)] = {
-				Keys = copy.GlobalBehavior.Keys,
-				Values = copy.GlobalBehavior.Values,
-				Meta = copy.GlobalBehavior.Meta,
-			}
+				Keys = {},
+				Values = { "transform", "reconcile", "replace" },
+				Meta = {},
+			},
 		}, {
 			__index = getmetatable(copy.GlobalBehavior).__index,
 			__newindex = getmetatable(copy.GlobalBehavior).__newindex,
 		}),
 		Transform = {},
 		BehaviorMap = setmetatable({}, {
-			__mode = getmetatable(copy.BehaviorMap).__mode
+			__mode = getmetatable(copy.BehaviorMap).__mode,
 		}),
 
 		Extend = copy.Extend,
 		BehaveAs = copy.BehaveAs,
 		Flush = copy.Flush,
 	}, {
-		__call = getmetatable(copy).__call
+		__call = getmetatable(copy).__call,
 	})
 	return newCopy
 end

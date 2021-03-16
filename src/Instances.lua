@@ -35,25 +35,35 @@ end
 
 function indexSubTable(state, tabl)
 	state.Explored[tabl] = true
-	if tabl == state.Copy.Transform then return end
+	if tabl == state.Copy.Transform then
+		return
+	end
 	for k, v in pairs(tabl) do
-		if state.Copy.GlobalBehavior.Keys == "copy"
-			or state.Copy.GlobalBehavior.Keys == "default" and not getTransform(state.Copy, k)
+		if
+			table.find(state.Copy.GlobalBehavior.Keys, "replace")
+			or table.find(state.Copy.GlobalBehavior.Keys, "transform")
+			and not getTransform(state.Copy, k)
 		then
 			indexSubValue(state, k)
 		end
-		if state.Copy.GlobalBehavior.Values == "copy"
-			or state.Copy.GlobalBehavior.Values == "default" and not getTransform(state.Copy, v)
+		if
+			table.find(state.Copy.GlobalBehavior.Values, "replace")
+			or table.find(state.Copy.GlobalBehavior.Values, "transform")
+			and not getTransform(state.Copy, v)
 		then
 			indexSubValue(state, v)
 		end
 	end
 
 	local meta = getmetatable(tabl)
-	if type(meta) == "table" and (
-		state.Copy.GlobalBehavior.Meta == "copy"
-		or state.Copy.GlobalBehavior.Meta == "default" and not getTransform(state.Copy, meta)
-	) then
+	if
+		type(meta) == "table"
+		and (
+			table.find(state.Copy.GlobalBehavior.Meta, "replace")
+			or table.find(state.Copy.GlobalBehavior.Meta, "transform")
+			and not getTransform(state.Copy, meta)
+		)
+	then
 		indexSubValue(state, meta)
 	end
 end
@@ -62,7 +72,7 @@ local function indexValue(copy, value)
 	local state = {
 		Copy = copy,
 		Instances = {},
-		Explored = {}
+		Explored = {},
 	}
 	indexSubValue(state, value)
 	return state.Instances
@@ -82,7 +92,9 @@ local function getInstanceRelations(instance, instances)
 	return true, result
 end
 
-local function cloneRootAncestors(instances, transform, setParent)
+local function cloneRootAncestors(instances, setParent)
+	local transform = {}
+
 	for instance in pairs(instances) do
 		local isRootAncestor, registeredDescendants = getInstanceRelations(instance, instances)
 		if isRootAncestor then
@@ -98,6 +110,8 @@ local function cloneRootAncestors(instances, transform, setParent)
 			end
 		end
 	end
+
+	return transform
 end
 
 -- Module
@@ -110,7 +124,8 @@ end
 
 function Instances.ApplyTransform(copy, value)
 	local instances = indexValue(copy, value)
-	cloneRootAncestors(instances, copy.Transform, copy.Flags.SetParent)
+	local transform = cloneRootAncestors(instances, copy.Flags.SetParent)
+	return transform
 end
 
 return Instances

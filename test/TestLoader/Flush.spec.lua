@@ -1,15 +1,13 @@
 return function()
 	local CopyFactory = require(script.Parent.Parent.CopyFactory)
-	local T = getfenv()
-	local expect = T.expect
 
 	local Copy
-	T.beforeEach(function()
+	beforeEach(function()
 		Copy = CopyFactory()
 	end)
-	
-	T.describe("Copy:Flush", function()
-		T.it("should work", function()
+
+	describe("Copy:Flush", function()
+		it("should work", function()
 			Copy.Flags.Flush = false
 
 			local someTable = {}

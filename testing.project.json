@@ -7,7 +7,7 @@
 			"$className": "Workspace",
 
 			"Copy": {
-				"$path": "src/Copy"
+				"$path": "src"
 			},
 
 			"CopyTest": {

@@ -1,21 +1,19 @@
 return function()
 	local CopyFactory = require(script.Parent.Parent.CopyFactory)
-	local T = getfenv()
-	local expect = T.expect
 
 	local Copy
-	T.beforeEach(function()
+	beforeEach(function()
 		Copy = CopyFactory()
 	end)
 
 	local base = {
 		Key = "base value",
-		BaseKey = "inherited value"
+		BaseKey = "inherited value",
 	}
 
 	local modifier = {
 		Key = "modified value",
-		ModKey = "extended value"
+		ModKey = "extended value",
 	}
 
 	local modifier2 = {
@@ -23,9 +21,9 @@ return function()
 		Mod2Key = "extended 2 value",
 	}
 
-	T.describe("Copy:Extend", function()
+	describe("Copy:Extend", function()
 
-		T.it("errors if the arguments aren't tables", function()
+		it("errors if the arguments aren't tables", function()
 			local userdata = newproxy(true)
 			local otherUserdata = newproxy(true)
 			local otherMt = getmetatable(otherUserdata)
@@ -36,7 +34,7 @@ return function()
 			end).to.throw()
 		end)
 
-		T.it("works on arrays", function()
+		it("works on arrays", function()
 			local completeArray = { "a", "b", "c" }
 			local array = { nil, "b", nil }
 
@@ -47,7 +45,7 @@ return function()
 			expect(array[3]).to.equal("c")
 		end)
 
-		T.it("works on dictionaries", function()
+		it("works on dictionaries", function()
 			local namespace = {}
 			function namespace.Method()
 				return "method"
@@ -64,7 +62,7 @@ return function()
 			expect(namespace.OtherMethod()).to.equal("other method")
 		end)
 
-		T.it("works on metatables", function()
+		it("works on metatables", function()
 			local someTable = setmetatable({}, { key = "value" })
 			local otherTable = setmetatable({}, { otherKey = "other value" })
 
@@ -75,9 +73,9 @@ return function()
 			expect(otherMt.otherKey).to.equal(nil)
 		end)
 
-		T.it("allows inheritance among tables", function()
+		it("allows inheritance among tables", function()
 			local object = {
-				objectKey = "object value"
+				objectKey = "object value",
 			}
 
 			Copy:Extend(object, base, modifier, modifier2)
@@ -89,11 +87,11 @@ return function()
 			expect(object.Mod2Key).to.equal("extended 2 value")
 		end)
 
-		T.it("allows inheritance among sub-tables", function()
+		it("allows inheritance among sub-tables", function()
 			local object = {
 				sub = {
-					objectKey = "object value"
-				}
+					objectKey = "object value",
+				},
 			}
 
 			Copy:Extend(object, { sub = base }, { sub = modifier }, { sub = modifier2 })

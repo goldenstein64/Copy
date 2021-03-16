@@ -1,4 +1,4 @@
-local Copy =  require(script.Parent)
+local Copy = require(script.Parent)
 
 local classPrototype = {}
 
@@ -20,7 +20,7 @@ function classPrototype:gatherSupers()
 
 	-- reverse order of result
 	local len = #result
-	for i = 1, len/2 do
+	for i = 1, len / 2 do
 		local other = len - i + 1
 		result[i], result[other] = result[other], result[i]
 	end
@@ -32,24 +32,25 @@ local classMt = {
 	__tostring = function(self)
 		return self.name
 	end,
-	__index = classPrototype
+	__index = classPrototype,
 }
+
+local function defaultInit(self)
+	return self
+end
 
 local function class(name, ...)
 	local newClass = {
 		extends = { ... },
 		prototype = {},
+		init = defaultInit,
 
-		name = name
+		name = name,
 	}
 
 	function newClass.new(...)
 		local self = Copy:Extend({}, class:gatherSupers())
 		return newClass.init(self, ...)
-	end
-
-	function newClass:init(...)
-		return self
 	end
 
 	setmetatable(newClass, classMt)

@@ -5,34 +5,26 @@ There is some boilerplate included with `Copy()` that allows for the creation of
 List:
 
 ```lua
+local HttpService = game:GetService("HttpService")
+
+local Copy = require(path.to.Copy)
 local class = require(path.to.Copy.Class)
 
 local List = class("List")
 
-function List.init(self, ...)
-  local values = table.pack(...)
-  table.move(values, 1, values.n, self.length, self.data)
+function List.init(self)
+  return self
 end
 
-local prototype = {
-  data = {},
-  length = 0
-}
-
-function prototype:append(value)
-  table.insert(self.data, value)
-  self.length += 1
+function List.fromJSON(value)
+  local data = HttpService:DecodeJSON(value)
+  local self = Copy:Extend(data, List:gatherSupers())
+  return self
 end
 
-function prototype:insert(index, value)
-  table.insert(self.data, index, value)
-  self.length += 1
-end
+local prototype = {}
 
-function prototype:pop(index)
-  table.remove(self.data, index)
-  self.length -= 1
-end
+setmetatable(prototype, { __index = table })
 
 List.prototype = prototype
 
@@ -49,13 +41,15 @@ local list = require(script.Parent.list)
 
 local SortedList = class("SortedList", list)
 
-local prototype = {
-  data = {},
-  length = 0
-}
+local prototype = {}
 
-function prototype:append(value)
-  SortedList.extends[1].prototype.append(self, value)
+for name, func in pairs(table) do
+  prototype[k] = function(self, ...)
+    local result = table.pack(func(self, ...))
+    self:sort()
+
+    return table.unpack(result, 1, result.n)
+  end
 end
 
 SortedList.prototype = prototype

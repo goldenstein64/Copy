@@ -9,10 +9,13 @@ return function()
 		return result
 	end
 
+	local Copy
+	beforeEach(function()
+		Copy = CopyFactory()
+	end)
+
 	describe("__call samples", function()
 		it("can run the basic sample", function()
-			local Copy = CopyFactory()
-
 			-- this is a table
 			local array = { 1, 2, 3 }
 
@@ -24,8 +27,6 @@ return function()
 		end)
 
 		it("can run the technical sample", function()
-			local Copy = CopyFactory()
-
 			local parentFolder = Instance.new("Folder")
 
 			local key = {}
@@ -75,111 +76,76 @@ return function()
 
 	describe("__call behavior on each type", function()
 		it("copies tables", function()
-			local Copy = CopyFactory()
-
 			local someTable = {}
 			expect(Copy(someTable)).never.to.equal(someTable)
 		end)
 
 		it("copies userdatas", function()
-			local Copy = CopyFactory()
-
 			local someUserdata = newproxy(false)
 			expect(Copy(someUserdata)).never.to.equal(someUserdata)
 		end)
 
 		it("copies Instances", function()
-			local Copy = CopyFactory()
-
 			local someInstance = Instance.new("Part")
 			expect(Copy(someInstance)).never.to.equal(someInstance)
 		end)
 
 		it("copies the Random roblox type", function()
-			local Copy = CopyFactory()
-
 			local someRandom = Random.new()
 			expect(Copy(someRandom)).never.to.rawEqual(someRandom)
 		end)
 
 		it("preserves strings", function()
-			local Copy = CopyFactory()
-
 			local someString = "some string"
 			expect(Copy(someString)).to.equal(someString)
 		end)
 
 		it("preserves numbers", function()
-			local Copy = CopyFactory()
-
 			local someNumber = 8
 			expect(Copy(someNumber)).to.equal(someNumber)
 		end)
 
 		it("preserves booleans", function()
-			local Copy = CopyFactory()
-
 			local someBoolean = true
 			expect(Copy(someBoolean)).to.equal(someBoolean)
 		end)
 
 		it("preserves functions", function()
-			local Copy = CopyFactory()
-
 			local someFunction = function()
 			end
 			expect(Copy(someFunction)).to.equal(someFunction)
 		end)
 
 		it("preserves threads", function()
-			local Copy = CopyFactory()
-
 			local someThread = coroutine.create(function()
 			end)
 			expect(Copy(someThread)).to.equal(someThread)
 		end)
 
 		it("preserves uncloneable Instances", function()
-			local Copy = CopyFactory()
-
 			local RunService = game:GetService("RunService")
 			expect(Copy(RunService)).to.equal(RunService)
 		end)
 
 		it("preserves roblox types", function()
-			local Copy = CopyFactory()
-
 			local someRblxType = Vector3.new()
 			expect(Copy(someRblxType)).to.rawEqual(someRblxType)
 		end)
 
 		it("copies itself under default settings", function()
-			local Copy = CopyFactory()
+			local newCopy = Copy(Copy)
 
-			local allFlags = {}
-			for flagName in pairs(Copy.Flags) do
-				table.insert(allFlags, flagName)
-			end
-			local totalPermutations = 2 ^ #allFlags
-			for i = 0, totalPermutations - 1 do
-				for index, flagName in ipairs(allFlags) do
-					Copy.Flags[flagName] = (i / 2 ^ index) % 1 >= 0.5
-				end
-				local newCopy = Copy(Copy)
-				for k, v in pairs(Copy) do
-					local type_v = type(v)
-					if type_v == "function" then
-						expect(newCopy[k]).to.equal(v)
-					elseif type_v == "table" and v ~= Copy.Transform then
-						expect(getDictLen(newCopy[k])).to.equal(getDictLen(v))
-					end
+			for k, v in pairs(Copy) do
+				local type_v = type(v)
+				if type_v == "function" then
+					expect(newCopy[k]).to.equal(v)
+				elseif type_v == "table" and k ~= "Transform" then
+					expect(getDictLen(newCopy[k])).to.equal(getDictLen(v))
 				end
 			end
 		end)
 
-		it("should properly copy cyclic tables", function()
-			local Copy = CopyFactory()
-
+		it("Copies cyclic tables without infinitely looping", function()
 			local someTable = {}
 			someTable.cyclic = someTable
 
@@ -187,11 +153,23 @@ return function()
 
 			expect(newTable).to.equal(newTable.cyclic)
 		end)
+
+		it("Copies multi-level cyclic tables without infinitely looping", function()
+			local someTable = {}
+			local otherTable = {}
+			local anotherTable = {}
+			someTable.cyclic = otherTable
+			otherTable.cyclic = anotherTable
+			anotherTable.cyclic = someTable
+
+			local newTable = Copy(someTable)
+
+			expect(newTable).to.equal(newTable.cyclic.cyclic.cyclic)
+		end)
 	end)
 
 	describe("duplicate value handling", function()
 		it("should keep duplicate values the same", function()
-			local Copy = CopyFactory()
 			Copy.GlobalBehavior.Values = "default"
 
 			local subTable = {}
@@ -203,7 +181,6 @@ return function()
 		end)
 
 		it("should keep duplicate keys the same", function()
-			local Copy = CopyFactory()
 			Copy.GlobalBehavior.Keys = "default"
 
 			local subKey = {}
@@ -220,7 +197,6 @@ return function()
 		end)
 
 		it("should keep duplicate metatables the same", function()
-			local Copy = CopyFactory()
 			Copy.GlobalBehavior.Meta = "default"
 
 			local subMeta = {}
@@ -235,6 +211,43 @@ return function()
 			local meta2 = getmetatable(newTable[2])
 
 			expect(meta1).to.equal(meta2)
+		end)
+	end)
+
+	describe("default behavior", function()
+		it("copies sub-table values as default behavior", function()
+			local subTable = {
+				key = "some value",
+			}
+			local someTable = {
+				sub = subTable,
+			}
+
+			local newTable = Copy(someTable)
+
+			expect(newTable.sub).never.to.equal(someTable.sub)
+			expect(newTable.sub.key).to.equal("some value")
+		end)
+
+		it("doesn't copy keys as default behavior", function()
+			local key = {}
+			local someTable = {
+				[key] = "table value",
+			}
+
+			local newTable = Copy(someTable)
+
+			expect(newTable[key]).to.equal("table value")
+		end)
+
+		it("doesn't copy metatables as default behavior", function()
+			local meta = {}
+			local someTable = setmetatable({}, meta)
+
+			local newTable = Copy(someTable)
+			local newMeta = getmetatable(newTable)
+
+			expect(newMeta).to.equal(meta)
 		end)
 	end)
 end

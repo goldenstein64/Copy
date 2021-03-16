@@ -1,5 +1,5 @@
 -- Private Functions
-local function getTransform(copy, value)
+local function isTransformed(copy, value)
 	local result = copy.Transform[value]
 
 	return result ~= nil
@@ -24,7 +24,7 @@ end
 local indexSubTable
 local function indexSubValue(state, var)
 	local type_var = typeof(var)
-	if type_var == "Instance" and not getTransform(state.Copy, var) then
+	if type_var == "Instance" and not isTransformed(state.Copy, var) then
 		state.Instances[var] = true
 	elseif type_var == "table" and not state.Explored[var] and not state.Copy.BehaviorMap[var] then
 		indexSubTable(state, var)
@@ -42,14 +42,14 @@ function indexSubTable(state, tabl)
 		if
 			table.find(state.Copy.GlobalBehavior.Keys, "replace")
 			or table.find(state.Copy.GlobalBehavior.Keys, "transform")
-			and not getTransform(state.Copy, k)
+			and not isTransformed(state.Copy, k)
 		then
 			indexSubValue(state, k)
 		end
 		if
 			table.find(state.Copy.GlobalBehavior.Values, "replace")
 			or table.find(state.Copy.GlobalBehavior.Values, "transform")
-			and not getTransform(state.Copy, v)
+			and not isTransformed(state.Copy, v)
 		then
 			indexSubValue(state, v)
 		end
@@ -61,7 +61,7 @@ function indexSubTable(state, tabl)
 		and (
 			table.find(state.Copy.GlobalBehavior.Meta, "replace")
 			or table.find(state.Copy.GlobalBehavior.Meta, "transform")
-			and not getTransform(state.Copy, meta)
+			and not isTransformed(state.Copy, meta)
 		)
 	then
 		indexSubValue(state, meta)

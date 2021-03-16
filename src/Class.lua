@@ -28,6 +28,10 @@ function classPrototype:gatherSupers()
 	return table.unpack(result)
 end
 
+function classPrototype:init(...)
+	return self
+end
+
 local classMt = {
 	__tostring = function(self)
 		return self.name
@@ -35,15 +39,10 @@ local classMt = {
 	__index = classPrototype,
 }
 
-local function defaultInit(self)
-	return self
-end
-
 local function class(name, ...)
 	local newClass = {
 		extends = { ... },
 		prototype = {},
-		init = defaultInit,
 
 		name = name,
 	}

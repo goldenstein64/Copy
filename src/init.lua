@@ -35,16 +35,14 @@ local allFlags = {}
 -- Module
 local Copy = {
 	_id = newproxy(false),
+
 	Flags = {
 		Flush = true,
 		SetParent = false,
 	},
+
 	GlobalBehavior = GlobalBehavior,
-	BehaviorPresets = {
-		default = { "transform", "reconcile", "replace" },
-		copy = { "replace" },
-		set = {},
-	},
+
 	Transform = {},
 	BehaviorMap = setmetatable({}, { __mode = "k" }),
 }

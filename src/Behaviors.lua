@@ -6,15 +6,15 @@ local function getTransform(self, value)
 	local result = rawget(self.Transform, value)
 
 	if self.BehaviorMap[result] then
-		return true, result()
+		return true, result(value)
 	else
 		return result ~= nil, true, result
 	end
 end
 
-local switchBehavior = {}
+local behaviorHandlers = {}
 
-function switchBehavior.transform(self, value)
+function behaviorHandlers.transform(self, value)
 	local transSuccess, transDoSet, transCopy = getTransform(self, value)
 	if transSuccess then
 		return true, transDoSet, transCopy
@@ -23,7 +23,7 @@ function switchBehavior.transform(self, value)
 	end
 end
 
-function switchBehavior.reconcile(self, value, newValue)
+function behaviorHandlers.reconcile(self, value, newValue)
 	local typeof_value = typeof(value)
 	local handler = reconcilers[typeof_value]
 	if handler and typeof_value == typeof(newValue) then
@@ -33,7 +33,7 @@ function switchBehavior.reconcile(self, value, newValue)
 	end
 end
 
-function switchBehavior.replace(self, value)
+function behaviorHandlers.replace(self, value)
 	local typeof_value = typeof(value)
 	local handler = replacers[typeof_value]
 	if handler then
@@ -43,20 +43,22 @@ function switchBehavior.replace(self, value)
 	end
 end
 
-function switchBehavior.pass()
+function behaviorHandlers.pass()
 	return true, false, nil
 end
 
 local Behaviors = {
-	handlers = switchBehavior,
+	handlers = behaviorHandlers,
+
 	presets = {
 		default = { "transform", "reconcile", "replace" },
+		copy = { "replace" },
 		set = {},
 	},
 }
 
 local behaviorEnumArray = {}
-for key in pairs(switchBehavior) do
+for key in pairs(behaviorHandlers) do
 	table.insert(behaviorEnumArray, string.format("%q", key))
 end
 Behaviors.BEHAVIOR_ENUM = table.concat(behaviorEnumArray, ", ")
@@ -72,7 +74,7 @@ local function errorUnknownBehavior(behavior)
 	)
 end
 
-setmetatable(switchBehavior, {
+setmetatable(behaviorHandlers, {
 	__index = function(_, behavior)
 		errorUnknownBehavior(behavior)
 	end,
@@ -80,7 +82,7 @@ setmetatable(switchBehavior, {
 
 function Behaviors.handleValue(self, behaviors, value, midValue)
 	for _, behavior in ipairs(behaviors) do
-		local success, doSet, newValue = switchBehavior[behavior](self, value, midValue)
+		local success, doSet, newValue = behaviorHandlers[behavior](self, value, midValue)
 		if success then
 			return doSet, newValue
 		end
@@ -89,7 +91,7 @@ function Behaviors.handleValue(self, behaviors, value, midValue)
 end
 
 function Behaviors.assert(behavior)
-	if rawget(switchBehavior, behavior) ~= nil then
+	if rawget(behaviorHandlers, behavior) ~= nil then
 		return behavior
 	end
 	errorUnknownBehavior(behavior)

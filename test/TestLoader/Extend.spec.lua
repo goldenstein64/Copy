@@ -102,6 +102,5 @@ return function()
 			expect(object.sub.ModKey).to.equal("extended value")
 			expect(object.sub.Mod2Key).to.equal("extended 2 value")
 		end)
-
 	end)
 end

@@ -35,7 +35,6 @@ Copies all fields in `bases` to `object` from left to right. `Copy(some)` is the
 
 Creates a [Symbol](#symbols). It can be placed anywhere in the base value to signify that this field should follow the specified [Behavior](#behaviors).
 
-
 ### `Copy:Flush()`
 
 Clears any data lingering from the last time something was copied. This is only useful when paired with [`Copy.Flags.Flush`](#Flush_Flag) set to `false`.

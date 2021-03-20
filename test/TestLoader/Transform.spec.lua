@@ -9,12 +9,13 @@ return function()
 	describe("BaseTraits", function()
 
 		it("transforms values", function()
-			local array = { "value" }
+			local array = { "value", "normal value" }
 
 			Copy.Transform["value"] = "some other value"
 			local newArray = Copy(array)
 
 			expect(newArray[1]).to.equal("some other value")
+			expect(newArray[2]).to.equal("normal value")
 		end)
 
 		it("transforms keys", function()

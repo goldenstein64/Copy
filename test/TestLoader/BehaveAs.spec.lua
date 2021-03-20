@@ -19,7 +19,7 @@ return function()
 			Copy:Extend(someTable, baseTable)
 			local newValue = someTable.key
 
-			expect(newValue).to.be.a("nil")
+			expect(newValue).to.equal(nil)
 		end)
 
 		it("allows different behavior in keys", function()
@@ -182,7 +182,7 @@ return function()
 				key = symbol,
 			}
 
-			Copy.BehaviorMap[symbol] = true
+			Copy.SymbolMap[symbol] = true
 			Copy:Extend(someTable, baseTable)
 
 			expect(someTable.key).to.equal("some other value")
@@ -199,7 +199,7 @@ return function()
 				return true, duck
 			end
 
-			Copy.BehaviorMap[makeDuck] = true
+			Copy.SymbolMap[makeDuck] = true
 
 			local someTable = {
 				duck = makeDuck,
@@ -228,6 +228,16 @@ return function()
 			expect(function()
 				Copy.GlobalContext.FakeContext = "default"
 			end).to.throw()
+		end)
+	end)
+
+	describe("GarbageCollection", function()
+		it("deletes itself once not referenced anymore", function()
+			Copy:BehaveAs("set", nil)
+
+			wait()
+
+			expect(next(Copy.SymbolMap)).to.equal(nil)
 		end)
 	end)
 end

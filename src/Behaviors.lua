@@ -5,7 +5,7 @@ local replacers
 local function getTransform(self, value)
 	local result = rawget(self.Transform, value)
 
-	if self.BehaviorMap[result] then
+	if self.SymbolMap[result] then
 		return true, result(value)
 	else
 		return result ~= nil, true, result

@@ -246,8 +246,10 @@ return function()
 				local type_v = type(v)
 				if type_v == "function" then
 					expect(newCopy[k]).to.equal(v)
+
 				elseif type_v == "table" and k ~= "Transform" then
 					expect(getDictLen(newCopy[k])).to.equal(getDictLen(v))
+
 				end
 			end
 		end)

@@ -45,9 +45,9 @@ return function()
 		end)
 	end)
 
-	describe("SetParent", function()
+	describe("SetInstanceParent", function()
 		it("respects true", function()
-			Copy.Flags.SetParent = true
+			Copy.Flags.SetInstanceParent = true
 
 			local parent = Instance.new("Folder")
 			local somePart = Instance.new("Part")
@@ -60,7 +60,7 @@ return function()
 		end)
 
 		it("respects false", function()
-			Copy.Flags.SetParent = false
+			Copy.Flags.SetInstanceParent = false
 
 			local parent = Instance.new("Folder")
 			local somePart = Instance.new("Part")

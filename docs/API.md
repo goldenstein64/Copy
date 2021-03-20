@@ -2,6 +2,78 @@
 
 This is a list of all public properties and methods contained in the Copy module.
 
+## Functions
+
+There are only two functions that do the job of copying, the rest are just helper functions.
+
+### `Copy(object: T): T`
+
+Creates a copy of `object`. This is guaranteed to return a result of the same type and sub-type.
+
+All the datatypes copied by this function are:
+
+* `table`
+* `userdata`
+* `Random`
+* `Instance`
+
+Any other datatype passed in will simply return itself.
+
+You can also use `Copy()` to copy itself, like so:
+
+```lua
+local newCopy = Copy(Copy)
+```
+
+This is useful for creating a `Copy` module with a different configuration, since it holds flags and contexts.
+
+### `Copy:Extend(object: T, ...bases: Q): T & Q`
+
+Copies all fields in `bases` to `object` from left to right. `Copy(some)` is the same as `Copy:Extend({}, some)`.
+
+### <a name="Copy_BehaveAs"></a> `Copy:BehaveAs(behavior: string|array, object: any): Symbol`
+
+Creates a [Symbol](#symbols). It can be placed anywhere in the base value to signify that this field should follow the specified [Behavior](#behaviors).
+
+
+### `Copy:Flush()`
+
+Clears any data lingering from the last time something was copied. This is only useful when paired with [`Copy.Flags.Flush`](#Flush_Flag) set to `false`.
+
+## Properties
+
+There are a great number of properties `Copy` has, useful for creating versatile behavior.
+
+### `Copy.GlobalContext`
+
+This table stores the default behaviors `Copy()` should use to copy values when no behavior is provided, separated by context.
+
+* `Copy.GlobalBehavior.Keys` - The default behavior to use for table keys
+* `Copy.GlobalBehavior.Values` - The default behavior to use for generic values
+* `Copy.GlobalBehavior.Meta` - The default behavior to use for metatables
+
+These contexts accept the same [behaviors](#behaviors) as [`Copy:BehaveAs`](#Copy_BehaveAs).
+
+### `Copy.Flags`
+
+A set of miscellaneous flags. Setting an unknown flag throws an error.
+
+#### <a name="Flush_Flag"></a> `Copy.Flags.Flush = true`
+
+Stops `Copy()` and `Copy:Extend()` from removing internal data (namely `Copy.Transform` and `Copy.InstanceTransform`). This is useful for inspecting the module in case something was copied weirdly. If you plan to use the module again after inspection, make sure to call `Copy:Flush()` beforehand.
+
+#### `Copy.Flags.SetInstanceParent = false`
+
+Decides whether instances cloned by the module are parented to the original instance's parent, otherwise `nil`.
+
+### `Copy.SymbolMap`
+
+A weak table that lists every [Symbol](#symbols) in existence as keys. Symbols delete themselves once they are not used anymore, and they can be used multiple times. Any values intended to be used as symbols should be registered in the symbol map, like so:
+
+```lua
+Copy.SymbolMap[customSymbol] = true
+```
+
 ## Types and Enums
 
 The `Copy` module uses a few concepts to make itself more coherent, so this section is devoted to that specifically.
@@ -26,7 +98,7 @@ And all the lowest level behaviors are listed here:
 
 If the `Copy` module receives an empty array `{}`, copying that value will return itself.
 
-### Symbols
+### <a name="symbols"></a> Symbols
 
 The `Copy` module has the power to control how values are copied, but it needs `Symbols` to control which behaviors are used.
 
@@ -65,7 +137,7 @@ it("can make ducks", function()
     return true, duck
   end
 
-  Copy.BehaviorMap[makeDuck] = true
+  Copy.SymbolMap[makeDuck] = true
 
   local some = {
     duck = makeDuck
@@ -77,7 +149,7 @@ it("can make ducks", function()
 end)
 ```
 
-### Transform
+### <a name="transform"></a> Transform
 
 The `Copy` module uses a table to keep track of what values have been copied so that it can return it again if it receives a reference to that same value:
 
@@ -85,55 +157,14 @@ The `Copy` module uses a table to keep track of what values have been copied so 
 
 ```lua
 it("transforms values", function()
-  local array = { "value" }
+  local array = { "value", "normal value" }
 
   Copy.Transform["value"] = "some other value"
   local newArray = Copy(array)
 
   expect(newArray[1]).to.equal("some other value")
+  expect(newArray[2]).to.equal("normal value")
 end)
 ```
 
-## Functions
-
-There are only two functions that do the job of copying:
-
-### `Copy(object: T): T`
-
-`Copy()` makes an attempt to create a copy of the argument given and return it. This is guaranteed to return a result of the same type and sub-type.
-
-All the values that are copied by this function are:
-
-* `table`
-* `userdata`
-* `Random`
-
-Any other datatype passed in will simply return itself.
-
-You can also use `Copy()` to copy itself, like so:
-
-```lua
-local newCopy = Copy(Copy)
-```
-
-### `Copy:Extend(object: T, ...bases: Q): T & Q`
-
-Copies all fields in `bases` to `object` from left to right. This is essentially a lower-level method for creating classes by giving explicit control over what the root value is and what base values are used. `Copy(someTable)` is the same as `Copy:Extend({}, someTable)`.
-
-### <a name="Copy_BehaveAs"></a> `Copy:BehaveAs(behavior: string|array, object: any): Symbol
-
-Creates a Symbol for controlling how a specific sub-value is copied using [behaviors](#behaviors). It can be placed anywhere in the base value to signify making that value (but not its sub-values) behave in that way.
-
-## Properties
-
-There are a great number of properties `Copy` has, useful for creating versatile behavior.
-
-### `Copy.GlobalContext`
-
-This table stores the default behaviors `Copy()` should use to copy values when no behavior is provided, separated by context.
-
-* `Copy.GlobalBehavior.Keys` - The default behavior to use for table keys
-* `Copy.GlobalBehavior.Values` - The default behavior to use for generic values
-* `Copy.GlobalBehavior.Meta` - The default behavior to use for metatables
-
-These contexts accept the same [behaviors](#behaviors) as `Copy:BehaveAs`.
+`Copy.Transform` accepts any value, including [Symbols](#symbols).

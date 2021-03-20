@@ -38,16 +38,14 @@ local Copy = {
 
 	Flags = {
 		Flush = true,
-		SetParent = false,
+		SetInstanceParent = false,
 	},
 
 	GlobalContext = Contexts.Global,
 
 	Transform = {},
-	BehaviorMap = setmetatable({}, { __mode = "k" }),
+	SymbolMap = setmetatable({}, { __mode = "k" }),
 }
-
-setmetatable(Copy, CopyMt)
 
 local flagsMt = {}
 setmetatable(Copy.Flags, flagsMt)
@@ -68,7 +66,7 @@ function CopyMt:__call(value)
 	self.InstanceTransform = Instances.ApplyTransform(self, value)
 
 	local result
-	if self.BehaviorMap[value] then
+	if self.SymbolMap[value] then
 		result = select(2, value())
 	else
 		local valueBehavior = self.GlobalContext.Values
@@ -86,10 +84,10 @@ function Copy:Extend(object, ...)
 	for i = 1, select("#", ...) do
 		local modifier = select(i, ...)
 		assert(type(modifier) == "table", "All modifier arguments provided can only be of type 'table'")
-		assert(not self.BehaviorMap[modifier], "No modifier argument can directly be a symbol")
+		assert(not self.SymbolMap[modifier], "No modifier argument can directly be a symbol")
 
 		Instances.ApplyTransform(self, modifier)
-		if self.BehaviorMap[modifier] then
+		if self.SymbolMap[modifier] then
 			modifier(object)
 		else
 			Reconcilers.table(self, modifier, object)
@@ -104,13 +102,14 @@ function Copy:BehaveAs(behaviors, value)
 	behaviors = Behaviors.Convert(behaviors)
 
 	local behaviorObj = {
+		Name = tostring(value),
 		Owner = self,
 		Behaviors = behaviors,
 		Value = value,
 	}
 
 	setmetatable(behaviorObj, Symbol)
-	rawset(self.BehaviorMap, behaviorObj, true)
+	rawset(self.SymbolMap, behaviorObj, true)
 
 	return behaviorObj
 end
@@ -119,5 +118,7 @@ function Copy:Flush()
 	table.clear(self.Transform)
 	self.InstanceTransform = nil
 end
+
+setmetatable(Copy, CopyMt)
 
 return Copy

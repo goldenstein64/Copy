@@ -5,13 +5,13 @@ local function isTransformed(copy, value)
 	return result ~= nil
 end
 
-local function safeClone(instance, setParent)
+local function safeClone(instance, setInstanceParent)
 	local oldArchivable = instance.Archivable
 	instance.Archivable = true
 	local newInstance = instance:Clone()
 	if newInstance then
 		newInstance.Archivable = oldArchivable
-		if setParent then
+		if setInstanceParent then
 			newInstance.Parent = instance.Parent
 		end
 	else
@@ -26,7 +26,7 @@ local function indexSubValue(state, var)
 	local type_var = typeof(var)
 	if type_var == "Instance" and not isTransformed(state.Copy, var) then
 		state.Instances[var] = true
-	elseif type_var == "table" and not state.Explored[var] and not state.Copy.BehaviorMap[var] then
+	elseif type_var == "table" and not state.Explored[var] and not state.Copy.SymbolMap[var] then
 		indexSubTable(state, var)
 	elseif type_var == "userdata" then
 		indexSubValue(state, getmetatable(var))
@@ -107,12 +107,12 @@ local Instances = {}
 
 -- Public Functions
 function Instances.SafeClone(copy, instance)
-	return safeClone(instance, copy.Flags.SetParent)
+	return safeClone(instance, copy.Flags.SetInstanceParent)
 end
 
 function Instances.ApplyTransform(copy, value)
 	local instances = indexValue(copy, value)
-	local transform = cloneRootAncestors(instances, copy.Flags.SetParent)
+	local transform = cloneRootAncestors(instances, copy.Flags.SetInstanceParent)
 	return transform
 end
 

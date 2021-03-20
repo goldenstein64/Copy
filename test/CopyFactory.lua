@@ -6,7 +6,7 @@ return function()
 	local newCopy = setmetatable({
 		Flags = setmetatable({
 			Flush = copy.Flags.Flush,
-			SetParent = copy.Flags.SetParent,
+			SetInstanceParent = copy.Flags.SetInstanceParent,
 		}, {
 			__newindex = getmetatable(copy.Flags).__newindex,
 		}),
@@ -22,8 +22,8 @@ return function()
 			getmetatable(copy.GlobalContext)
 		),
 		Transform = {},
-		BehaviorMap = setmetatable({}, {
-			__mode = getmetatable(copy.BehaviorMap).__mode,
+		SymbolMap = setmetatable({}, {
+			__mode = getmetatable(copy.SymbolMap).__mode,
 		}),
 
 		Extend = copy.Extend,

@@ -16,7 +16,7 @@ function reconcilers.table(self, oldTable, newTable)
 	for k, v in pairs(oldTable) do
 		local doSet_k, newKey
 		local midKey = nil
-		if self.BehaviorMap[k] then
+		if self.SymbolMap[k] then
 			doSet_k, newKey = k(midKey)
 		else
 			doSet_k, newKey = Behaviors.HandleValue(self, keyBehavior, k, midKey)
@@ -27,7 +27,7 @@ function reconcilers.table(self, oldTable, newTable)
 
 		local doSet_v, newValue
 		local midValue = rawget(newTable, k)
-		if self.BehaviorMap[v] then
+		if self.SymbolMap[v] then
 			doSet_v, newValue = v(midValue)
 		else
 			doSet_v, newValue = Behaviors.HandleValue(self, valueBehavior, v, midValue)
@@ -41,7 +41,7 @@ function reconcilers.table(self, oldTable, newTable)
 	if type(meta) == "table" then
 		local doSet_m, newMeta
 		local midMeta = getmetatable(newTable)
-		if self.BehaviorMap[meta] then
+		if self.SymbolMap[meta] then
 			doSet_m, newMeta = meta(midMeta)
 		else
 			doSet_m, newMeta = Behaviors.HandleValue(self, metaBehavior, meta, midMeta)

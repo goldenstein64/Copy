@@ -6,23 +6,26 @@ return function()
 		Copy = CopyFactory()
 	end)
 
-	local base = {
-		Key = "base value",
-		BaseKey = "inherited value",
-	}
+	local function getExtenders()
+		local base = {
+			Key = "base value",
+			BaseKey = "inherited value",
+		}
 
-	local modifier = {
-		Key = "modified value",
-		ModKey = "extended value",
-	}
+		local modifier = {
+			Key = "modified value",
+			ModKey = "extended value",
+		}
 
-	local modifier2 = {
-		Key = "modified 2 value",
-		Mod2Key = "extended 2 value",
-	}
+		local modifier2 = {
+			Key = "modified 2 value",
+			Mod2Key = "extended 2 value",
+		}
 
-	describe("Copy:Extend", function()
+		return base, modifier, modifier2
+	end
 
+	describe("Assertions", function()
 		it("errors if the arguments aren't tables", function()
 			local userdata = newproxy(true)
 			local otherUserdata = newproxy(true)
@@ -33,7 +36,9 @@ return function()
 				Copy:Extend(userdata, otherUserdata)
 			end).to.throw()
 		end)
+	end)
 
+	describe("TestTableTypes", function()
 		it("works on arrays", function()
 			local completeArray = { "a", "b", "c" }
 			local array = { nil, "b", nil }
@@ -67,18 +72,20 @@ return function()
 			local otherTable = setmetatable({}, { otherKey = "other value" })
 
 			Copy:Extend(otherTable, someTable)
+			local someMt = getmetatable(someTable)
 			local otherMt = getmetatable(otherTable)
 
-			expect(otherMt.key).to.equal("value")
-			expect(otherMt.otherKey).to.equal(nil)
+			expect(otherMt).to.equal(someMt)
 		end)
+	end)
 
+	describe("Inheritance", function()
 		it("allows inheritance among tables", function()
 			local object = {
 				objectKey = "object value",
 			}
 
-			Copy:Extend(object, base, modifier, modifier2)
+			Copy:Extend(object, getExtenders())
 
 			expect(object.objectKey).to.equal("object value")
 			expect(object.Key).to.equal("modified 2 value")
@@ -88,6 +95,8 @@ return function()
 		end)
 
 		it("allows inheritance among sub-tables", function()
+			local base, modifier, modifier2 = getExtenders()
+
 			local object = {
 				sub = {
 					objectKey = "object value",

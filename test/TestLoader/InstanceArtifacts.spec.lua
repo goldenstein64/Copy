@@ -6,8 +6,7 @@ return function()
 		Copy = CopyFactory()
 	end)
 
-	describe("instance artifact detection", function()
-
+	describe("ContextTests", function()
 		it("avoids searching unreachable values", function()
 			Copy.GlobalContext.Values = "set"
 			Copy.Flags.Flush = false
@@ -64,7 +63,9 @@ return function()
 
 			expect(newPart).to.equal(nil)
 		end)
+	end)
 
+	describe("Stability", function()
 		it("preserves instance hierarchy", function()
 			local folder = Instance.new("Folder")
 			local someTable = {
@@ -78,5 +79,4 @@ return function()
 			expect(newTable.folder.Part).to.equal(newTable.part)
 		end)
 	end)
-
 end

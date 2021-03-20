@@ -51,45 +51,47 @@ But you can also create them using functions. Functions take the type `(T) -> (b
 * **Parameter:** the old value's field
 * **Returns:** a boolean describing whether to set the value, and the value to set
 
-```lua
---[[** Creates a duck **]]
-local function makeDuck(oldValue)
-  local duck = {}
+**`T.BehaveAs.CustomSymbols`**
 
-  function duck.quack()
-    print("QUACK")
+```lua
+it("can make ducks", function()
+  local function makeDuck(oldValue)
+    local duck = {}
+
+    function duck.quack()
+      return "QUACK"
+    end
+
+    return true, duck
   end
 
-  return true, duck
-end
+  Copy.BehaviorMap[makeDuck] = true
 
-Copy.BehaviorMap[makeDuck] = true
+  local some = {
+    duck = makeDuck
+  }
 
-local some = {
-  duck = makeDuck
-}
+  local new = Copy(some)
 
-local new = Copy(someTable)
-
-new.duck.quack() --> QUACK
+  expect(new.duck.quack()).to.equal("QUACK")
+end)
 ```
 
 ### Transform
 
 The `Copy` module uses a table to keep track of what values have been copied so that it can return it again if it receives a reference to that same value:
 
+**`T.Transform.BaseTraits`**
+
 ```lua
-Copy.Transform = {
-  ["old value"] = "new value"
-}
+it("transforms values", function()
+  local array = { "value" }
 
-local some = {
-  key = "old value"
-}
+  Copy.Transform["value"] = "some other value"
+  local newArray = Copy(array)
 
-local new = Copy(some)
-
-print(new.key) --> "new value"
+  expect(newArray[1]).to.equal("some other value")
+end)
 ```
 
 ## Functions
@@ -116,7 +118,7 @@ local newCopy = Copy(Copy)
 
 ### `Copy:Extend(object: T, ...bases: Q): T & Q`
 
-Creates a copy of `obj` and copies all fields from all tables given in `bases` from left to right. This is essentially a lower-level method for creating classes by giving explicit control over how the root value is structured and what base values are used.
+Copies all fields in `bases` to `object` from left to right. This is essentially a lower-level method for creating classes by giving explicit control over what the root value is and what base values are used. `Copy(someTable)` is the same as `Copy:Extend({}, someTable)`.
 
 ### <a name="Copy_BehaveAs"></a> `Copy:BehaveAs(behavior: string|array, object: any): Symbol
 
@@ -126,7 +128,7 @@ Creates a Symbol for controlling how a specific sub-value is copied using [behav
 
 There are a great number of properties `Copy` has, useful for creating versatile behavior.
 
-### `Copy.GlobalBehavior`
+### `Copy.GlobalContext`
 
 This table stores the default behaviors `Copy()` should use to copy values when no behavior is provided, separated by context.
 

@@ -6,7 +6,7 @@ return function()
 		Copy = CopyFactory()
 	end)
 
-	describe("Copy:Flush", function()
+	describe("Flush", function()
 		it("should work", function()
 			Copy.Flags.Flush = false
 

@@ -6,9 +6,8 @@ return function()
 		Copy = CopyFactory()
 	end)
 
-	describe("Copy:BehaveAs", function()
-
-		it("can 'set' values to nil", function()
+	describe("Exclusivity", function()
+		it("allows different behavior in values", function()
 			local someTable = {
 				key = "value",
 			}
@@ -18,11 +17,12 @@ return function()
 			}
 
 			Copy:Extend(someTable, baseTable)
+			local newValue = someTable.key
 
-			expect(someTable.key).to.equal(nil)
+			expect(newValue).to.be.a("nil")
 		end)
 
-		it("can allow 'default' behavior in keys", function()
+		it("allows different behavior in keys", function()
 			local key = newproxy(false)
 			local someTable = {
 				[Copy:BehaveAs("default", key)] = "value",
@@ -31,20 +31,24 @@ return function()
 			local newTable = Copy(someTable)
 			local newKey = next(newTable)
 
+			expect(newKey).to.be.a("userdata")
 			expect(newKey).never.to.equal(key)
 		end)
 
-		it("can allow 'default' behavior in metatables", function()
+		it("allows different behavior in metatables", function()
 			local meta = {}
 			local someTable = setmetatable({}, Copy:BehaveAs("default", meta))
 
 			local newTable = Copy(someTable)
 			local newMeta = getmetatable(newTable)
 
+			expect(newMeta).to.be.a("table")
 			expect(newMeta).never.to.equal(meta)
 		end)
+	end)
 
-		it("can duplicate values between different keys using 'replace'", function()
+	describe("Behaviors", function()
+		it("can copy values in the same table using 'replace'", function()
 			local subTable = {
 				key = "value",
 			}
@@ -60,7 +64,7 @@ return function()
 			expect(newTable.sub2.key).to.equal("value")
 		end)
 
-		it("can extend copied fields from values using 'reconcile'", function()
+		it("can copy fields in values using 'reconcile'", function()
 			local someTable = {
 				sub = {
 					key = "value",
@@ -82,7 +86,7 @@ return function()
 			expect(someTable.sub.key).to.equal("value")
 		end)
 
-		it("can overwrite original keys using 'replace'", function()
+		it("can overwrite values using 'replace'", function()
 			local someTable = {
 				sub = {
 					key = "value",
@@ -123,20 +127,6 @@ return function()
 			expect(someTable.shared).to.equal(sharedTable)
 		end)
 
-		it("can extend metatables using 'reconcile'", function()
-
-			local meta = {}
-			local someTable = setmetatable({}, meta)
-
-			local baseTable = setmetatable({}, Copy:BehaveAs("reconcile", {
-				key = "base value",
-			}))
-
-			Copy:Extend(someTable, baseTable)
-
-			expect(meta.key).to.equal("base value")
-		end)
-
 		it("can skip extending values using 'pass'", function()
 			local someTable = {
 				key = "value",
@@ -151,6 +141,22 @@ return function()
 			expect(someTable.key).to.equal("value")
 		end)
 
+		it("can extend metatables using 'reconcile'", function()
+
+			local meta = {}
+			local someTable = setmetatable({}, meta)
+
+			local baseTable = setmetatable({}, Copy:BehaveAs("reconcile", {
+				key = "base value",
+			}))
+
+			Copy:Extend(someTable, baseTable)
+
+			expect(meta.key).to.equal("base value")
+		end)
+	end)
+
+	describe("BehaviorPriority", function()
 		it("gives Copy:BehaveAs priority over global behavior", function()
 			local someTable = Copy:BehaveAs("default", {
 				key = Copy:BehaveAs("set", "value"),
@@ -161,11 +167,14 @@ return function()
 
 			expect(newTable.key).to.equal("value")
 		end)
+	end)
 
+	describe("CustomSymbols", function()
 		it("can use custom symbols", function()
 			local function symbol()
 				return true, "some other value"
 			end
+
 			local someTable = {
 				key = "value",
 			}
@@ -179,6 +188,30 @@ return function()
 			expect(someTable.key).to.equal("some other value")
 		end)
 
+		it("can make ducks", function()
+			local function makeDuck(oldValue)
+				local duck = {}
+
+				function duck.quack()
+					return "QUACK"
+				end
+
+				return true, duck
+			end
+
+			Copy.BehaviorMap[makeDuck] = true
+
+			local someTable = {
+				duck = makeDuck,
+			}
+
+			local newTable = Copy(someTable)
+
+			expect(newTable.duck.quack()).to.equal("QUACK")
+		end)
+	end)
+
+	describe("Assertions", function()
 		it("does not allow foreign symbols in :BehaveAs", function()
 			expect(function()
 				Copy:BehaveAs("not a real symbol!", true)

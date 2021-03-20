@@ -6,12 +6,11 @@ return function()
 		Copy = CopyFactory()
 	end)
 
-	describe("Copy.Transform", function()
+	describe("BaseTraits", function()
 
 		it("transforms values", function()
 			local array = { "value" }
 
-			Copy.GlobalContext.Values = "default"
 			Copy.Transform["value"] = "some other value"
 			local newArray = Copy(array)
 
@@ -68,7 +67,9 @@ return function()
 			expect(newObj.key).to.equal("value")
 			expect(newObj.sub.key).to.equal("some other value")
 		end)
+	end)
 
+	describe("SymbolParity", function()
 		it("can delete values", function()
 			local dict = {
 				key = "value",
@@ -91,6 +92,17 @@ return function()
 			expect(newDict.key).to.equal(nil)
 		end)
 
+		it("can preserve with a symbol", function()
+			local dict = {
+				shared = {},
+			}
+
+			Copy.Transform[dict.shared] = Copy:BehaveAs("set", dict.shared)
+			local newDict = Copy(dict)
+
+			expect(newDict.shared).to.equal(dict.shared)
+		end)
+
 		it("can preserve without a symbol", function()
 			local dict = {
 				shared = {},
@@ -101,7 +113,9 @@ return function()
 
 			expect(newDict.shared).to.equal(dict.shared)
 		end)
+	end)
 
+	describe("Safeguards", function()
 		it("is safeguarded from Copy()", function()
 			Copy.Transform["value"] = "other value"
 

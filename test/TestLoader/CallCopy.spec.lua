@@ -14,7 +14,7 @@ return function()
 		Copy = CopyFactory()
 	end)
 
-	describe("__call samples", function()
+	describe("Samples", function()
 		it("can run the basic sample", function()
 			-- this is a table
 			local array = { 1, 2, 3 }
@@ -74,7 +74,7 @@ return function()
 		end)
 	end)
 
-	describe("__call behavior on each type", function()
+	describe("TypeTests", function()
 		it("copies tables", function()
 			local someTable = {}
 			expect(Copy(someTable)).never.to.equal(someTable)
@@ -131,45 +131,10 @@ return function()
 			local someRblxType = Vector3.new()
 			expect(Copy(someRblxType)).to.rawEqual(someRblxType)
 		end)
-
-		it("copies itself under default settings", function()
-			local newCopy = Copy(Copy)
-
-			for k, v in pairs(Copy) do
-				local type_v = type(v)
-				if type_v == "function" then
-					expect(newCopy[k]).to.equal(v)
-				elseif type_v == "table" and k ~= "Transform" then
-					expect(getDictLen(newCopy[k])).to.equal(getDictLen(v))
-				end
-			end
-		end)
-
-		it("Copies cyclic tables without infinitely looping", function()
-			local someTable = {}
-			someTable.cyclic = someTable
-
-			local newTable = Copy(someTable)
-
-			expect(newTable).to.equal(newTable.cyclic)
-		end)
-
-		it("Copies multi-level cyclic tables without infinitely looping", function()
-			local someTable = {}
-			local otherTable = {}
-			local anotherTable = {}
-			someTable.cyclic = otherTable
-			otherTable.cyclic = anotherTable
-			anotherTable.cyclic = someTable
-
-			local newTable = Copy(someTable)
-
-			expect(newTable).to.equal(newTable.cyclic.cyclic.cyclic)
-		end)
 	end)
 
-	describe("duplicate value handling", function()
-		it("should keep duplicate values the same", function()
+	describe("Duplicates", function()
+		it("keeps duplicate values the same", function()
 			Copy.GlobalContext.Values = "default"
 
 			local subTable = {}
@@ -180,7 +145,7 @@ return function()
 			expect(newTable[1]).to.equal(newTable[2])
 		end)
 
-		it("should keep duplicate keys the same", function()
+		it("keeps duplicate keys the same", function()
 			Copy.GlobalContext.Keys = "default"
 
 			local subKey = {}
@@ -196,7 +161,7 @@ return function()
 			expect(newTable[2][key1]).to.equal(true)
 		end)
 
-		it("should keep duplicate metatables the same", function()
+		it("keeps duplicate metatables the same", function()
 			Copy.GlobalContext.Meta = "default"
 
 			local subMeta = {}
@@ -211,6 +176,28 @@ return function()
 			local meta2 = getmetatable(newTable[2])
 
 			expect(meta1).to.equal(meta2)
+		end)
+
+		it("copies cyclic tables without infinitely looping", function()
+			local someTable = {}
+			someTable.cyclic = someTable
+
+			local newTable = Copy(someTable)
+
+			expect(newTable).to.equal(newTable.cyclic)
+		end)
+
+		it("copies multi-level cyclic tables without infinitely looping", function()
+			local someTable = {}
+			local otherTable = {}
+			local anotherTable = {}
+			someTable.cyclic = otherTable
+			otherTable.cyclic = anotherTable
+			anotherTable.cyclic = someTable
+
+			local newTable = Copy(someTable)
+
+			expect(newTable).to.equal(newTable.cyclic.cyclic.cyclic)
 		end)
 	end)
 
@@ -248,6 +235,21 @@ return function()
 			local newMeta = getmetatable(newTable)
 
 			expect(newMeta).to.equal(meta)
+		end)
+	end)
+
+	describe("SelfCopy", function()
+		it("copies itself under default settings", function()
+			local newCopy = Copy(Copy)
+
+			for k, v in pairs(Copy) do
+				local type_v = type(v)
+				if type_v == "function" then
+					expect(newCopy[k]).to.equal(v)
+				elseif type_v == "table" and k ~= "Transform" then
+					expect(getDictLen(newCopy[k])).to.equal(getDictLen(v))
+				end
+			end
 		end)
 	end)
 end

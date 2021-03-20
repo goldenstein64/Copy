@@ -6,14 +6,8 @@ return function()
 		Copy = CopyFactory()
 	end)
 
-	describe("Copy.Flags", function()
-		it("does not allow for nonexistent flags", function()
-			expect(function()
-				Copy.Flags.NonFlag = true
-			end).to.throw()
-		end)
-
-		it("Flush: respects true", function()
+	describe("Flush", function()
+		it("respects true", function()
 			Copy.Flags.Flush = true
 
 			local dict = {
@@ -25,7 +19,7 @@ return function()
 			expect(next(Copy.Transform)).to.equal(nil)
 		end)
 
-		it("Flush: respects false", function()
+		it("respects false", function()
 			Copy.Flags.Flush = false
 
 			local dict = {
@@ -37,7 +31,7 @@ return function()
 			expect(next(Copy.Transform)).never.to.equal(nil)
 		end)
 
-		it("Flush: preserves table relations", function()
+		it("preserves table relations", function()
 			Copy.Flags.Flush = false
 
 			local someTable = {
@@ -49,8 +43,10 @@ return function()
 
 			expect(newTable.sub).to.equal(newSubTable)
 		end)
+	end)
 
-		it("SetParent: respects true", function()
+	describe("SetParent", function()
+		it("respects true", function()
 			Copy.Flags.SetParent = true
 
 			local parent = Instance.new("Folder")
@@ -63,7 +59,7 @@ return function()
 			expect(newArray[1].Parent).to.equal(parent)
 		end)
 
-		it("SetParent: respects false", function()
+		it("respects false", function()
 			Copy.Flags.SetParent = false
 
 			local parent = Instance.new("Folder")
@@ -74,6 +70,14 @@ return function()
 			local newArray = Copy(array)
 
 			expect(newArray[1].Parent).to.equal(nil)
+		end)
+	end)
+
+	describe("Assertions", function()
+		it("does not allow for nonexistent flags", function()
+			expect(function()
+				Copy.Flags.NonFlag = true
+			end).to.throw()
 		end)
 	end)
 end

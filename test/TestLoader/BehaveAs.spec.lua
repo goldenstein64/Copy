@@ -156,7 +156,7 @@ return function()
 				key = Copy:BehaveAs("set", "value"),
 			})
 
-			Copy.GlobalBehavior.Values = "pass"
+			Copy.GlobalContext.Values = "pass"
 			local newTable = Copy(someTable)
 
 			expect(newTable.key).to.equal("value")
@@ -187,13 +187,13 @@ return function()
 
 		it("does not allow foreign symbols in global behavior", function()
 			expect(function()
-				Copy.GlobalBehavior.Values = "not a real symbol!"
+				Copy.GlobalContext.Values = "not a real symbol!"
 			end).to.throw()
 		end)
 
 		it("does not allow foreign contexts in global behavior", function()
 			expect(function()
-				Copy.GlobalBehavior.FakeContext = "default"
+				Copy.GlobalContext.FakeContext = "default"
 			end).to.throw()
 		end)
 	end)

@@ -50,25 +50,27 @@ end
 local Behaviors = {
 	handlers = behaviorHandlers,
 
-	presets = {
+	Presets = {
 		default = { "transform", "reconcile", "replace" },
 		copy = { "replace" },
 		set = {},
 	},
 }
 
-local behaviorEnumArray = {}
-for key in pairs(behaviorHandlers) do
-	table.insert(behaviorEnumArray, string.format("%q", key))
+Behaviors.Enum = {}
+local enumString = {}
+for behavior in pairs(behaviorHandlers) do
+	Behaviors.Enum[behavior] = true
+	table.insert(enumString, behavior)
 end
-Behaviors.BEHAVIOR_ENUM = table.concat(behaviorEnumArray, ", ")
 
+enumString = table.concat(enumString, ", ")
 local function errorUnknownBehavior(behavior)
 	error(
 		string.format(
 			"Unknown behavior (%q) found. The only allowed behaviors are %s.",
 			tostring(behavior),
-			Behaviors.BEHAVIOR_ENUM
+			enumString
 		),
 		2
 	)
@@ -80,7 +82,7 @@ setmetatable(behaviorHandlers, {
 	end,
 })
 
-function Behaviors.handleValue(self, behaviors, value, midValue)
+function Behaviors.HandleValue(self, behaviors, value, midValue)
 	for _, behavior in ipairs(behaviors) do
 		local success, doSet, newValue = behaviorHandlers[behavior](self, value, midValue)
 		if success then
@@ -90,14 +92,29 @@ function Behaviors.handleValue(self, behaviors, value, midValue)
 	return true, value
 end
 
-function Behaviors.assert(behavior)
-	if rawget(behaviorHandlers, behavior) ~= nil then
-		return behavior
+function Behaviors.Convert(behaviors)
+	local typeof_behaviors = typeof(behaviors)
+	local preset_behavior = Behaviors.Presets[behaviors]
+	if preset_behavior then
+		return preset_behavior
+
+	elseif Behaviors.Enum[behaviors] then
+		return { behaviors }
+
+	elseif typeof_behaviors == "table" then
+		for _, behavior in ipairs(behaviors) do
+			if not Behaviors.Enum[behavior] then
+				errorUnknownBehavior(behavior)
+			end
+		end
+		return behaviors
+
+	else
+		errorUnknownBehavior(behaviors)
 	end
-	errorUnknownBehavior(behavior)
 end
 
-function Behaviors.init()
+function Behaviors.Init()
 	reconcilers = require(main.Reconcilers)
 	replacers = require(main.Replacers)
 end

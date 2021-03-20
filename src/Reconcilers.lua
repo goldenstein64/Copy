@@ -9,9 +9,9 @@ function reconcilers.table(self, oldTable, newTable)
 	end
 	self.Transform[oldTable] = newTable
 
-	local keyBehavior = self.GlobalBehavior.Keys
-	local valueBehavior = self.GlobalBehavior.Values
-	local metaBehavior = self.GlobalBehavior.Meta
+	local keyBehavior = self.GlobalContext.Keys
+	local valueBehavior = self.GlobalContext.Values
+	local metaBehavior = self.GlobalContext.Meta
 
 	for k, v in pairs(oldTable) do
 		local doSet_k, newKey
@@ -19,7 +19,7 @@ function reconcilers.table(self, oldTable, newTable)
 		if self.BehaviorMap[k] then
 			doSet_k, newKey = k(midKey)
 		else
-			doSet_k, newKey = Behaviors.handleValue(self, keyBehavior, k, midKey)
+			doSet_k, newKey = Behaviors.HandleValue(self, keyBehavior, k, midKey)
 		end
 		if not doSet_k or newKey == nil then
 			newKey = k
@@ -30,7 +30,7 @@ function reconcilers.table(self, oldTable, newTable)
 		if self.BehaviorMap[v] then
 			doSet_v, newValue = v(midValue)
 		else
-			doSet_v, newValue = Behaviors.handleValue(self, valueBehavior, v, midValue)
+			doSet_v, newValue = Behaviors.HandleValue(self, valueBehavior, v, midValue)
 		end
 		if doSet_v then
 			rawset(newTable, newKey, newValue)
@@ -44,7 +44,7 @@ function reconcilers.table(self, oldTable, newTable)
 		if self.BehaviorMap[meta] then
 			doSet_m, newMeta = meta(midMeta)
 		else
-			doSet_m, newMeta = Behaviors.handleValue(self, metaBehavior, meta, midMeta)
+			doSet_m, newMeta = Behaviors.HandleValue(self, metaBehavior, meta, midMeta)
 		end
 		if doSet_m then
 			setmetatable(newTable, newMeta)

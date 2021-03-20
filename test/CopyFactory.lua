@@ -10,16 +10,17 @@ return function()
 		}, {
 			__newindex = getmetatable(copy.Flags).__newindex,
 		}),
-		GlobalBehavior = setmetatable({
-			[next(copy.GlobalBehavior)] = {
-				Keys = {},
-				Values = { "transform", "reconcile", "replace" },
-				Meta = {},
+		GlobalContext = setmetatable(
+			{
+				[newproxy(false)] = {
+					Keys = {},
+					Values = { "transform", "reconcile", "replace" },
+					Meta = {},
+				},
+
 			},
-		}, {
-			__index = getmetatable(copy.GlobalBehavior).__index,
-			__newindex = getmetatable(copy.GlobalBehavior).__newindex,
-		}),
+			getmetatable(copy.GlobalContext)
+		),
 		Transform = {},
 		BehaviorMap = setmetatable({}, {
 			__mode = getmetatable(copy.BehaviorMap).__mode,

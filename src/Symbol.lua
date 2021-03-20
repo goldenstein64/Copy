@@ -8,7 +8,7 @@ function Symbol:__tostring()
 end
 
 function Symbol:__call(newValue)
-	return Behaviors.handleValue(self.Owner, self.Behaviors, self.Value, newValue)
+	return Behaviors.HandleValue(self.Owner, self.Behaviors, self.Value, newValue)
 end
 
 return Symbol

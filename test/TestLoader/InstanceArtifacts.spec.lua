@@ -9,7 +9,7 @@ return function()
 	describe("instance artifact detection", function()
 
 		it("avoids searching unreachable values", function()
-			Copy.GlobalBehavior.Values = "set"
+			Copy.GlobalContext.Values = "set"
 			Copy.Flags.Flush = false
 
 			local part = Instance.new("Part")
@@ -22,7 +22,7 @@ return function()
 		end)
 
 		it("avoids searching unreachable keys", function()
-			Copy.GlobalBehavior.Keys = "set"
+			Copy.GlobalContext.Keys = "set"
 			Copy.Flags.Flush = false
 
 			local part = Instance.new("Part")
@@ -37,7 +37,7 @@ return function()
 		end)
 
 		it("avoids searching unreachable metatables", function()
-			Copy.GlobalBehavior.Meta = "set"
+			Copy.GlobalContext.Meta = "set"
 			Copy.Flags.Flush = false
 
 			local part = Instance.new("Part")
@@ -51,7 +51,7 @@ return function()
 		end)
 
 		it("avoids searching unreachable values in symbols", function()
-			Copy.GlobalBehavior.Values = "default"
+			Copy.GlobalContext.Values = "default"
 			Copy.Flags.Flush = false
 
 			local part = Instance.new("Part")

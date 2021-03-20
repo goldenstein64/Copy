@@ -17,10 +17,10 @@ local Instances = require(script.Instances)
 local Behaviors = require(script.Behaviors)
 local CopyMt = require(script.CopyMeta)
 local Reconcilers = require(script.Reconcilers)
-local GlobalBehavior = require(script.GlobalBehavior)
+local Contexts = require(script.Contexts)
 local Symbol = require(script.Symbol)
 
-Behaviors.init()
+Behaviors.Init()
 
 -- Private Functions
 local function attemptFlush(self)
@@ -41,7 +41,7 @@ local Copy = {
 		SetParent = false,
 	},
 
-	GlobalBehavior = GlobalBehavior,
+	GlobalContext = Contexts.Global,
 
 	Transform = {},
 	BehaviorMap = setmetatable({}, { __mode = "k" }),
@@ -71,8 +71,8 @@ function CopyMt:__call(value)
 	if self.BehaviorMap[value] then
 		result = select(2, value())
 	else
-		local valueBehavior = self.GlobalBehavior.Values
-		result = select(2, Behaviors.handleValue(self, valueBehavior, value, nil))
+		local valueBehavior = self.GlobalContext.Values
+		result = select(2, Behaviors.HandleValue(self, valueBehavior, value, nil))
 	end
 
 	attemptFlush(self)
@@ -101,27 +101,14 @@ function Copy:Extend(object, ...)
 end
 
 function Copy:BehaveAs(behaviors, value)
-	local typeof_behaviors = typeof(behaviors)
-
-	local found_behaviors = Behaviors.presets[behaviors]
-	if found_behaviors then
-		behaviors = found_behaviors
-	elseif typeof_behaviors == "table" then
-		for _, behavior in ipairs(behaviors) do
-			Behaviors.assert(behavior)
-		end
-	elseif typeof_behaviors == "string" then
-		Behaviors.assert(behaviors)
-		behaviors = { behaviors }
-	else
-		Behaviors.assert(behaviors)
-	end
+	behaviors = Behaviors.Convert(behaviors)
 
 	local behaviorObj = {
 		Owner = self,
 		Behaviors = behaviors,
 		Value = value,
 	}
+
 	setmetatable(behaviorObj, Symbol)
 	rawset(self.BehaviorMap, behaviorObj, true)
 

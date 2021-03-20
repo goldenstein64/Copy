@@ -170,7 +170,7 @@ return function()
 
 	describe("duplicate value handling", function()
 		it("should keep duplicate values the same", function()
-			Copy.GlobalBehavior.Values = "default"
+			Copy.GlobalContext.Values = "default"
 
 			local subTable = {}
 			local someTable = { subTable, subTable }
@@ -181,7 +181,7 @@ return function()
 		end)
 
 		it("should keep duplicate keys the same", function()
-			Copy.GlobalBehavior.Keys = "default"
+			Copy.GlobalContext.Keys = "default"
 
 			local subKey = {}
 			local someTable = {
@@ -197,7 +197,7 @@ return function()
 		end)
 
 		it("should keep duplicate metatables the same", function()
-			Copy.GlobalBehavior.Meta = "default"
+			Copy.GlobalContext.Meta = "default"
 
 			local subMeta = {}
 			local someTable = {

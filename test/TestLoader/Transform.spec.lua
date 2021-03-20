@@ -11,7 +11,7 @@ return function()
 		it("transforms values", function()
 			local array = { "value" }
 
-			Copy.GlobalBehavior.Values = "default"
+			Copy.GlobalContext.Values = "default"
 			Copy.Transform["value"] = "some other value"
 			local newArray = Copy(array)
 
@@ -21,7 +21,7 @@ return function()
 		it("transforms keys", function()
 			local dict = { key = "value" }
 
-			Copy.GlobalBehavior.Keys = "default"
+			Copy.GlobalContext.Keys = "default"
 			Copy.Transform["key"] = "someOtherKey"
 			local newDict = Copy(dict)
 
@@ -43,7 +43,7 @@ return function()
 			local someTable = setmetatable({ Value = 3 }, addMeta)
 			local otherTable = { Value = 8 }
 
-			Copy.GlobalBehavior.Meta = "default"
+			Copy.GlobalContext.Meta = "default"
 			Copy.Transform[addMeta] = otherMeta
 			local newTable = Copy(someTable)
 

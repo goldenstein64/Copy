@@ -39,31 +39,16 @@ function indexSubTable(state, tabl)
 		return
 	end
 	for k, v in pairs(tabl) do
-		if
-			table.find(state.Copy.GlobalBehavior.Keys, "replace")
-			or table.find(state.Copy.GlobalBehavior.Keys, "transform")
-			and not isTransformed(state.Copy, k)
-		then
+		if table.find(state.Copy.GlobalContext.Keys, "replace") then
 			indexSubValue(state, k)
 		end
-		if
-			table.find(state.Copy.GlobalBehavior.Values, "replace")
-			or table.find(state.Copy.GlobalBehavior.Values, "transform")
-			and not isTransformed(state.Copy, v)
-		then
+		if table.find(state.Copy.GlobalContext.Values, "replace") then
 			indexSubValue(state, v)
 		end
 	end
 
 	local meta = getmetatable(tabl)
-	if
-		type(meta) == "table"
-		and (
-			table.find(state.Copy.GlobalBehavior.Meta, "replace")
-			or table.find(state.Copy.GlobalBehavior.Meta, "transform")
-			and not isTransformed(state.Copy, meta)
-		)
-	then
+	if type(meta) == "table" and table.find(state.Copy.GlobalContext.Meta, "replace") then
 		indexSubValue(state, meta)
 	end
 end
@@ -74,7 +59,10 @@ local function indexValue(copy, value)
 		Instances = {},
 		Explored = {},
 	}
-	indexSubValue(state, value)
+	if table.find(state.Copy.GlobalContext.Values, "replace") then
+		indexSubValue(state, value)
+	end
+
 	return state.Instances
 end
 

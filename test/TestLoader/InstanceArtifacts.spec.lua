@@ -65,18 +65,16 @@ return function()
 		end)
 	end)
 
-	describe("Stability", function()
-		it("preserves instance hierarchy", function()
-			local folder = Instance.new("Folder")
-			local someTable = {
-				folder = folder,
-				part = Instance.new("Part"),
-			}
-			someTable.part.Parent = folder
+	it("preserves instance hierarchy", function()
+		local folder = Instance.new("Folder")
+		local someTable = {
+			folder = folder,
+			part = Instance.new("Part"),
+		}
+		someTable.part.Parent = folder
 
-			local newTable = Copy(someTable)
+		local newTable = Copy(someTable)
 
-			expect(newTable.folder.Part).to.equal(newTable.part)
-		end)
+		expect(newTable.folder.Part).to.equal(newTable.part)
 	end)
 end

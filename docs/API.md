@@ -2,6 +2,12 @@
 
 This is a list of all public properties and methods contained in the Copy module.
 
+As a precursor, you may see references to `it()` functions in code blocks. These will be cited using this format:
+
+**`T.FileName.DescribeBlock`**
+
+These functions can be found in the `test` directory found [here](https://github.com/goldenstein64/Copy/test/TestLoader).
+
 ## Functions
 
 There are only two functions that do the job of copying, the rest are just helper functions.
@@ -33,7 +39,26 @@ Copies all fields in `bases` to `object` from left to right. `Copy(some)` is the
 
 ### <a name="Copy_BehaveAs"></a> `Copy:BehaveAs(behavior: string|array, object: any): Symbol`
 
-Creates a [Symbol](#symbols). It can be placed anywhere in the base value to signify that this field should follow the specified [Behavior](#behaviors).
+Creates a [Symbol](#symbols). It can be placed anywhere in the base value to signify that it should follow the specified [Behavior](#behaviors).
+
+**`T.BehaveAs.Exclusivity`**
+
+```lua
+it("allows different behavior in values", function()
+  local someTable = {
+    key = "value",
+  }
+
+  local baseTable = {
+    key = Copy:BehaveAs("set", nil),
+  }
+
+  Copy:Extend(someTable, baseTable)
+  local newValue = someTable.key
+
+  expect(newValue).to.equal(nil)
+end)
+```
 
 ### `Copy:Flush()`
 
@@ -99,22 +124,26 @@ If the `Copy` module receives an empty array `{}`, copying that value will retur
 
 ### <a name="symbols"></a> Symbols
 
-The `Copy` module has the power to control how values are copied, but it needs `Symbols` to control which behaviors are used.
+The `Copy` module has the power to control how values are copied, but it needs `Symbols` to control how particular sub-values are copied.
 
 Traditionally, `Symbols` are created using [`Copy:BehaveAs`](#Copy_BehaveAs):
 
+**`T.BehaveAs.Behaviors`**
+
 ```lua
-local sub = {}
+it("can move shared values using 'set'", function()
+  local sub = {}
 
-local some = {
-  owned = sub,
-  shared = Copy:BehaveAs("set", sub)
-}
+  local some = {
+    owned = sub,
+    shared = Copy:BehaveAs("set", sub),
+  }
 
-local new = Copy(some)
+  local new = Copy(some)
 
-print(new.owned == sub) --> false
-print(new.shared == sub) --> true
+  expect(new.owned).to.never.equal(sub)
+  expect(new.shared).to.equal(sub)
+end)
 ```
 
 But you can also create them using functions. Functions take the type `(T) -> (boolean, T)`.
@@ -150,7 +179,7 @@ end)
 
 ### <a name="transform"></a> Transform
 
-The `Copy` module uses a table to keep track of what values have been copied so that it can return it again if it receives a reference to that same value:
+The `Copy` module solves recursive tables by using a mapping of original values to new ones. Any values that were already copied in a single `Copy()` call will be used again in subsequent assignments.
 
 **`T.Transform.BaseTraits`**
 

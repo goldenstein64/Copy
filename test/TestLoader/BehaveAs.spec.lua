@@ -32,7 +32,7 @@ return function()
 			local newKey = next(newTable)
 
 			expect(newKey).to.be.a("userdata")
-			expect(newKey).never.to.equal(key)
+			expect(newKey).to.never.equal(key)
 		end)
 
 		it("allows different behavior in metatables", function()
@@ -43,12 +43,12 @@ return function()
 			local newMeta = getmetatable(newTable)
 
 			expect(newMeta).to.be.a("table")
-			expect(newMeta).never.to.equal(meta)
+			expect(newMeta).to.never.equal(meta)
 		end)
 	end)
 
 	describe("Behaviors", function()
-		it("can copy values in the same table using 'replace'", function()
+		it("can duplicate values using 'replace'", function()
 			local subTable = {
 				key = "value",
 			}
@@ -59,7 +59,7 @@ return function()
 
 			local newTable = Copy(someTable)
 
-			expect(newTable.sub).never.to.equal(newTable.sub2)
+			expect(newTable.sub).to.never.equal(newTable.sub2)
 			expect(newTable.sub.key).to.equal("value")
 			expect(newTable.sub2.key).to.equal("value")
 		end)
@@ -80,17 +80,18 @@ return function()
 
 			Copy:Extend(someTable, baseTable)
 
-			expect(someTable.sub).never.to.equal(nil)
-			expect(someTable.sub).never.to.equal(subBaseTable)
+			expect(someTable.sub).to.never.equal(nil)
+			expect(someTable.sub).to.never.equal(subBaseTable)
 			expect(someTable.sub.baseKey).to.equal("copied value")
 			expect(someTable.sub.key).to.equal("value")
 		end)
 
 		it("can overwrite values using 'replace'", function()
+			local subSomeTable = {
+				key = "value",
+			}
 			local someTable = {
-				sub = {
-					key = "value",
-				},
+				sub = subSomeTable,
 			}
 
 			local subBaseTable = {
@@ -102,32 +103,14 @@ return function()
 
 			Copy:Extend(someTable, baseTable)
 
-			expect(someTable.sub).never.to.equal(nil)
-			expect(someTable.sub).never.to.equal(subBaseTable)
+			expect(someTable.sub).to.never.equal(subSomeTable)
+			expect(someTable.sub).to.never.equal(subBaseTable)
+			expect(someTable.sub).to.never.equal(nil)
 			expect(someTable.sub.key).to.equal(nil)
 			expect(someTable.sub.baseKey).to.equal("copied value")
 		end)
 
-		it("can extend shared values using 'set'", function()
-			local someTable = {
-				shared = {
-					key = "value",
-				},
-			}
-
-			local sharedTable = {
-				baseKey = "replaced value",
-			}
-			local baseTable = {
-				shared = Copy:BehaveAs("set", sharedTable),
-			}
-
-			Copy:Extend(someTable, baseTable)
-
-			expect(someTable.shared).to.equal(sharedTable)
-		end)
-
-		it("can skip extending values using 'pass'", function()
+		it("can skip copying values using 'pass'", function()
 			local someTable = {
 				key = "value",
 			}
@@ -154,19 +137,48 @@ return function()
 
 			expect(meta.key).to.equal("base value")
 		end)
+
+		describe("Presets", function()
+			it("can normally copy values in other contexts using 'default'", function()
+				local key = newproxy(false)
+				local some = {
+					[Copy:BehaveAs("default", key)] = "value",
+				}
+
+				local new = Copy(some)
+				local newKey = next(new)
+
+				expect(newKey).to.never.equal(key)
+				expect(new[key]).to.equal(nil)
+				expect(some[newKey]).to.equal(nil)
+				expect(new[newKey]).to.equal("value")
+			end)
+
+			it("can move shared values using 'set'", function()
+				local sub = {}
+
+				local some = {
+					owned = sub,
+					shared = Copy:BehaveAs("set", sub),
+				}
+
+				local new = Copy(some)
+
+				expect(new.owned).to.never.equal(sub)
+				expect(new.shared).to.equal(sub)
+			end)
+		end)
 	end)
 
-	describe("BehaviorPriority", function()
-		it("gives Copy:BehaveAs priority over global behavior", function()
-			local someTable = Copy:BehaveAs("default", {
-				key = Copy:BehaveAs("set", "value"),
-			})
+	it("gives Copy:BehaveAs priority over global behavior", function()
+		local someTable = Copy:BehaveAs("default", {
+			key = Copy:BehaveAs("set", "value"),
+		})
 
-			Copy.GlobalContext.Values = "pass"
-			local newTable = Copy(someTable)
+		Copy.GlobalContext.Values = "pass"
+		local newTable = Copy(someTable)
 
-			expect(newTable.key).to.equal("value")
-		end)
+		expect(newTable.key).to.equal("value")
 	end)
 
 	describe("CustomSymbols", function()
@@ -231,13 +243,11 @@ return function()
 		end)
 	end)
 
-	describe("GarbageCollection", function()
-		it("deletes itself once not referenced anymore", function()
-			Copy:BehaveAs("set", nil)
+	it("deletes itself once not referenced anymore", function()
+		Copy:BehaveAs("set", nil)
 
-			wait()
+		wait(1)
 
-			expect(next(Copy.SymbolMap)).to.equal(nil)
-		end)
+		expect(next(Copy.SymbolMap)).to.equal(nil)
 	end)
 end

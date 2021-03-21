@@ -22,11 +22,8 @@ function List.fromJSON(value)
   return self
 end
 
-local prototype = {}
-
-setmetatable(prototype, { __index = table })
-
-List.prototype = prototype
+List.prototype = {}
+setmetatable(List.prototype, { __index = table })
 
 return List
 ```
@@ -41,18 +38,35 @@ local list = require(script.Parent.list)
 
 local SortedList = class("SortedList", list)
 
-local prototype = {}
-
-for name, func in pairs(table) do
-  prototype[k] = function(self, ...)
-    local result = table.pack(func(self, ...))
-    self:sort()
-
-    return table.unpack(result, 1, result.n)
-  end
+function SortedList.fromJSON(value)
+  local self = list.fromJSON(value)
+  self:sort()
+  return self
 end
 
-SortedList.prototype = prototype
+SortedList.prototype = {}
+
+function SortedList.prototype:insert(value)
+  table.insert(self, value)
+  self:sort()
+end
 
 return SortedList
+```
+
+Usage:
+
+```lua
+local SortedList = require(path.to.SortedList)
+
+local someList = SortedList.new()
+
+someList:insert(1)
+someList:insert(3)
+someList:insert(2)
+
+for i, v in ipairs(someList) do
+  print(i, v)
+  --> { [1] = 1, [2] = 2, [3] = 3 }
+end
 ```

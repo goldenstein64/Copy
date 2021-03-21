@@ -23,7 +23,7 @@ return function()
 			local newArray = Copy(array)
 
 			-- these tables are not the same!
-			expect(newArray).never.to.equal(array)
+			expect(newArray).to.never.equal(array)
 		end)
 
 		it("can run the technical sample", function()
@@ -54,11 +54,11 @@ return function()
 
 			local newDict = Copy(dict)
 
-			expect(dict).never.to.equal(newDict) --> This table was copied!
+			expect(dict).to.never.equal(newDict) --> This table was copied!
 
 			expect(newDict.member).to.equal(8) --> Copies stateless members
 			expect(newDict.cyclic).to.equal(newDict) --> Retains cyclic behavior
-			expect(dict.part).never.to.equal(newDict.part) --> Clones parts
+			expect(dict.part).to.never.equal(newDict.part) --> Clones parts
 			expect(dict.greet).to.equal(newDict.greet) --> Retains functions
 
 			expect(newDict[key]).to.equal("value") --> Retains keys
@@ -66,7 +66,7 @@ return function()
 			expect(getmetatable(dict)).to.equal(getmetatable(newDict)) --> Retains metatables
 			expect(newDict.fakeMember).to.equal("does not exist!") --> Retains metamethods
 
-			expect(dict.userdata).never.to.equal(newDict.userdata) --> Copies userdatas
+			expect(dict.userdata).to.never.equal(newDict.userdata) --> Copies userdatas
 			expect(dict.userdata.key).to.equal("indexed with key") --> Retains metamethods!
 
 			expect(newDict.folder.Part).to.equal(newDict.part) --> Retains hierarchy
@@ -77,22 +77,22 @@ return function()
 	describe("TypeTests", function()
 		it("copies tables", function()
 			local someTable = {}
-			expect(Copy(someTable)).never.to.equal(someTable)
+			expect(Copy(someTable)).to.never.equal(someTable)
 		end)
 
 		it("copies userdatas", function()
 			local someUserdata = newproxy(false)
-			expect(Copy(someUserdata)).never.to.equal(someUserdata)
+			expect(Copy(someUserdata)).to.never.equal(someUserdata)
 		end)
 
 		it("copies Instances", function()
 			local someInstance = Instance.new("Part")
-			expect(Copy(someInstance)).never.to.equal(someInstance)
+			expect(Copy(someInstance)).to.never.equal(someInstance)
 		end)
 
 		it("copies the Random roblox type", function()
 			local someRandom = Random.new()
-			expect(Copy(someRandom)).never.to.rawEqual(someRandom)
+			expect(Copy(someRandom)).to.never.rawEqual(someRandom)
 		end)
 
 		it("preserves strings", function()
@@ -212,7 +212,7 @@ return function()
 
 			local newTable = Copy(someTable)
 
-			expect(newTable.sub).never.to.equal(someTable.sub)
+			expect(newTable.sub).to.never.equal(someTable.sub)
 			expect(newTable.sub.key).to.equal("some value")
 		end)
 

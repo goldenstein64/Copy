@@ -1,4 +1,7 @@
 -- Dependencies
-local TestEZ: TestEZ = require(script.Parent.TestEZ)
+local TestEZModule = script.Parent.TestEZ
+local TextReporter = require(TestEZModule.Reporters.TextReporter)
 
-TestEZ.TestBootstrap:run({ script })
+local TestEZ: TestEZ = require(TestEZModule)
+
+TestEZ.TestBootstrap:run({ script }, TextReporter)

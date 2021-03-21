@@ -31,6 +31,8 @@ return function()
 		Flush = copy.Flush,
 	}, {
 		__call = getmetatable(copy).__call,
+		__index = getmetatable(copy).__index,
+		__newindex = getmetatable(copy).__newindex,
 	})
 	return newCopy
 end

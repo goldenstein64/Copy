@@ -63,7 +63,15 @@ end
 
 -- Public Functions
 function CopyMt:__call(value)
-	self.InstanceTransform = Instances.ApplyTransform(self, value)
+	local instanceTransform = rawget(self, "InstanceTransform")
+	if instanceTransform then
+		local newTransform = Instances.ApplyTransform(self, value)
+		for oldInstance, newInstance in pairs(newTransform) do
+			instanceTransform[oldInstance] = newInstance
+		end
+	else
+		rawset(self, "InstanceTransform", Instances.ApplyTransform(self, value))
+	end
 
 	local result
 	if self.SymbolMap[value] then
@@ -81,12 +89,21 @@ end
 function Copy:Extend(object, ...)
 	assert(type(object) == "table", "`base` can only be of type 'table'")
 
+	local instanceTransform = rawget(self, "InstanceTransform")
+	if not instanceTransform then
+		rawset(self, "InstanceTransform", {})
+	end
+
 	for i = 1, select("#", ...) do
 		local modifier = select(i, ...)
 		assert(type(modifier) == "table", "All modifier arguments provided can only be of type 'table'")
 		assert(not self.SymbolMap[modifier], "No modifier argument can directly be a symbol")
 
-		Instances.ApplyTransform(self, modifier)
+		local transform = Instances.ApplyTransform(self, modifier)
+		for oldInstance, newInstance in pairs(transform) do
+			self.InstanceTransform[oldInstance] = newInstance
+		end
+
 		if self.SymbolMap[modifier] then
 			modifier(object)
 		else
@@ -116,7 +133,7 @@ end
 
 function Copy:Flush()
 	table.clear(self.Transform)
-	self.InstanceTransform = nil
+	rawset(self, "InstanceTransform", nil)
 end
 
 setmetatable(Copy, CopyMt)

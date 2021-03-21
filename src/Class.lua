@@ -48,7 +48,7 @@ local function class(name, ...)
 	}
 
 	function newClass.new(...)
-		local self = Copy:Extend({}, class:gatherSupers())
+		local self = Copy:Extend({}, newClass:gatherSupers())
 		return newClass.init(self, ...)
 	end
 

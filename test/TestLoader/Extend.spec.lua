@@ -1,6 +1,25 @@
 return function()
 	local CopyFactory = require(script.Parent.Parent.CopyFactory)
 
+	local function isOfClass(value, className)
+		local typeof_value = typeof(value)
+		if typeof_value ~= "Instance" then
+			return {
+				pass = false,
+				message = string.format("Expected value of type 'Instance', got '%s'", typeof_value),
+			}
+		end
+
+		return {
+			pass = value.ClassName == className,
+			message = string.format(
+				"Expected Instance of class '%s', got '%s'",
+				tostring(className),
+				value.ClassName
+			),
+		}
+	end
+
 	local Copy
 	beforeEach(function()
 		Copy = CopyFactory()
@@ -25,17 +44,15 @@ return function()
 		return base, modifier, modifier2
 	end
 
-	describe("Assertions", function()
-		it("errors if the arguments aren't tables", function()
-			local userdata = newproxy(true)
-			local otherUserdata = newproxy(true)
-			local otherMt = getmetatable(otherUserdata)
-			otherMt.__index = {}
+	it("errors if the arguments aren't tables", function()
+		local userdata = newproxy(true)
+		local otherUserdata = newproxy(true)
+		local otherMt = getmetatable(otherUserdata)
+		otherMt.__index = {}
 
-			expect(function()
-				Copy:Extend(userdata, otherUserdata)
-			end).to.throw()
-		end)
+		expect(function()
+			Copy:Extend(userdata, otherUserdata)
+		end).to.throw()
 	end)
 
 	describe("TestTableTypes", function()
@@ -63,7 +80,7 @@ return function()
 
 			Copy:Extend(namespace, otherNamespace)
 
-			expect(namespace.OtherMethod).never.to.equal(nil)
+			expect(namespace.OtherMethod).to.never.equal(nil)
 			expect(namespace.OtherMethod()).to.equal("other method")
 		end)
 
@@ -77,6 +94,28 @@ return function()
 
 			expect(otherMt).to.equal(someMt)
 		end)
+	end)
+
+	it("copies instances", function()
+		expect.extend({ ofClass = isOfClass })
+
+		local parent = Instance.new("Folder")
+
+		local some = {
+			key = "value",
+		}
+
+		local base = {
+			folder = parent,
+			part = Instance.new("Part"),
+		}
+
+		base.part.Parent = parent
+
+		Copy:Extend(some, base)
+
+		expect(some.part).to.be.ofClass("Part")
+		expect(some.part).to.never.equal(base.part)
 	end)
 
 	describe("Inheritance", function()

@@ -28,7 +28,7 @@ return function()
 
 			local _ = Copy(dict)
 
-			expect(next(Copy.Transform)).never.to.equal(nil)
+			expect(next(Copy.Transform)).to.never.equal(nil)
 		end)
 
 		it("preserves table relations", function()
@@ -73,11 +73,9 @@ return function()
 		end)
 	end)
 
-	describe("Assertions", function()
-		it("does not allow for nonexistent flags", function()
-			expect(function()
-				Copy.Flags.NonFlag = true
-			end).to.throw()
-		end)
+	it("does not allow for nonexistent flags", function()
+		expect(function()
+			Copy.Flags.NonFlag = true
+		end).to.throw()
 	end)
 end

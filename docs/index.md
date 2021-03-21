@@ -16,4 +16,4 @@ Not to mention all the potential data types you might or might not want to suppo
 
 This module takes a deeper look at how all these algorithms are created and makes an all-encompassing system for the problem.
 
-* [API Reference](../API.md)
+* [API Reference](./API)

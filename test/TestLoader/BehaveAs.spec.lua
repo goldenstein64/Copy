@@ -125,7 +125,6 @@ return function()
 		end)
 
 		it("can extend metatables using 'reconcile'", function()
-
 			local meta = {}
 			local someTable = setmetatable({}, meta)
 
@@ -170,7 +169,7 @@ return function()
 		end)
 	end)
 
-	it("gives Copy:BehaveAs priority over global behavior", function()
+	it("gives Copy:BehaveAs() priority over global behavior", function()
 		local someTable = Copy:BehaveAs("default", {
 			key = Copy:BehaveAs("set", "value"),
 		})
@@ -201,7 +200,7 @@ return function()
 		end)
 
 		it("can make ducks", function()
-			local function makeDuck(oldValue)
+			local function makeDuck()
 				local duck = {}
 
 				function duck.quack()

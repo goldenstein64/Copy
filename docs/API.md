@@ -62,7 +62,7 @@ end)
 
 ### `Copy:Flush()`
 
-Clears any data lingering from the last time something was copied. This is only useful when paired with [`Copy.Flags.Flush`](#Flush_Flag) set to `false`.
+Clears any data lingering from the last time something was copied. This is only useful when paired with [Copy.Flags.Flush](#Flush_Flag) set to `false`.
 
 ## Properties
 
@@ -70,13 +70,13 @@ There are a great number of properties `Copy` has, useful for creating versatile
 
 ### `Copy.GlobalContext`
 
-This table stores the default behaviors `Copy()` should use to copy values when no behavior is provided, separated by context.
+This table stores the default behaviors `Copy()` should use to copy values when no behavior is provided, categorized by context.
 
 * `Copy.GlobalBehavior.Keys` - The default behavior to use for table keys
 * `Copy.GlobalBehavior.Values` - The default behavior to use for generic values
 * `Copy.GlobalBehavior.Meta` - The default behavior to use for metatables
 
-These contexts accept the same [behaviors](#behaviors) as [`Copy:BehaveAs`](#Copy_BehaveAs).
+These contexts accept the same [behaviors](#behaviors) as [Copy:BehaveAs()](#Copy_BehaveAs).
 
 ### `Copy.Flags`
 
@@ -104,29 +104,67 @@ The `Copy` module uses a few concepts to make itself more coherent, so this sect
 
 ### <a name="behaviors"></a> Behaviors
 
-The `Copy` module uses `Behaviors` to describe how objects are copied from a base value to a new one. Behaviors are usually combined to create higher-level behaviors using arrays, like so: `{ "transform", "reconcile", "replace" }`. The `Copy` module sequentially makes a pass with each behavior and, upon the first successful conversion, returns that value.
+The `Copy` module uses `Behaviors` to describe how objects are copied from a base value to a new one. This is encapsulated in the `Behaviors` module, found under the `Copy` module.
+
+All the lowest level behaviors are listed here:
+
+* `"transform"` - if the value is mapped to an already copied value in `Copy.Transform`, it will return that value.
+* `"reconcile"` - if the value can be reconciled, like a table, `Copy` will overwrite fields from the old value to the new one. This type of behavior is used in functions like `Copy:Extend`.
+* `"replace"` - if the value can be replaced, like a `Random` object, `Copy` will create a new value from the old one.
+* `"skip"` - This will do nothing with the value and skip its setting.
+
+The above can be used by supplying them as strings where expected:
+
+```lua
+Copy:BehaveAs('transform', "some value")
+Copy.GlobalBehavior.Values = 'transform'
+```
+
+Behaviors are usually combined to create higher-level behaviors using arrays, like so:
+
+```lua
+Copy:BehaveAs({'transform', 'reconcile', 'replace'}, "some value")
+Copy.GlobalBehavior.Values = {'transform', 'reconcile', 'replace'}
+```
+
+The `Copy` module sequentially makes a pass with each behavior and, upon the first successful conversion, returns that value.
+
+The most commonly used behaviors can be substituted with a string just like the lower level behaviors. These are known as (behavior) presets.
 
 All the presets are listed here:
 
 * `"default" = { "transform", "reconcile", "replace" }` - the default behavior for copying generic values.
 * `"set" = {}` - skips copying a value and simply return itself.
 
-Presets can be used by simply supplying the name as a string, `Copy:BehaveAs("set", 'some value')`
+These can be used by simply supplying the name as a string:
 
-And all the lowest level behaviors are listed here:
+```lua
+Copy:BehaveAs('default', "some value")
+Copy.GlobalBehavior.Keys = 'default'
+```
 
-* `"transform"` - if the value is mapped to an already copied value in `Copy.Transform`, it will return that value.
-* `"reconcile"` - if the value can be reconciled, like a table, `Copy` will attempt to overwrite fields from the old value to the new one, given it exists. This type of behavior is used in functions like `Copy:Extend`.
-* `"replace"` - if the value can be replaced, like a `Random` datatype, `Copy` will attempt to create a new value from the old value, removing the new one entirely.
-* `"skip"` - don't do anything with the value and skip setting it.
+If the `Copy` module receives an empty array `{}` in place of a behavior, copying the value with that behavior will return itself.
 
-If the `Copy` module receives an empty array `{}`, copying that value will return itself.
+Indexing `Copy.GlobalBehavior` will return the array representing the behavior:
+
+```lua
+Copy.GlobalBehavior.Keys = 'default'
+
+local keysBehavior = Copy.GlobalBehavior.Keys
+
+expect(keysBehavior).to.be.a("table")
+expect(keysBehavior[1]).to.equal('transform')
+expect(keysBehavior[2]).to.equal('reconcile')
+expect(keyBehavior[3]).to.equal('replace')
+```
 
 ### <a name="symbols"></a> Symbols
 
-The `Copy` module has the power to control how values are copied, but it needs `Symbols` to control how particular sub-values are copied.
+The `Copy` module has the power to control how values behave when copied, but it needs `Symbols` to control the behavior of particular sub-values.
 
-Traditionally, `Symbols` are created using [`Copy:BehaveAs`](#Copy_BehaveAs):
+Symbols are very good for representing different copying behavior for identical sub-values in different locations, but they are not very good for being treated as actual values.
+
+Traditionally, `Symbols` are created using [Copy:BehaveAs()](#Copy_BehaveAs):
 
 **`T.BehaveAs.Behaviors`**
 
@@ -145,6 +183,13 @@ it("can move shared values using 'set'", function()
   expect(new.shared).to.equal(sub)
 end)
 ```
+
+Symbols created using `Copy:BehaveAs()` have a small API of their own.
+
+* `Symbol.Owner` - describes which `Copy` module created the symbol
+* `Symbol.Value` - the value that the symbol should copy
+* `Symbol.Behavior` - how the value will behave when copied. **There are no type assertions made for this field, so be careful if you decide to assign to this!**
+* `Symbol()` - Copies the value using the owner, behavior, and value provided by its fields.
 
 But you can also create them using functions. Functions take the type `(T) -> (boolean, T)`.
 
@@ -179,7 +224,7 @@ end)
 
 ### <a name="transform"></a> Transform
 
-The `Copy` module solves recursive tables by using a mapping of original values to new ones. Any values that were already copied in a single `Copy()` call will be used again in subsequent assignments.
+The `Copy` module solves recursive tables by using a mapping of original values to new ones. Any values that were already copied in a `Copy()` call will be used again in subsequent assignments to that value.
 
 **`T.Transform.BaseTraits`**
 

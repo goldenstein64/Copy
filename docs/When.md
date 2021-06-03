@@ -3,6 +3,7 @@
 The utmost requirement for being able to copy a value is whether the state of that value can be inspected and accessed.
 
 These are all the Lua datatypes and whether they have state:
+
 | Datatypes | Has state? |
 |---|---|
 | nil | no |

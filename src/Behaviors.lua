@@ -19,7 +19,7 @@ function behaviorHandlers.transform(self, value)
 	if transSuccess then
 		return true, transDoSet, transCopy
 	else
-		return false
+		return false, false, nil
 	end
 end
 
@@ -29,7 +29,7 @@ function behaviorHandlers.reconcile(self, value, newValue)
 	if handler and typeof_value == typeof(newValue) then
 		return handler(self, value, newValue)
 	else
-		return false
+		return false, false, nil
 	end
 end
 
@@ -39,7 +39,7 @@ function behaviorHandlers.replace(self, value)
 	if handler then
 		return handler(self, value)
 	else
-		return false
+		return false, false, nil
 	end
 end
 
@@ -48,7 +48,7 @@ function behaviorHandlers.pass()
 end
 
 local Behaviors = {
-	handlers = behaviorHandlers,
+	Behaviors = behaviorHandlers,
 
 	Presets = {
 		default = { "transform", "reconcile", "replace" },

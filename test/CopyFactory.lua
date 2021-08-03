@@ -10,17 +10,13 @@ return function()
 		}, {
 			__newindex = getmetatable(copy.Flags).__newindex,
 		}),
-		GlobalContext = setmetatable(
-			{
-				[newproxy(false)] = {
-					Keys = {},
-					Values = { "transform", "reconcile", "replace" },
-					Meta = {},
-				},
-
+		GlobalContext = setmetatable({
+			[newproxy()] = {
+				Keys = {},
+				Values = { "transform", "reconcile", "replace" },
+				Meta = {},
 			},
-			getmetatable(copy.GlobalContext)
-		),
+		}, getmetatable(copy.GlobalContext)),
 		Transform = {},
 		SymbolMap = setmetatable({}, {
 			__mode = getmetatable(copy.SymbolMap).__mode,

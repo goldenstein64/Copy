@@ -1,7 +1,5 @@
--- Dependencies
-local TestEZModule = script.Parent.TestEZ
-local TextReporter = require(TestEZModule.Reporters.TextReporter)
+local Workspace = game:GetService("Workspace")
 
-local TestEZ: TestEZ = require(TestEZModule)
+local TestEZ = require(Workspace.CopyTest.TestEZ)
 
-TestEZ.TestBootstrap:run({ script }, TextReporter)
+TestEZ.TestBootstrap:run({ script }, TestEZ.Reporters.TextReporter)

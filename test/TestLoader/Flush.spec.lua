@@ -17,8 +17,9 @@ return function()
 		Copy:Flush()
 		local newTable3 = Copy(someTable)
 
-		expect(newTable1).to.equal(newTable2)
+		expect(newTable1)
+			.to.equal(newTable2)
+			.to.never.equal(newTable3)
 		expect(storedTable).to.equal(newTable2)
-		expect(newTable1).to.never.equal(newTable3)
 	end)
 end

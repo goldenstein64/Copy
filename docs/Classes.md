@@ -1,29 +1,37 @@
-# Classes
+# Creating classes with Copy
 
-There is some boilerplate included with `Copy()` that allows for the creation of classes with inheritance and proper objects with separate namespaces. You can pair this with `Copy:Extend` to create instances of objects like in `javascript`.
+This page lists some examples of some alternative organizations you can create using `Copy`.
+
+Since functions are copied by reference, this method uses about the same memory as metatable classes without the re-index overhead. This also creates a proper separation between class functions and object methods, meaning `Class.new().new()...` is no longer possible.
 
 List:
 
 ```lua
+-- dependencies
 local HttpService = game:GetService("HttpService")
 
 local Copy = require(path.to.Copy)
-local class = require(path.to.Copy.Class)
 
-local List = class("List")
+-- content
+local prototype = {}
 
-function List.init(self)
-  return self
+local List = {
+  prototype = prototype
+}
+
+-- object methods
+Copy:Extend(prototype, table)
+
+-- class methods
+function List.new()
+  return Copy(prototype)
 end
 
 function List.fromJSON(value)
   local data = HttpService:DecodeJSON(value)
-  local self = Copy:Extend(data, List:gatherSupers())
+  local self = Copy:Extend(data, prototype)
   return self
 end
-
-List.prototype = {}
-setmetatable(List.prototype, { __index = table })
 
 return List
 ```
@@ -31,24 +39,32 @@ return List
 Sorted List:
 
 ```lua
+-- dependencies
 local Copy = require(path.to.Copy)
-local class = require(path.to.Copy.Class)
 
-local list = require(script.Parent.list)
+-- base classes
+local List = require(script.Parent.List)
 
-local SortedList = class("SortedList", list)
+-- content - inherits from List
+local SortedList = Copy(List)
 
-function SortedList.fromJSON(value)
-  local self = list.fromJSON(value)
-  self:sort()
-  return self
+local prototype = SortedList.prototype
+
+-- object methods
+function prototype:insert(value)
+  local index = 1
+  while value > self[index] do
+    index += 1
+  end
+  table.insert(self, index, value)
 end
 
-SortedList.prototype = {}
-
-function SortedList.prototype:insert(value)
-  table.insert(self, value)
+-- class methods
+function SortedList.fromJSON(value)
+  local self = List.fromJSON(value)
+  Copy:Extend(self, prototype)
   self:sort()
+  return self
 end
 
 return SortedList
@@ -61,12 +77,9 @@ local SortedList = require(path.to.SortedList)
 
 local someList = SortedList.new()
 
-someList:insert(1)
 someList:insert(3)
 someList:insert(2)
+someList:insert(1)
 
-for i, v in ipairs(someList) do
-  print(i, v)
-  --> { [1] = 1, [2] = 2, [3] = 3 }
-end
+print(someList)
 ```

@@ -23,7 +23,7 @@ return function()
 		end)
 
 		it("allows different behavior in keys", function()
-			local key = newproxy(false)
+			local key = newproxy()
 			local someTable = {
 				[Copy:BehaveAs("default", key)] = "value",
 			}
@@ -103,9 +103,10 @@ return function()
 
 			Copy:Extend(someTable, baseTable)
 
-			expect(someTable.sub).to.never.equal(subSomeTable)
-			expect(someTable.sub).to.never.equal(subBaseTable)
-			expect(someTable.sub).to.never.equal(nil)
+			expect(someTable.sub)
+				.to.never.equal(subSomeTable)
+				.to.never.equal(subBaseTable)
+				.to.never.equal(nil)
 			expect(someTable.sub.key).to.equal(nil)
 			expect(someTable.sub.baseKey).to.equal("copied value")
 		end)
@@ -138,8 +139,19 @@ return function()
 		end)
 
 		describe("Presets", function()
+			it("always returns an array upon index", function()
+				Copy.GlobalContext.Values = "default"
+		
+				local valuesContext = Copy.GlobalContext.Values
+		
+				expect(valuesContext).to.be.a("table")
+				expect(valuesContext[1]).to.equal("transform")
+				expect(valuesContext[2]).to.equal("reconcile")
+				expect(valuesContext[3]).to.equal("replace")
+			end)
+
 			it("can normally copy values in other contexts using 'default'", function()
-				local key = newproxy(false)
+				local key = newproxy()
 				local some = {
 					[Copy:BehaveAs("default", key)] = "value",
 				}

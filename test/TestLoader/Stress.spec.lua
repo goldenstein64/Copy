@@ -49,7 +49,7 @@ return function()
 		local someTable = {}
 		do
 			for i = 1, ITER do
-				someTable[i] = newproxy(false)
+				someTable[i] = newproxy()
 			end
 		end
 		local t = os.clock()

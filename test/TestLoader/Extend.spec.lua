@@ -55,7 +55,7 @@ return function()
 		end).to.throw()
 	end)
 
-	describe("TestTableTypes", function()
+	describe("table types", function()
 		it("works on arrays", function()
 			local completeArray = { "a", "b", "c" }
 			local array = { nil, "b", nil }
@@ -114,11 +114,12 @@ return function()
 
 		Copy:Extend(some, base)
 
-		expect(some.part).to.be.ofClass("Part")
-		expect(some.part).to.never.equal(base.part)
+		expect(some.part)
+			.to.be.ofClass("Part")
+			.to.never.equal(base.part)
 	end)
 
-	describe("Inheritance", function()
+	describe("inheritance", function()
 		it("allows inheritance among tables", function()
 			local object = {
 				objectKey = "object value",

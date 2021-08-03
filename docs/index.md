@@ -18,6 +18,8 @@ Not to mention all the potential data types you might or might not want to suppo
 
 This module takes a deeper look at how all these algorithms are created and makes an all-encompassing system for the problem.
 
-* [API Reference](./API)
-* [Guide on Classes](./Classes)
-* [When to use `Copy`](./When)
+* [How to use Copy](./how)
+* [API Reference](./api)
+* [Creating classes with Copy](./classes)
+* [How types are supported by Copy](./types)
+* [Adding type support](./modifications)

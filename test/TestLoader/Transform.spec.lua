@@ -31,13 +31,13 @@ return function()
 
 		it("transforms metatables", function()
 			local addMeta = {
-				__add = function(self, b)
-					return self.Value + b.Value
+				__add = function(self, other)
+					return self.Value + other.Value
 				end,
 			}
 			local otherMeta = {
-				__add = function(self, b)
-					return 2 * (self.Value + b.Value)
+				__add = function(self, other)
+					return 2 * (self.Value + other.Value)
 				end,
 			}
 			local someTable = setmetatable({ Value = 3 }, addMeta)

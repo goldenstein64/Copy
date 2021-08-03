@@ -73,9 +73,9 @@ return function()
 		end)
 	end)
 
-	it("does not allow for nonexistent flags", function()
+	it("does not allow nonexistent flags", function()
 		expect(function()
-			Copy.Flags.NonFlag = true
+			Copy.Flags.FakeFlag = true
 		end).to.throw()
 	end)
 end

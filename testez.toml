@@ -32,6 +32,9 @@ type = "function"
 [[expect.args]]
 type = "any"
 
+[[expect.extend.args]]
+type = "table"
+
 [[FIXME.args]]
 type = "string"
 required = false

@@ -7,7 +7,7 @@ end
 
 local Contexts = {
 	Global = {
-		[newproxy(false)] = {
+		[newproxy()] = {
 			Keys = {},
 			Values = { "transform", "reconcile", "replace" },
 			Meta = {},
@@ -25,11 +25,7 @@ end
 enumString = table.concat(enumString, ", ")
 local function errorUnknownContext(context)
 	error(
-		string.format(
-			"Unknown context (%s) found. The only allowed contexts are %s.",
-			tostring(context),
-			enumString
-		),
+		string.format("Unknown context (%s) found. The only allowed contexts are %s.", tostring(context), enumString),
 		2
 	)
 end

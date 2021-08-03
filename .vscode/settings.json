@@ -1,0 +1,5 @@
+{
+  "Lua.diagnostics.enable": false,
+  "rojo.buildOutputPath": "CopyTest",
+  "rojo.buildFileFormat": "XML"
+}

@@ -2,11 +2,9 @@
 
 This is a list of all public properties and methods contained in the Copy module.
 
-As a precursor, you may see references to `it()` functions in code blocks. These will be cited using this format:
+As a precursor, you may see references to `it()` functions in code blocks. This is part of the TestEZ framework used to test this module and make sure it's up to snuff. They will be cited using this format, and can be found in the `test` directory found [here](https://github.com/goldenstein64/Copy/test/TestLoader).
 
 **`T.FileName.DescribeBlock`**
-
-These functions can be found in the `test` directory found [here](https://github.com/goldenstein64/Copy/test/TestLoader).
 
 ## Functions
 
@@ -25,7 +23,7 @@ All the datatypes copied by this function are:
 
 Any other datatype passed in will simply return itself.
 
-You can also use `Copy()` to copy itself, like so:
+You can also use `Copy()` to copy itself, like so.
 
 ```lua
 local newCopy = Copy(Copy)
@@ -72,9 +70,9 @@ There are a great number of properties `Copy` has, useful for creating versatile
 
 This table stores the default behaviors `Copy()` should use to copy values when no behavior is provided, categorized by context.
 
-* `Copy.GlobalBehavior.Keys` - The default behavior to use for table keys
-* `Copy.GlobalBehavior.Values` - The default behavior to use for generic values
-* `Copy.GlobalBehavior.Meta` - The default behavior to use for metatables
+* `Copy.GlobalContext.Keys` - The default behavior to use for table keys
+* `Copy.GlobalContext.Values` - The default behavior to use for generic values
+* `Copy.GlobalContext.Meta` - The default behavior to use for metatables
 
 These contexts accept the same [behaviors](#behaviors) as [Copy:BehaveAs()](#Copy_BehaveAs).
 
@@ -92,7 +90,7 @@ Decides whether instances cloned by the module are parented to the original inst
 
 ### `Copy.SymbolMap`
 
-A weak table that lists every [Symbol](#symbols) in existence as keys. Symbols delete themselves once they are not used anymore, and they can be used multiple times. Any values intended to be used as symbols should be registered in the symbol map, like so:
+A weak table that lists every [Symbol](#symbols) in existence as keys. Symbols delete themselves once they are not used anymore, and they can be used multiple times. Any values intended to be used as symbols should be registered in the symbol map, like so.
 
 ```lua
 Copy.SymbolMap[customSymbol] = true
@@ -113,49 +111,66 @@ All the lowest level behaviors are listed here:
 * `"replace"` - if the value can be replaced, like a `Random` object, `Copy` will create a new value from the old one.
 * `"skip"` - This will do nothing with the value and skip its setting.
 
-The above can be used by supplying them as strings where expected:
+These can be used by supplying them as strings where expected.
 
 ```lua
-Copy:BehaveAs('transform', "some value")
-Copy.GlobalBehavior.Values = 'transform'
+Copy:BehaveAs('transform', [[some value]])
+Copy.GlobalContext.Values = 'transform'
 ```
 
-Behaviors are usually combined to create higher-level behaviors using arrays, like so:
+Value types supported by the `"reconcile"` behavior are:
+
+* `table`
+* `userdata`
+
+Value types supported by the `"replace"` behavior are:
+
+* `table`
+* `userdata`
+* `Random`
+* `Instance`
+
+Behaviors are usually combined to create higher-level behaviors using arrays.
 
 ```lua
-Copy:BehaveAs({'transform', 'reconcile', 'replace'}, "some value")
-Copy.GlobalBehavior.Values = {'transform', 'reconcile', 'replace'}
+Copy:BehaveAs({'transform', 'reconcile', 'replace'}, [[some value]])
+Copy.GlobalContext.Values = {'transform', 'reconcile', 'replace'}
 ```
 
 The `Copy` module sequentially makes a pass with each behavior and, upon the first successful conversion, returns that value.
 
-The most commonly used behaviors can be substituted with a string just like the lower level behaviors. These are known as (behavior) presets.
+The most commonly used behaviors can be substituted with a string just like the lower level behaviors. These are known as behavior presets.
 
 All the presets are listed here:
 
 * `"default" = { "transform", "reconcile", "replace" }` - the default behavior for copying generic values.
-* `"set" = {}` - skips copying a value and simply return itself.
+* `"copy" = { "replace" }` - copies the value without reference to `transform` or the old value.
+* `"set" = {}` - skips copying a value and simply returns itself.
 
-These can be used by simply supplying the name as a string:
+These can be used by simply supplying the name as a string.
 
 ```lua
-Copy:BehaveAs('default', "some value")
-Copy.GlobalBehavior.Keys = 'default'
+Copy:BehaveAs('default', [[some value]])
+Copy.GlobalContext.Keys = 'default'
 ```
 
 If the `Copy` module receives an empty array `{}` in place of a behavior, copying the value with that behavior will return itself.
 
-Indexing `Copy.GlobalBehavior` will return the array representing the behavior:
+Indexing `Copy.GlobalContext` will return the array representing the behavior.
+
+**`T.GlobalContext`**
 
 ```lua
-Copy.GlobalBehavior.Keys = 'default'
+it("always returns an array upon index", function()
+  Copy.GlobalContext.Keys = "default"
 
-local keysBehavior = Copy.GlobalBehavior.Keys
+  local keysContext = Copy.GlobalContext.Keys
 
-expect(keysBehavior).to.be.a("table")
-expect(keysBehavior[1]).to.equal('transform')
-expect(keysBehavior[2]).to.equal('reconcile')
-expect(keyBehavior[3]).to.equal('replace')
+  expect(keysContext).to.be.a("table")
+  expect(keysContext[1]).to.equal("transform")
+  expect(keysContext[2]).to.equal("reconcile")
+  expect(keysContext[3]).to.equal("replace")
+end)
 ```
 
 ### <a name="symbols"></a> Symbols
@@ -174,7 +189,7 @@ it("can move shared values using 'set'", function()
 
   local some = {
     owned = sub,
-    shared = Copy:BehaveAs("set", sub),
+    shared = Copy:BehaveAs('set', sub),
   }
 
   local new = Copy(some)
@@ -189,11 +204,11 @@ Symbols created using `Copy:BehaveAs()` have a small API of their own.
 * `Symbol.Owner` - describes which `Copy` module created the symbol
 * `Symbol.Value` - the value that the symbol should copy
 * `Symbol.Behavior` - how the value will behave when copied. **There are no type assertions made for this field, so be careful if you decide to assign to this!**
-* `Symbol()` - Copies the value using the owner, behavior, and value provided by its fields.
+* `Symbol(T) -> (boolean, T)` - Copies the value using the owner, behavior, and value provided by its fields.
 
-But you can also create them using functions. Functions take the type `(T) -> (boolean, T)`.
+But you can also create them using functions. Symbol functions take the type `(T) -> (boolean, T)`.
 
-* **Parameter:** the old value's field
+* **Parameter:** the old value
 * **Returns:** a boolean describing whether to set the value, and the value to set
 
 **`T.BehaveAs.CustomSymbols`**

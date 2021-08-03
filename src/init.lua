@@ -1,12 +1,12 @@
 --[[
 
-The Copy Module
-A library for copying any value with state.
+Copy
+A module for copying any value with state.
 
 Author: goldenstein64
 Free Model: https://www.roblox.com/library/5089132938
 GitHub: https://github.com/goldenstein64/Copy
-Docs: TBD
+Docs: https://goldenstein64.github.io/Copy
 
 ver 1
 
@@ -15,7 +15,6 @@ ver 1
 -- Dependencies
 local Instances = require(script.Instances)
 local Behaviors = require(script.Behaviors)
-local CopyMt = require(script.CopyMeta)
 local Reconcilers = require(script.Reconcilers)
 local Contexts = require(script.Contexts)
 local Symbol = require(script.Symbol)
@@ -32,9 +31,11 @@ end
 -- Private Properties
 local allFlags = {}
 
+local CopyMt = {}
+
 -- Module
 local Copy = {
-	_id = newproxy(false),
+	_id = newproxy(),
 
 	Flags = {
 		Flush = true,
@@ -53,12 +54,17 @@ setmetatable(Copy.Flags, flagsMt)
 for flagName in pairs(Copy.Flags) do
 	allFlags[flagName] = true
 end
-function flagsMt.__newindex(self, flagName, value)
+
+function flagsMt:__newindex(flagName, value)
 	if allFlags[flagName] then
 		rawset(self, flagName, value)
 	else
 		error(string.format("Attempt to assign %q to Copy.Flags", tostring(flagName)), 2)
 	end
+end
+
+function CopyMt:__tostring()
+	return string.format("Copy: %s", tostring(self._id):sub(11))
 end
 
 -- Public Functions

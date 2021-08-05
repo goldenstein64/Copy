@@ -18,11 +18,4 @@ Not to mention all the potential data types you might or might not want to suppo
 
 This module takes a deeper look at how all these algorithms are created and makes an all-encompassing system for the problem.
 
-## `Copy:BehaveAs(behavior: string|array, object: any): Symbol`
-
-* [Usage Guide](usage-guide) (WIP)
-  * [Creating classes with Copy](usage-guide/classes)
-* [API Reference](API)
-* [How types are Supported by Copy](types)
-* [Contributing](contributing)
-  * [Adding New Type Support](contributing/new-types)
+* TOC {:toc}

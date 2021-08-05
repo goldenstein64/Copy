@@ -12,7 +12,7 @@ Free Model: <https://www.roblox.com/library/5089132938>
 
 Docs: <https://goldenstein64.github.io/Copy>
 
-You can read about how to contribute to this project [here](docs/contributing.md).
+You can read about how to contribute to this project [here](https://goldenstein64.github.io/Copy/contributing).
 
 ## Building the Module
 

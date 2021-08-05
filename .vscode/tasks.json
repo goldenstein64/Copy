@@ -6,7 +6,7 @@
     {
       "label": "Build",
       "type": "shell",
-      "command": "src/_venv/Scripts/sphinx-build.exe src docs",
+      "command": "src/_venv/Scripts/sphinx-build.exe -b=singlehtml src docs",
       "problemMatcher": []
     }
   ]

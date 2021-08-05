@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Copy &#8212; Copy TBD documentation</title>
+    <title>Copy TBD documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -15,7 +15,6 @@
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="API" href="api.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -35,18 +34,600 @@
   <section class="tex2jax_ignore mathjax_ignore" id="copy">
 <h1>Copy<a class="headerlink" href="#copy" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
+<span id="document-api"></span><section class="tex2jax_ignore mathjax_ignore" id="api">
+<h2>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h2>
+<p>This is a list of all public properties and methods contained in the Copy module.</p>
+<p>As a precursor, you may see references to <code class="docutils literal notranslate"><span class="pre">it()</span></code> functions in code blocks. This is part of the TestEZ framework used to test this module and make sure it’s up to snuff. They will be cited using this format and can be found in <a class="reference external" href="https://github.com/goldenstein64/Copy/tree/main/test/Tests">the test directory</a>.</p>
+<p><strong><code class="docutils literal notranslate"><span class="pre">T.FileName.DescribeBlock</span></code></strong></p>
+<section id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
+<p>There are only two functions that do the job of copying, the rest are just helper functions.</p>
+<section id="copy-object">
+<h4><code class="docutils literal notranslate"><span class="pre">Copy(object)</span></code><a class="headerlink" href="#copy-object" title="Permalink to this headline">¶</a></h4>
+<p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">(object:</span> <span class="pre">T)</span> <span class="pre">-&gt;</span> <span class="pre">newObject:</span> <span class="pre">T</span></code></p>
+<p>Creates a copy of <code class="docutils literal notranslate"><span class="pre">object</span></code>. This is guaranteed to return a result of the same type and sub-type.</p>
+<p>All the datatypes copied by this function are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">table</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">userdata</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Random</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Instance</span></code></p></li>
+</ul>
+<p>Any other datatype passed in will simply return itself.</p>
+<p>You can also use <code class="docutils literal notranslate"><span class="pre">Copy()</span></code> to copy itself, like so.</p>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="kd">local</span> <span class="n">newCopy</span> <span class="o">=</span> <span class="n">Copy</span><span class="p">(</span><span class="n">Copy</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is useful for creating a <code class="docutils literal notranslate"><span class="pre">Copy</span></code> module with a different configuration, since it holds flags and contexts.</p>
+</section>
+<section id="copy-extend-object-bases">
+<h4><code class="docutils literal notranslate"><span class="pre">Copy:Extend(object,</span> <span class="pre">...bases)</span></code><a class="headerlink" href="#copy-extend-object-bases" title="Permalink to this headline">¶</a></h4>
+<p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">(object:</span> <span class="pre">T,</span> <span class="pre">...bases:</span> <span class="pre">B)</span> <span class="pre">-&gt;</span> <span class="pre">object:</span> <span class="pre">T</span> <span class="pre">&amp;</span> <span class="pre">B</span></code></p>
+<p>Copies all fields in <code class="docutils literal notranslate"><span class="pre">bases</span></code> to <code class="docutils literal notranslate"><span class="pre">object</span></code> from left to right. <code class="docutils literal notranslate"><span class="pre">Copy(some)</span></code> is the same as <code class="docutils literal notranslate"><span class="pre">Copy:Extend({},</span> <span class="pre">some)</span></code>.</p>
+</section>
+<section id="copy-behaveas-behavior-object">
+<h4><code class="docutils literal notranslate"><span class="pre">Copy:BehaveAs(behavior,</span> <span class="pre">object)</span></code><a class="headerlink" href="#copy-behaveas-behavior-object" title="Permalink to this headline">¶</a></h4>
+<p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">(behavior:</span> <span class="pre">string|array,</span> <span class="pre">object:</span> <span class="pre">any)</span> <span class="pre">-&gt;</span> <span class="pre">Symbol:</span> <span class="pre">Symbol</span></code></p>
+<p>Creates a <a class="reference external" href="#symbols">Symbol</a>. It can be placed anywhere in the base value to signify that it should follow the specified <a class="reference external" href="#behaviors">Behavior</a>.</p>
+<p><strong><code class="docutils literal notranslate"><span class="pre">T.BehaveAs.Exclusivity</span></code></strong></p>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="n">it</span><span class="p">(</span><span class="s2">&quot;allows different behavior in values&quot;</span><span class="p">,</span> <span class="kr">function</span><span class="p">()</span>
+  <span class="kd">local</span> <span class="n">someTable</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span>
+  <span class="p">}</span>
+
+  <span class="kd">local</span> <span class="n">baseTable</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">Copy</span><span class="p">:</span><span class="n">BehaveAs</span><span class="p">(</span><span class="s2">&quot;set&quot;</span><span class="p">,</span> <span class="kc">nil</span><span class="p">),</span>
+  <span class="p">}</span>
+
+  <span class="n">Copy</span><span class="p">:</span><span class="n">Extend</span><span class="p">(</span><span class="n">someTable</span><span class="p">,</span> <span class="n">baseTable</span><span class="p">)</span>
+  <span class="kd">local</span> <span class="n">newValue</span> <span class="o">=</span> <span class="n">someTable</span><span class="p">.</span><span class="n">key</span>
+
+  <span class="n">expect</span><span class="p">(</span><span class="n">newValue</span><span class="p">).</span><span class="n">to</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="kc">nil</span><span class="p">)</span>
+<span class="kr">end</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="copy-flush">
+<h4><code class="docutils literal notranslate"><span class="pre">Copy:Flush()</span></code><a class="headerlink" href="#copy-flush" title="Permalink to this headline">¶</a></h4>
+<p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">()</span> <span class="pre">-&gt;</span> <span class="pre">()</span></code></p>
+<p>Clears any data lingering from the last time something was copied. This is only useful when paired with <a class="reference external" href="#copyflagsflush--true">Copy.Flags.Flush</a> set to <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p>
+</section>
+</section>
+<section id="properties">
+<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
+<p>There are a great number of properties <code class="docutils literal notranslate"><span class="pre">Copy</span></code> has, useful for creating versatile behavior.</p>
+<section id="copy-globalcontext">
+<h4><code class="docutils literal notranslate"><span class="pre">Copy.GlobalContext</span></code><a class="headerlink" href="#copy-globalcontext" title="Permalink to this headline">¶</a></h4>
+<p>This table stores the default behaviors <code class="docutils literal notranslate"><span class="pre">Copy()</span></code> should use to copy values when no behavior is provided, categorized by context. These contexts accept the same <a class="reference external" href="#behaviors">behaviors</a> as <a class="reference external" href="#copybehaveasbehavior-object">Copy:BehaveAs()</a>.</p>
+<section id="copy-globalcontext-keys-set">
+<h5><code class="docutils literal notranslate"><span class="pre">Copy.GlobalContext.Keys</span> <span class="pre">=</span> <span class="pre">&quot;set&quot;</span></code><a class="headerlink" href="#copy-globalcontext-keys-set" title="Permalink to this headline">¶</a></h5>
+<p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">Behavior</span></code></p>
+<p>The default behavior to use for table keys</p>
+</section>
+<section id="copy-globalcontext-values-default">
+<h5><code class="docutils literal notranslate"><span class="pre">Copy.GlobalContext.Values</span> <span class="pre">=</span> <span class="pre">&quot;default&quot;</span></code><a class="headerlink" href="#copy-globalcontext-values-default" title="Permalink to this headline">¶</a></h5>
+<p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">Behavior</span></code></p>
+<p>The default behavior to use for generic values</p>
+</section>
+<section id="copy-globalcontext-meta-set">
+<h5><code class="docutils literal notranslate"><span class="pre">Copy.GlobalContext.Meta</span> <span class="pre">=</span> <span class="pre">&quot;set&quot;</span></code><a class="headerlink" href="#copy-globalcontext-meta-set" title="Permalink to this headline">¶</a></h5>
+<p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">Behavior</span></code></p>
+<p>The default behavior to use for metatables</p>
+</section>
+</section>
+<section id="copy-flags">
+<h4><code class="docutils literal notranslate"><span class="pre">Copy.Flags</span></code><a class="headerlink" href="#copy-flags" title="Permalink to this headline">¶</a></h4>
+<p>A set of miscellaneous flags. Setting an unknown flag throws an error.</p>
+<section id="copy-flags-flush-true">
+<h5><code class="docutils literal notranslate"><span class="pre">Copy.Flags.Flush</span> <span class="pre">=</span> <span class="pre">true</span></code><a class="headerlink" href="#copy-flags-flush-true" title="Permalink to this headline">¶</a></h5>
+<p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">boolean</span></code></p>
+<p>Stops <code class="docutils literal notranslate"><span class="pre">Copy()</span></code> and <code class="docutils literal notranslate"><span class="pre">Copy:Extend()</span></code> from removing internal data (namely <code class="docutils literal notranslate"><span class="pre">Copy.Transform</span></code> and <code class="docutils literal notranslate"><span class="pre">Copy.InstanceTransform</span></code>). This is useful for debugging the module in case something was copied weirdly. If you plan to use the module again afterwards, make sure to call <code class="docutils literal notranslate"><span class="pre">Copy:Flush()</span></code> beforehand.</p>
+</section>
+<section id="copy-flags-setinstanceparent-false">
+<h5><code class="docutils literal notranslate"><span class="pre">Copy.Flags.SetInstanceParent</span> <span class="pre">=</span> <span class="pre">false</span></code><a class="headerlink" href="#copy-flags-setinstanceparent-false" title="Permalink to this headline">¶</a></h5>
+<p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">boolean</span></code></p>
+<p>Decides whether instances cloned by the module are parented to the original instance’s parent, otherwise <code class="docutils literal notranslate"><span class="pre">nil</span></code>.</p>
+</section>
+</section>
+<section id="copy-symbolmap">
+<h4><code class="docutils literal notranslate"><span class="pre">Copy.SymbolMap</span></code><a class="headerlink" href="#copy-symbolmap" title="Permalink to this headline">¶</a></h4>
+<p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">{[Symbol]:</span> <span class="pre">true}</span></code></p>
+<p>A weak table that lists every <a class="reference external" href="#symbols">Symbol</a> in existence as keys. Symbols delete themselves once they are not used anymore, and they can be used multiple times. Any values intended to be used as symbols should be registered in the symbol map, like so.</p>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="n">Copy</span><span class="p">.</span><span class="n">SymbolMap</span><span class="p">[</span><span class="n">customSymbol</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="types-and-enums">
+<h3>Types and Enums<a class="headerlink" href="#types-and-enums" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Copy</span></code> module uses a few concepts to make itself more coherent, so this section is devoted to that specifically.</p>
+<section id="behaviors">
+<h4>Behaviors<a class="headerlink" href="#behaviors" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">Copy</span></code> module uses <code class="docutils literal notranslate"><span class="pre">Behaviors</span></code> to describe how objects are copied from a base value to a new one. This is encapsulated in the <code class="docutils literal notranslate"><span class="pre">Behaviors</span></code> module, found under the <code class="docutils literal notranslate"><span class="pre">Copy</span></code> module.</p>
+<p>All the lowest level behaviors are listed here:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;transform&quot;</span></code> - if the value is mapped to an already copied value in <code class="docutils literal notranslate"><span class="pre">Copy.Transform</span></code>, it will return that value.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;reconcile&quot;</span></code> - if the value can be reconciled, like a table, <code class="docutils literal notranslate"><span class="pre">Copy</span></code> will overwrite fields from the old value to the new one. This type of behavior is used in functions like <code class="docutils literal notranslate"><span class="pre">Copy:Extend</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;replace&quot;</span></code> - if the value can be replaced, like a <code class="docutils literal notranslate"><span class="pre">Random</span></code> object, <code class="docutils literal notranslate"><span class="pre">Copy</span></code> will create a new value from the old one.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;skip&quot;</span></code> - This will do nothing with the value and skip its setting.</p></li>
+</ul>
+<p>These can be used by supplying them as strings where expected.</p>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="n">Copy</span><span class="p">:</span><span class="n">BehaveAs</span><span class="p">(</span><span class="s1">&#39;transform&#39;</span><span class="p">,</span> <span class="s">[[some value]]</span><span class="p">)</span>
+<span class="n">Copy</span><span class="p">.</span><span class="n">GlobalContext</span><span class="p">.</span><span class="n">Values</span> <span class="o">=</span> <span class="s1">&#39;transform&#39;</span>
+</pre></div>
+</div>
+<p>Value types supported by the <code class="docutils literal notranslate"><span class="pre">&quot;reconcile&quot;</span></code> behavior are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">table</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">userdata</span></code></p></li>
+</ul>
+<p>Value types supported by the <code class="docutils literal notranslate"><span class="pre">&quot;replace&quot;</span></code> behavior are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">table</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">userdata</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Random</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Instance</span></code></p></li>
+</ul>
+<p>Behaviors are usually combined to create higher-level behaviors using arrays.</p>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="n">Copy</span><span class="p">:</span><span class="n">BehaveAs</span><span class="p">({</span><span class="s1">&#39;transform&#39;</span><span class="p">,</span> <span class="s1">&#39;reconcile&#39;</span><span class="p">,</span> <span class="s1">&#39;replace&#39;</span><span class="p">},</span> <span class="s">[[some value]]</span><span class="p">)</span>
+<span class="n">Copy</span><span class="p">.</span><span class="n">GlobalContext</span><span class="p">.</span><span class="n">Values</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;transform&#39;</span><span class="p">,</span> <span class="s1">&#39;reconcile&#39;</span><span class="p">,</span> <span class="s1">&#39;replace&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">Copy</span></code> module sequentially makes a pass with each behavior and, upon the first successful conversion, returns that value.</p>
+<p>The most commonly used behaviors can be substituted with a string just like the lower level behaviors. These are known as behavior presets.</p>
+<p>All the presets are listed here:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;default&quot;</span> <span class="pre">=</span> <span class="pre">{</span> <span class="pre">&quot;transform&quot;,</span> <span class="pre">&quot;reconcile&quot;,</span> <span class="pre">&quot;replace&quot;</span> <span class="pre">}</span></code> - the default behavior for copying generic values.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;copy&quot;</span> <span class="pre">=</span> <span class="pre">{</span> <span class="pre">&quot;replace&quot;</span> <span class="pre">}</span></code> - copies the value without reference to <code class="docutils literal notranslate"><span class="pre">transform</span></code> or the old value.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;set&quot;</span> <span class="pre">=</span> <span class="pre">{}</span></code> - skips copying a value and simply returns itself.</p></li>
+</ul>
+<p>These can be used by simply supplying the name as a string.</p>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="n">Copy</span><span class="p">:</span><span class="n">BehaveAs</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s">[[some value]]</span><span class="p">)</span>
+<span class="n">Copy</span><span class="p">.</span><span class="n">GlobalContext</span><span class="p">.</span><span class="n">Keys</span> <span class="o">=</span> <span class="s1">&#39;default&#39;</span>
+</pre></div>
+</div>
+<p>If the <code class="docutils literal notranslate"><span class="pre">Copy</span></code> module receives an empty array <code class="docutils literal notranslate"><span class="pre">{}</span></code> in place of a behavior, copying the value with that behavior will return itself.</p>
+<p>Indexing <code class="docutils literal notranslate"><span class="pre">Copy.GlobalContext</span></code> will return the array representing the behavior.</p>
+<p><strong><code class="docutils literal notranslate"><span class="pre">T.BehaveAs.Presets</span></code></strong></p>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="n">it</span><span class="p">(</span><span class="s2">&quot;always returns an array upon index&quot;</span><span class="p">,</span> <span class="kr">function</span><span class="p">()</span>
+  <span class="n">Copy</span><span class="p">.</span><span class="n">GlobalContext</span><span class="p">.</span><span class="n">Keys</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span>
+
+  <span class="kd">local</span> <span class="n">keysContext</span> <span class="o">=</span> <span class="n">Copy</span><span class="p">.</span><span class="n">GlobalContext</span><span class="p">.</span><span class="n">Keys</span>
+
+  <span class="n">expect</span><span class="p">(</span><span class="n">keysContext</span><span class="p">).</span><span class="n">to</span><span class="p">.</span><span class="n">be</span><span class="p">.</span><span class="n">a</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">)</span>
+  <span class="n">expect</span><span class="p">(</span><span class="n">keysContext</span><span class="p">[</span><span class="mi">1</span><span class="p">]).</span><span class="n">to</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="s2">&quot;transform&quot;</span><span class="p">)</span>
+  <span class="n">expect</span><span class="p">(</span><span class="n">keysContext</span><span class="p">[</span><span class="mi">2</span><span class="p">]).</span><span class="n">to</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="s2">&quot;reconcile&quot;</span><span class="p">)</span>
+  <span class="n">expect</span><span class="p">(</span><span class="n">keysContext</span><span class="p">[</span><span class="mi">3</span><span class="p">]).</span><span class="n">to</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="s2">&quot;replace&quot;</span><span class="p">)</span>
+<span class="kr">end</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="symbols">
+<h4>Symbols<a class="headerlink" href="#symbols" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">Copy</span></code> module has the power to control how values behave when copied, but it needs <code class="docutils literal notranslate"><span class="pre">Symbols</span></code> to control the behavior of particular sub-values.</p>
+<p>Symbols are very good for representing different copying behavior for identical sub-values in different locations, but they are not very good for being treated as actual values.</p>
+<p>Traditionally, <code class="docutils literal notranslate"><span class="pre">Symbols</span></code> are created using <a class="reference external" href="#copybehaveasbehavior-object-symbol">Copy:BehaveAs()</a>:</p>
+<p><strong><code class="docutils literal notranslate"><span class="pre">T.BehaveAs.Presets</span></code></strong></p>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="n">it</span><span class="p">(</span><span class="s2">&quot;can move shared values using &#39;set&#39;&quot;</span><span class="p">,</span> <span class="kr">function</span><span class="p">()</span>
+  <span class="kd">local</span> <span class="n">sub</span> <span class="o">=</span> <span class="p">{}</span>
+
+  <span class="kd">local</span> <span class="n">some</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">owned</span> <span class="o">=</span> <span class="n">sub</span><span class="p">,</span>
+    <span class="n">shared</span> <span class="o">=</span> <span class="n">Copy</span><span class="p">:</span><span class="n">BehaveAs</span><span class="p">(</span><span class="s1">&#39;set&#39;</span><span class="p">,</span> <span class="n">sub</span><span class="p">),</span>
+  <span class="p">}</span>
+
+  <span class="kd">local</span> <span class="n">new</span> <span class="o">=</span> <span class="n">Copy</span><span class="p">(</span><span class="n">some</span><span class="p">)</span>
+
+  <span class="n">expect</span><span class="p">(</span><span class="n">new</span><span class="p">.</span><span class="n">owned</span><span class="p">).</span><span class="n">to</span><span class="p">.</span><span class="n">never</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="n">sub</span><span class="p">)</span>
+  <span class="n">expect</span><span class="p">(</span><span class="n">new</span><span class="p">.</span><span class="n">shared</span><span class="p">).</span><span class="n">to</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="n">sub</span><span class="p">)</span>
+<span class="kr">end</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Symbols created using <code class="docutils literal notranslate"><span class="pre">Copy:BehaveAs()</span></code> have a small API of their own.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Symbol.Owner</span></code> - describes which <code class="docutils literal notranslate"><span class="pre">Copy</span></code> module created the symbol</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Symbol.Value</span></code> - the value that the symbol should copy</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Symbol.Behavior</span></code> - how the value will behave when copied. <strong>There are no type assertions made for this field, so be careful if you decide to assign to this!</strong></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Symbol(T)</span> <span class="pre">-&gt;</span> <span class="pre">(boolean,</span> <span class="pre">T)</span></code> - Copies the value using the owner, behavior, and value provided by its fields.</p></li>
+</ul>
+<p>But you can also create them using functions. Symbol functions take the type <code class="docutils literal notranslate"><span class="pre">(T)</span> <span class="pre">-&gt;</span> <span class="pre">(boolean,</span> <span class="pre">T)</span></code>.</p>
+<ul class="simple">
+<li><p><strong>Parameter:</strong> the old value</p></li>
+<li><p><strong>Returns:</strong> a boolean describing whether to set the value, and the value to set</p></li>
+</ul>
+<p><strong><code class="docutils literal notranslate"><span class="pre">T.BehaveAs.CustomSymbols</span></code></strong></p>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="n">it</span><span class="p">(</span><span class="s2">&quot;can make ducks&quot;</span><span class="p">,</span> <span class="kr">function</span><span class="p">()</span>
+  <span class="kd">local</span> <span class="kr">function</span> <span class="nf">makeDuck</span><span class="p">(</span><span class="n">oldValue</span><span class="p">)</span>
+    <span class="kd">local</span> <span class="n">duck</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="kr">function</span> <span class="nc">duck</span><span class="p">.</span><span class="nf">quack</span><span class="p">()</span>
+      <span class="kr">return</span> <span class="s2">&quot;QUACK&quot;</span>
+    <span class="kr">end</span>
+
+    <span class="kr">return</span> <span class="kc">true</span><span class="p">,</span> <span class="n">duck</span>
+  <span class="kr">end</span>
+
+  <span class="n">Copy</span><span class="p">.</span><span class="n">SymbolMap</span><span class="p">[</span><span class="n">makeDuck</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span>
+
+  <span class="kd">local</span> <span class="n">some</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">duck</span> <span class="o">=</span> <span class="n">makeDuck</span>
+  <span class="p">}</span>
+
+  <span class="kd">local</span> <span class="n">new</span> <span class="o">=</span> <span class="n">Copy</span><span class="p">(</span><span class="n">some</span><span class="p">)</span>
+
+  <span class="n">expect</span><span class="p">(</span><span class="n">new</span><span class="p">.</span><span class="n">duck</span><span class="p">.</span><span class="n">quack</span><span class="p">()).</span><span class="n">to</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="s2">&quot;QUACK&quot;</span><span class="p">)</span>
+<span class="kr">end</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="a-name-transform-a-transform">
+<h4><a name="transform"></a> Transform<a class="headerlink" href="#a-name-transform-a-transform" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">Copy</span></code> module solves recursive tables by using a mapping of original values to new ones. Any values that were already copied in a <code class="docutils literal notranslate"><span class="pre">Copy()</span></code> call will be used again in subsequent assignments to that value.</p>
+<p><strong><code class="docutils literal notranslate"><span class="pre">T.Transform.BaseTraits</span></code></strong></p>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="n">it</span><span class="p">(</span><span class="s2">&quot;transforms values&quot;</span><span class="p">,</span> <span class="kr">function</span><span class="p">()</span>
+  <span class="kd">local</span> <span class="n">array</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="s2">&quot;normal value&quot;</span> <span class="p">}</span>
+
+  <span class="n">Copy</span><span class="p">.</span><span class="n">Transform</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;some other value&quot;</span>
+  <span class="kd">local</span> <span class="n">newArray</span> <span class="o">=</span> <span class="n">Copy</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+
+  <span class="n">expect</span><span class="p">(</span><span class="n">newArray</span><span class="p">[</span><span class="mi">1</span><span class="p">]).</span><span class="n">to</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="s2">&quot;some other value&quot;</span><span class="p">)</span>
+  <span class="n">expect</span><span class="p">(</span><span class="n">newArray</span><span class="p">[</span><span class="mi">2</span><span class="p">]).</span><span class="n">to</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="s2">&quot;normal value&quot;</span><span class="p">)</span>
+<span class="kr">end</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Copy.Transform</span></code> accepts any value, including <a class="reference external" href="#symbols">Symbols</a>.</p>
+</section>
+</section>
+</section>
+<span id="document-usage-guide/index"></span><section class="tex2jax_ignore mathjax_ignore" id="how-to-use-copy">
+<h2>How to Use Copy<a class="headerlink" href="#how-to-use-copy" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<span id="document-usage-guide/types"></span><section class="tex2jax_ignore mathjax_ignore" id="how-types-are-supported-by-copy">
+<h3>How Types are Supported by Copy<a class="headerlink" href="#how-types-are-supported-by-copy" title="Permalink to this headline">¶</a></h3>
+<p>The utmost requirement for being able to copy a value is whether the state of that value can be inspected and accessed.</p>
+<p>These are all the Lua datatypes and whether they have state:</p>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Datatypes</p></th>
+<th class="head"><p>Has state?</p></th>
+<th class="head"><p>Can copy?</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>nil</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-odd"><td><p>boolean</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-even"><td><p>number</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-odd"><td><p>string</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-even"><td><p>userdata</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-odd"><td><p>function</p></td>
+<td><p>yes</p></td>
+<td><p>no</p></td>
+</tr>
+<tr class="row-even"><td><p>thread</p></td>
+<td><p>yes</p></td>
+<td><p>no</p></td>
+</tr>
+<tr class="row-odd"><td><p>table</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+</tr>
+</tbody>
+</table>
+<p>Those first four values (nil, boolean, number, string) are primitives. That is, their internal state is stored <em>directly</em> inside the variable. Therefore, the thing that determines the state of these values is whatever value the variable is. And therefore, it is not the state of the value that changes, but the state of the variable, and variables are trivial to copy (<code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">y</span></code>). Since the <code class="docutils literal notranslate"><span class="pre">Copy</span></code> module returns these values back to the caller, copying primitives is technically supported, but that’s not what <code class="docutils literal notranslate"><span class="pre">Copy</span></code> is used for.</p>
+<p>For functions, the only state you can change is their environment through <code class="docutils literal notranslate"><span class="pre">setfenv</span></code> and <code class="docutils literal notranslate"><span class="pre">getfenv</span></code>. However in Luau, these environments are not inspectable for optimization reasons, so functions cannot be inspected, and therefore cannot be copied.</p>
+<p>For userdatas in Luau, the only state you can change is their metamethods through <code class="docutils literal notranslate"><span class="pre">setmetatable</span></code> and <code class="docutils literal notranslate"><span class="pre">getmetatable</span></code>. However, their metamethods are implemented as tables, so we can say the state of a userdata depends on the state of their metamethods, which is a table. Also, due to Luau implementation, a userdata’s metatable cannot be changed, so userdatas don’t have state, just the table containing their metamethods.</p>
+<p>For threads, the only state you can change is their status, visible through <code class="docutils literal notranslate"><span class="pre">coroutine.status</span></code>. This status can be changed through:</p>
+<ul class="simple">
+<li><p>calls to <code class="docutils literal notranslate"><span class="pre">coroutine.resume</span></code> and <code class="docutils literal notranslate"><span class="pre">coroutine.yield</span></code></p></li>
+<li><p>whether the underlying function has started or ended or both.</p></li>
+</ul>
+<p>The most useful portion of the thread would be how far it has progressed in the underlying function implementing it, which is not exactly accessible. Since we cannot access the entirety of the thread’s state, it would be impossible to create a complete copy of the thread, so it’s just not supported.</p>
+<p>This leaves tables. All other values that require an accessible state have an underlying table implementing it. A table’s state is <em>completely</em> accessible (given <code class="docutils literal notranslate"><span class="pre">__metatable</span></code> is not set on its metatable), so the <code class="docutils literal notranslate"><span class="pre">Copy</span></code> module supports copying tables.</p>
+</section>
+<span id="document-usage-guide/classes"></span><section class="tex2jax_ignore mathjax_ignore" id="creating-classes-with-copy">
+<h3>Creating classes With Copy<a class="headerlink" href="#creating-classes-with-copy" title="Permalink to this headline">¶</a></h3>
+<p>This page lists some examples of some alternative organizations you can create using <code class="docutils literal notranslate"><span class="pre">Copy</span></code>.</p>
+<p>Since functions are copied by reference, this method uses about the same memory as metatable classes without the re-index overhead. This also creates a proper separation between class functions and object methods, meaning <code class="docutils literal notranslate"><span class="pre">Class.new().new()...</span></code> is no longer possible.</p>
+<p>List:</p>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="c1">-- dependencies</span>
+<span class="kd">local</span> <span class="n">HttpService</span> <span class="o">=</span> <span class="n">game</span><span class="p">:</span><span class="n">GetService</span><span class="p">(</span><span class="s2">&quot;HttpService&quot;</span><span class="p">)</span>
+
+<span class="kd">local</span> <span class="n">Copy</span> <span class="o">=</span> <span class="nb">require</span><span class="p">(</span><span class="n">path</span><span class="p">.</span><span class="n">to</span><span class="p">.</span><span class="n">Copy</span><span class="p">)</span>
+
+<span class="c1">-- content</span>
+<span class="kd">local</span> <span class="n">prototype</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="kd">local</span> <span class="n">List</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="n">prototype</span> <span class="o">=</span> <span class="n">prototype</span>
+<span class="p">}</span>
+
+<span class="c1">-- object methods</span>
+<span class="n">Copy</span><span class="p">:</span><span class="n">Extend</span><span class="p">(</span><span class="n">prototype</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
+
+<span class="c1">-- class methods</span>
+<span class="kr">function</span> <span class="nc">List</span><span class="p">.</span><span class="nf">new</span><span class="p">()</span>
+  <span class="kr">return</span> <span class="n">Copy</span><span class="p">(</span><span class="n">prototype</span><span class="p">)</span>
+<span class="kr">end</span>
+
+<span class="kr">function</span> <span class="nc">List</span><span class="p">.</span><span class="nf">fromJSON</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+  <span class="kd">local</span> <span class="n">data</span> <span class="o">=</span> <span class="n">HttpService</span><span class="p">:</span><span class="n">DecodeJSON</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+  <span class="kd">local</span> <span class="n">self</span> <span class="o">=</span> <span class="n">Copy</span><span class="p">:</span><span class="n">Extend</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">prototype</span><span class="p">)</span>
+  <span class="kr">return</span> <span class="n">self</span>
+<span class="kr">end</span>
+
+<span class="kr">return</span> <span class="n">List</span>
+</pre></div>
+</div>
+<p>Sorted List:</p>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="c1">-- dependencies</span>
+<span class="kd">local</span> <span class="n">Copy</span> <span class="o">=</span> <span class="nb">require</span><span class="p">(</span><span class="n">path</span><span class="p">.</span><span class="n">to</span><span class="p">.</span><span class="n">Copy</span><span class="p">)</span>
+
+<span class="c1">-- base classes</span>
+<span class="kd">local</span> <span class="n">List</span> <span class="o">=</span> <span class="nb">require</span><span class="p">(</span><span class="n">script</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">List</span><span class="p">)</span>
+
+<span class="c1">-- content - inherits from List</span>
+<span class="kd">local</span> <span class="n">SortedList</span> <span class="o">=</span> <span class="n">Copy</span><span class="p">(</span><span class="n">List</span><span class="p">)</span>
+
+<span class="kd">local</span> <span class="n">prototype</span> <span class="o">=</span> <span class="n">SortedList</span><span class="p">.</span><span class="n">prototype</span>
+
+<span class="c1">-- object methods</span>
+<span class="kr">function</span> <span class="nc">prototype</span><span class="p">:</span><span class="nf">insert</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+  <span class="kd">local</span> <span class="n">index</span> <span class="o">=</span> <span class="mi">1</span>
+  <span class="kr">while</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="n">self</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="kr">do</span>
+    <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+  <span class="kr">end</span>
+  <span class="nb">table.insert</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+<span class="kr">end</span>
+
+<span class="c1">-- class methods</span>
+<span class="kr">function</span> <span class="nc">SortedList</span><span class="p">.</span><span class="nf">fromJSON</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+  <span class="kd">local</span> <span class="n">self</span> <span class="o">=</span> <span class="n">List</span><span class="p">.</span><span class="n">fromJSON</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+  <span class="n">Copy</span><span class="p">:</span><span class="n">Extend</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">prototype</span><span class="p">)</span>
+  <span class="n">self</span><span class="p">:</span><span class="n">sort</span><span class="p">()</span>
+  <span class="kr">return</span> <span class="n">self</span>
+<span class="kr">end</span>
+
+<span class="kr">return</span> <span class="n">SortedList</span>
+</pre></div>
+</div>
+<p>Usage:</p>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="kd">local</span> <span class="n">SortedList</span> <span class="o">=</span> <span class="nb">require</span><span class="p">(</span><span class="n">path</span><span class="p">.</span><span class="n">to</span><span class="p">.</span><span class="n">SortedList</span><span class="p">)</span>
+
+<span class="kd">local</span> <span class="n">someList</span> <span class="o">=</span> <span class="n">SortedList</span><span class="p">.</span><span class="n">new</span><span class="p">()</span>
+
+<span class="n">someList</span><span class="p">:</span><span class="n">insert</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">someList</span><span class="p">:</span><span class="n">insert</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">someList</span><span class="p">:</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">someList</span><span class="p">)</span> <span class="c1">--&gt; { 1, 2, 3 }</span>
+</pre></div>
+</div>
+</section>
+</div>
+<section id="what-can-copy-do">
+<h3>What can Copy Do?<a class="headerlink" href="#what-can-copy-do" title="Permalink to this headline">¶</a></h3>
+<p>On the surface, the <code class="docutils literal notranslate"><span class="pre">Copy</span></code> module is very simple: any value you give it, it will do its best to clone that value and return it.</p>
+<p><strong><code class="docutils literal notranslate"><span class="pre">T.CallCopy</span></code></strong></p>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="n">it</span><span class="p">(</span><span class="s2">&quot;can run the basic sample&quot;</span><span class="p">,</span> <span class="kr">function</span><span class="p">()</span>
+  <span class="c1">-- this is a table</span>
+  <span class="kd">local</span> <span class="n">array</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span> <span class="p">}</span>
+
+  <span class="c1">-- this is a copy of that table</span>
+  <span class="kd">local</span> <span class="n">newArray</span> <span class="o">=</span> <span class="n">Copy</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+
+  <span class="c1">-- these tables are not the same!</span>
+  <span class="n">expect</span><span class="p">(</span><span class="n">newArray</span><span class="p">).</span><span class="n">to</span><span class="p">.</span><span class="n">never</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+<span class="kr">end</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In most cases, this is all you will ever need.</p>
+<p>However, this module includes some extra infrastructure for more niche use cases, like</p>
+<ul class="simple">
+<li><p>classes or prototypes</p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="usage-guide/index.html">How to Use Copy</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="usage-guide/types.html">How Types are Supported by Copy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usage-guide/classes.html">Creating classes With Copy</a></li>
+<li><p>classes are used to create copies of an object</p></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="contributing/index.html">Contributing</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="contributing/new-types.html">Adding Type Support to Copy</a></li>
+<li><p>copying grained by sub-value</p>
+<ul>
+<li><p>copying or sharing only part of a large structure may be useful.</p></li>
+</ul>
+</li>
+<li><p>copying to a pre-existing value</p>
+<ul>
+<li><p>this could be necessary for tables that require modifications from many sources, such as reseting a table’s data, multiple inheritance, .</p></li>
+<li><p>this is one of the ways of forming inheritance - giving an empty table all the values of <code class="docutils literal notranslate"><span class="pre">A</span></code> and then all the values of <code class="docutils literal notranslate"><span class="pre">B</span></code> is the same as creating an instance of <code class="docutils literal notranslate"><span class="pre">B</span></code> that inherits from <code class="docutils literal notranslate"><span class="pre">A</span></code></p></li>
 </ul>
 </li>
 </ul>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="c1">-- classes and prototypes</span>
+
+<span class="kd">local</span> <span class="n">Copy</span> <span class="o">=</span> <span class="nb">require</span><span class="p">(</span><span class="n">path</span><span class="p">.</span><span class="n">to</span><span class="p">.</span><span class="n">Copy</span><span class="p">)</span>
+
+<span class="kd">local</span> <span class="n">Vector4</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="kd">local</span> <span class="n">prototype</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="n">W</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="n">X</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="n">Y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="n">Z</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="kd">local</span> <span class="n">prototypeMt</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="nb">setmetatable</span><span class="p">(</span><span class="n">prototype</span><span class="p">,</span> <span class="n">prototypeMt</span><span class="p">)</span>
+
+<span class="kr">function</span> <span class="nc">prototype</span><span class="p">:</span><span class="nf">GetMagnitude</span><span class="p">()</span>
+  <span class="kr">return</span> <span class="nb">math.sqrt</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">W</span><span class="o">^</span><span class="mi">2</span> <span class="o">+</span> <span class="n">self</span><span class="p">.</span><span class="n">X</span><span class="o">^</span><span class="mi">2</span> <span class="o">+</span> <span class="n">self</span><span class="p">.</span><span class="n">Y</span><span class="o">^</span><span class="mi">2</span> <span class="o">+</span> <span class="n">self</span><span class="p">.</span><span class="n">Z</span><span class="o">^</span><span class="mi">2</span><span class="p">)</span>
+<span class="kr">end</span>
+
+<span class="kr">function</span> <span class="nc">prototype</span><span class="p">:</span><span class="nf">GetUnit</span><span class="p">()</span>
+  <span class="kd">local</span> <span class="n">magnitude</span> <span class="o">=</span> <span class="n">self</span><span class="p">:</span><span class="n">GetMagnitude</span><span class="p">()</span>
+  <span class="kr">return</span> <span class="n">Vector4</span><span class="p">.</span><span class="n">new</span><span class="p">(</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">W</span> <span class="o">/</span> <span class="n">magnitude</span><span class="p">,</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">X</span> <span class="o">/</span> <span class="n">magnitude</span><span class="p">,</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">Y</span> <span class="o">/</span> <span class="n">magnitude</span><span class="p">,</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">Z</span> <span class="o">/</span> <span class="n">magnitude</span>
+  <span class="p">)</span>
+<span class="kr">end</span>
+
+<span class="kr">function</span> <span class="nc">prototypeMt</span><span class="p">:</span><span class="nf">__add</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+  <span class="kr">return</span> <span class="n">Vector4</span><span class="p">.</span><span class="n">new</span><span class="p">(</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">W</span> <span class="o">+</span> <span class="n">other</span><span class="p">.</span><span class="n">W</span><span class="p">,</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">X</span> <span class="o">+</span> <span class="n">other</span><span class="p">.</span><span class="n">X</span><span class="p">,</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">Y</span> <span class="o">+</span> <span class="n">other</span><span class="p">.</span><span class="n">Y</span><span class="p">,</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">Z</span> <span class="o">+</span> <span class="n">other</span><span class="p">.</span><span class="n">Z</span>
+  <span class="p">)</span>
+<span class="kr">end</span>
+
+<span class="kr">function</span> <span class="nc">Vector4</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+  <span class="kr">return</span> <span class="n">Copy</span><span class="p">:</span><span class="n">Extend</span><span class="p">(</span><span class="n">prototype</span><span class="p">,</span> <span class="p">{</span>
+    <span class="n">W</span> <span class="o">=</span> <span class="n">w</span><span class="p">,</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">y</span><span class="p">,</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">z</span><span class="p">,</span>
+  <span class="p">})</span>
+<span class="kr">end</span>
+
+<span class="kr">return</span> <span class="n">Vector4</span>
+</pre></div>
+</div>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="c1">-- copying grained by sub-value</span>
+
+<span class="kd">local</span> <span class="n">hugeTable</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="n">subTable</span> <span class="o">=</span> <span class="p">{},</span>
+  <span class="n">skipped</span> <span class="o">=</span> <span class="p">{},</span>
+  <span class="n">shared</span> <span class="o">=</span> <span class="p">{},</span>
+  <span class="c1">-- ...</span>
+<span class="p">}</span>
+
+<span class="c1">-- makes sure not to copy any values in the table, just the root table</span>
+<span class="n">Copy</span><span class="p">.</span><span class="n">GlobalContext</span><span class="p">.</span><span class="n">Values</span> <span class="o">=</span> <span class="s2">&quot;set&quot;</span>
+<span class="kd">local</span> <span class="n">protoTable</span> <span class="o">=</span> <span class="n">Copy</span><span class="p">(</span><span class="n">hugeTable</span><span class="p">)</span>
+
+<span class="c1">-- returns back to default</span>
+<span class="n">Copy</span><span class="p">.</span><span class="n">GlobalContext</span><span class="p">.</span><span class="n">Values</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span>
+<span class="n">protoTable</span><span class="p">.</span><span class="n">shared</span> <span class="o">=</span> <span class="n">Copy</span><span class="p">:</span><span class="n">BehaveAs</span><span class="p">(</span><span class="n">protoTable</span><span class="p">.</span><span class="n">shared</span><span class="p">,</span> <span class="s2">&quot;set&quot;</span><span class="p">)</span>
+<span class="n">protoTable</span><span class="p">.</span><span class="n">skipped</span> <span class="o">=</span> <span class="kc">nil</span>
+
+<span class="kd">local</span> <span class="kr">function</span> <span class="nf">createHugeTable</span><span class="p">()</span>
+  <span class="kr">return</span> <span class="n">Copy</span><span class="p">(</span><span class="n">protoTable</span><span class="p">)</span>
+<span class="kr">end</span>
+</pre></div>
+</div>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="c1">-- copying to a pre-existing value</span>
+
+<span class="kd">local</span> <span class="n">human</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="kd">local</span> <span class="n">canFly</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="kr">function</span> <span class="nc">canFly</span><span class="p">:</span><span class="nf">fly</span><span class="p">()</span>
+  <span class="c1">-- ...</span>
+<span class="kr">end</span>
+
+<span class="kd">local</span> <span class="n">canRun</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="kr">function</span> <span class="nc">canRun</span><span class="p">:</span><span class="nf">run</span><span class="p">()</span>
+  <span class="c1">-- ...</span>
+<span class="kr">end</span>
+
+<span class="c1">-- other component tables</span>
+
+<span class="n">Copy</span><span class="p">:</span><span class="n">Extend</span><span class="p">(</span><span class="n">human</span><span class="p">,</span> <span class="n">canFly</span><span class="p">,</span> <span class="n">canRun</span><span class="p">,</span> <span class="p">...)</span>
+<span class="c1">-- now human can :fly(), :run(), etc.</span>
+</pre></div>
+</div>
+</section>
+<section id="what-heuristics-should-i-use-to-know-when-to-use-copy">
+<h3>What heuristics should I use to know when to use Copy?<a class="headerlink" href="#what-heuristics-should-i-use-to-know-when-to-use-copy" title="Permalink to this headline">¶</a></h3>
+<p>Generally, if you need to copy of a table, you use <code class="docutils literal notranslate"><span class="pre">Copy()</span></code>. Everything else is there purely for completing the definition of copying something in virtually any respect.</p>
+<p>(WIP)</p>
+</section>
+</section>
+<span id="document-contributing/index"></span><section class="tex2jax_ignore mathjax_ignore" id="contributing">
+<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<span id="document-contributing/new-types"></span><section class="tex2jax_ignore mathjax_ignore" id="adding-type-support-to-copy">
+<h3>Adding Type Support to Copy<a class="headerlink" href="#adding-type-support-to-copy" title="Permalink to this headline">¶</a></h3>
+<p>Just like how Copy is meant to be flexible, it’s also meant to be extensible. If a new copyable datatype comes out (like <code class="docutils literal notranslate"><span class="pre">Random</span></code>), it might be useful to specify a method for copying it. This page will be covering how to do just that.</p>
+<p>There are two ways to copy a value, replacing and reconciling.</p>
+<ul class="simple">
+<li><p>Replacing - creating a new value from an old value</p></li>
+<li><p>Reconciling - mapping an old value’s state to a pre-existing value</p></li>
+</ul>
+<p>Both of these methods expect the same return values:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">success:</span> <span class="pre">boolean</span></code> - whether the value was successfully copied; if <code class="docutils literal notranslate"><span class="pre">false</span></code>, no further arguments are needed</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">doSet:</span> <span class="pre">boolean</span></code> - whether the value should be assigned on its super-value; if <code class="docutils literal notranslate"><span class="pre">false</span></code>, no further arguments are needed</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">newValue:</span> <span class="pre">T</span></code> - the new value to set</p></li>
+</ul>
+<section id="replacing">
+<h4>Replacing<a class="headerlink" href="#replacing" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">(self:</span> <span class="pre">Copy,</span> <span class="pre">oldValue:</span> <span class="pre">T)</span> <span class="pre">-&gt;</span> <span class="pre">(success:</span> <span class="pre">boolean,</span> <span class="pre">doSet:</span> <span class="pre">boolean,</span> <span class="pre">newValue:</span> <span class="pre">T)</span></code></p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">self:</span> <span class="pre">Copy</span></code> - the module doing the copying</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">oldValue:</span> <span class="pre">T</span></code> - the old value being used as a blueprint</p></li>
+</ul>
+<p>There are two required tasks the function has to complete when replacing a value.</p>
+<ol class="simple">
+<li><p>Creating the new value</p></li>
+<li><p>Mapping the old value to the new one in <code class="docutils literal notranslate"><span class="pre">self.Transform</span></code></p></li>
+</ol>
+</section>
+<section id="reconciling">
+<h4>Reconciling<a class="headerlink" href="#reconciling" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">(self:</span> <span class="pre">Copy,</span> <span class="pre">oldValue:</span> <span class="pre">T,</span> <span class="pre">newValue:</span> <span class="pre">T)</span> <span class="pre">-&gt;</span> <span class="pre">(success:</span> <span class="pre">boolean,</span> <span class="pre">doSet:</span> <span class="pre">boolean,</span> <span class="pre">newValue:</span> <span class="pre">T)</span></code></p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">self:</span> <span class="pre">Copy</span></code> - the module doing the copying</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">oldValue:</span> <span class="pre">T</span></code> - the value to copy from</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">newValue:</span> <span class="pre">T</span></code> - the value to copy to</p></li>
+</ul>
+</section>
+</section>
+</div>
+<p>This project is developed using <a class="reference external" href="https://code.visualstudio.com/">VS Code</a>/<a class="reference external" href="https://rojo.space">Rojo</a>, and the documentation is developed using <a class="reference external" href="https://code.visualstudio.com/">VS Code</a>.</p>
+<p>VS Code’s Extensions side bar will recommend the extensions used in this project.</p>
+<section id="contributing-to-source">
+<h3>Contributing to Source<a class="headerlink" href="#contributing-to-source" title="Permalink to this headline">¶</a></h3>
+<p>This project uses <a class="reference external" href="https://github.com/rojo-rbx/run-in-roblox">run-in-roblox</a>, <a class="reference external" href="https://rojo.space">Rojo</a>, and <a class="reference external" href="https://github.com/Roblox/testez">TestEZ</a> for testing. TestEZ is included as a submodule.</p>
+<ul class="simple">
+<li><p><span class="xref myst">Adding New Type Support</span></p></li>
+</ul>
+<section id="dev-environment">
+<h4>Dev Environment<a class="headerlink" href="#dev-environment" title="Permalink to this headline">¶</a></h4>
+<p>Included with the project is a collection of tasks used for building and testing <code class="docutils literal notranslate"><span class="pre">Copy</span></code>.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Build</span></code> - Rebuilds <code class="docutils literal notranslate"><span class="pre">CopyTest.rbxlx</span></code> from scratch.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Test</span></code> - Runs the <code class="docutils literal notranslate"><span class="pre">test/TestLoader</span></code> script in <code class="docutils literal notranslate"><span class="pre">CopyTest</span></code> using <code class="docutils literal notranslate"><span class="pre">run-in-roblox</span></code>. It also automatically rebuilds the place before running it to account for changes.</p></li>
+</ul>
+<p>A <code class="docutils literal notranslate"><span class="pre">rojo</span></code> and <code class="docutils literal notranslate"><span class="pre">run-in-roblox</span></code> executable needs to be added to your PATH to use the tasks in this project.</p>
+<p>A place is already included in the repository, <code class="docutils literal notranslate"><span class="pre">CopyTest.rbxlx</span></code>, but you can use the <code class="docutils literal notranslate"><span class="pre">Build</span></code> task to rebuild it, and the <code class="docutils literal notranslate"><span class="pre">Test</span></code> task will do it automatically.</p>
+<p>Even though you can use the <code class="docutils literal notranslate"><span class="pre">Test</span></code> task to test the module from inside VSCode, you can still use <code class="docutils literal notranslate"><span class="pre">rojo</span> <span class="pre">serve</span></code> and sync with Roblox Studio for faster testing. Simply running the game will apply test results.</p>
+<p>Both new tests and new features can be accepted as long as they don’t overlap with existing features. Refactors are generally not accepted unless required for a feature with a lot of impact.</p>
+</section>
+</section>
+<section id="contributing-to-documentation">
+<h3>Contributing to Documentation<a class="headerlink" href="#contributing-to-documentation" title="Permalink to this headline">¶</a></h3>
+<p>The documentation <em>as a whole</em> has no obvious structure other than being linked from <code class="docutils literal notranslate"><span class="pre">index.md</span></code>. New documents can be accepted as pull requests as long as they are reviewed by the owner, &#64;goldenstein64.</p>
+</section>
+</section>
 </div>
 <section id="purpose">
 <h2>Purpose<a class="headerlink" href="#purpose" title="Permalink to this headline">¶</a></h2>
@@ -75,35 +656,17 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="#">Table of Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="usage-guide/index.html">How to Use Copy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing/index.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-api">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-usage-guide/index">How to Use Copy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-contributing/index">Contributing</a></li>
 </ul>
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="#">Documentation overview</a><ul>
-      <li>Next: <a href="api.html" title="next chapter">API</a></li>
   </ul></li>
 </ul>
 </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/index.md.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -115,9 +678,6 @@
       Powered by <a href="http://sphinx-doc.org/">Sphinx 4.1.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
-      |
-      <a href="_sources/index.md.txt"
-          rel="nofollow">Page source</a>
     </div>
 
     

@@ -1,6 +1,10 @@
 # Copy
 
-![Copy logo](https://docs.google.com/drawings/d/e/2PACX-1vSYq2HMmvf-QR2SczbHpasO4k7mujT6HbD8pg4ITwFP8fPkr5wh_DddzvDTJf7GriOOgAsV2wgGsd1V/pub?w=1080&h=1080)
+<img
+  src="https://docs.google.com/drawings/d/e/2PACX-1vSYq2HMmvf-QR2SczbHpasO4k7mujT6HbD8pg4ITwFP8fPkr5wh_DddzvDTJf7GriOOgAsV2wgGsd1V/pub?w=1080&h=1080"
+  alt="Copy logo"
+  width="360"
+/>
 
 A module for copying any value with state.
 

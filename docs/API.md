@@ -10,7 +10,9 @@ As a precursor, you may see references to `it()` functions in code blocks. This 
 
 There are only two functions that do the job of copying, the rest are just helper functions.
 
-### `Copy(object: T): T`
+### `Copy(object): newObject`
+
+* `(object: T) -> newObject: T`
 
 Creates a copy of `object`. This is guaranteed to return a result of the same type and sub-type.
 
@@ -31,11 +33,15 @@ local newCopy = Copy(Copy)
 
 This is useful for creating a `Copy` module with a different configuration, since it holds flags and contexts.
 
-### `Copy:Extend(object: T, ...bases: Q): T & Q`
+### `Copy:Extend(object, ...bases): object`
+
+* `(object: T, ...bases: B) -> object: T & B`
 
 Copies all fields in `bases` to `object` from left to right. `Copy(some)` is the same as `Copy:Extend({}, some)`.
 
-### <a name="Copy_BehaveAs"></a> `Copy:BehaveAs(behavior: string|array, object: any): Symbol`
+### `Copy:BehaveAs(behavior, object): Symbol`
+
+* `(behavior: string|array, object: any) -> Symbol: Symbol`
 
 Creates a [Symbol](#symbols). It can be placed anywhere in the base value to signify that it should follow the specified [Behavior](#behaviors).
 
@@ -60,6 +66,8 @@ end)
 
 ### `Copy:Flush()`
 
+* `() -> ()`
+
 Clears any data lingering from the last time something was copied. This is only useful when paired with [Copy.Flags.Flush](#Flush_Flag) set to `false`.
 
 ## Properties
@@ -74,15 +82,15 @@ This table stores the default behaviors `Copy()` should use to copy values when 
 * `Copy.GlobalContext.Values` - The default behavior to use for generic values
 * `Copy.GlobalContext.Meta` - The default behavior to use for metatables
 
-These contexts accept the same [behaviors](#behaviors) as [Copy:BehaveAs()](#Copy_BehaveAs).
+These contexts accept the same [behaviors](#behaviors) as [Copy:BehaveAs()](#copybehaveasbehavior-object-symbol).
 
 ### `Copy.Flags`
 
 A set of miscellaneous flags. Setting an unknown flag throws an error.
 
-#### <a name="Flush_Flag"></a> `Copy.Flags.Flush = true`
+#### `Copy.Flags.Flush = true`
 
-Stops `Copy()` and `Copy:Extend()` from removing internal data (namely `Copy.Transform` and `Copy.InstanceTransform`). This is useful for inspecting the module in case something was copied weirdly. If you plan to use the module again after inspection, make sure to call `Copy:Flush()` beforehand.
+Stops `Copy()` and `Copy:Extend()` from removing internal data (namely `Copy.Transform` and `Copy.InstanceTransform`). This is useful for debugging the module in case something was copied weirdly. If you plan to use the module again afterwards, make sure to call `Copy:Flush()` beforehand.
 
 #### `Copy.Flags.SetInstanceParent = false`
 
@@ -100,7 +108,7 @@ Copy.SymbolMap[customSymbol] = true
 
 The `Copy` module uses a few concepts to make itself more coherent, so this section is devoted to that specifically.
 
-### <a name="behaviors"></a> Behaviors
+### Behaviors
 
 The `Copy` module uses `Behaviors` to describe how objects are copied from a base value to a new one. This is encapsulated in the `Behaviors` module, found under the `Copy` module.
 
@@ -158,7 +166,7 @@ If the `Copy` module receives an empty array `{}` in place of a behavior, copyin
 
 Indexing `Copy.GlobalContext` will return the array representing the behavior.
 
-**`T.GlobalContext`**
+**`T.BehaveAs.Presets`**
 
 ```lua
 it("always returns an array upon index", function()
@@ -173,15 +181,15 @@ it("always returns an array upon index", function()
 end)
 ```
 
-### <a name="symbols"></a> Symbols
+### Symbols
 
 The `Copy` module has the power to control how values behave when copied, but it needs `Symbols` to control the behavior of particular sub-values.
 
 Symbols are very good for representing different copying behavior for identical sub-values in different locations, but they are not very good for being treated as actual values.
 
-Traditionally, `Symbols` are created using [Copy:BehaveAs()](#Copy_BehaveAs):
+Traditionally, `Symbols` are created using [Copy:BehaveAs()](#copybehaveasbehavior-object-symbol):
 
-**`T.BehaveAs.Behaviors`**
+**`T.BehaveAs.Presets`**
 
 ```lua
 it("can move shared values using 'set'", function()

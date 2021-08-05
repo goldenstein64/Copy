@@ -4,10 +4,27 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Build",
+      "type": "shell",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "command": "rojo build default.project.json -o CopyTest.rbxlx",
+      "problemMatcher": []
+    },
+    {
       "label": "Test",
       "type": "shell",
-      "command": "run-in-roblox --place CopyTest.rbxlx --script test/TestLoader/init.server.lua",
-      "problemMatcher": []
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "command": "run-in-roblox --place CopyTest.rbxlx --script test/TestLoader.server.lua",
+      "problemMatcher": [],
+      "dependsOn": [
+        "Build"
+      ]
     }
   ]
 }

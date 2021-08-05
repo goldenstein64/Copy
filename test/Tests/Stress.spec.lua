@@ -77,7 +77,7 @@ return function()
 		return "Userdatas", string.format("%.6f", finish)
 	end)
 
-	it("copies nested tables quickly", function()
+	itSKIP("copies nested tables quickly", function()
 		local someTable = {}
 		do
 			local current = someTable

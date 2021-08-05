@@ -1,5 +1,7 @@
 # How to use Copy
 
+* [Creating Classes with Copy](classes)
+
 ## What can Copy do?
 
 On the surface, the `Copy` module is very simple: any value you give it, it will do its best to clone that value and return it.
@@ -26,7 +28,16 @@ However, this module includes some extra infrastructure for more niche use cases
 * classes or prototypes
   * classes are used to create copies of an object
 
+* copying grained by sub-value
+  * copying or sharing only part of a large structure may be useful.
+
+* copying to a pre-existing value
+  * this could be necessary for tables that require modifications from many sources, such as reseting a table's data, multiple inheritance, .
+  * this is one of the ways of forming inheritance - giving an empty table all the values of `A` and then all the values of `B` is the same as creating an instance of `B` that inherits from `A`
+
 ```lua
+-- classes and prototypes
+
 local Copy = require(path.to.Copy)
 
 local Vector4 = {}
@@ -37,6 +48,10 @@ local prototype = {
   Y = 0,
   Z = 0,
 }
+
+local prototypeMt = {}
+
+setmetatable(prototype, prototypeMt)
 
 function prototype:GetMagnitude()
   return math.sqrt(self.W^2 + self.X^2 + self.Y^2 + self.Z^2)
@@ -52,6 +67,15 @@ function prototype:GetUnit()
   )
 end
 
+function prototypeMt:__add(other)
+  return Vector4.new(
+    self.W + other.W,
+    self.X + other.X,
+    self.Y + other.Y,
+    self.Z + other.Z
+  )
+end
+
 function Vector4.new(w, x, y, z)
   return Copy:Extend(prototype, {
     W = w,
@@ -64,10 +88,9 @@ end
 return Vector4
 ```
 
-* copying grained by sub-value
-  * copying or sharing only part of a large structure may be useful.
-
 ```lua
+-- copying grained by sub-value
+
 local hugeTable = {
   subTable = {},
   skipped = {},
@@ -75,7 +98,7 @@ local hugeTable = {
   -- ...
 }
 
--- makes sure not to copy any values in the table
+-- makes sure not to copy any values in the table, just the root table
 Copy.GlobalContext.Values = "set"
 local protoTable = Copy(hugeTable)
 
@@ -89,11 +112,9 @@ local function createHugeTable()
 end
 ```
 
-* copying to a pre-existing value
-  * this could be necessary for tables that require modifications from many sources, such as reseting a table's data, multiple inheritance, .
-  * this is one of the ways of forming inheritance - giving an empty table all the values of `A` and then all the values of `B` is the same as creating an instance of `B` that inherits from `A`
-
 ```lua
+-- copying to a pre-existing value
+
 local human = {}
 
 local canFly = {}
@@ -116,4 +137,6 @@ Copy:Extend(human, canFly, canRun, ...)
 
 ## What heuristics should I use to know when to use Copy?
 
-Generally, if I need to copy of a table, I use `Copy()`. Everything else is there purely for completing the definition of copying something in virtually any respect.
+Generally, if you need to copy of a table, you use `Copy()`. Everything else is there purely for completing the definition of copying something in virtually any respect.
+
+(WIP)

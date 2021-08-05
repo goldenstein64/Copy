@@ -81,5 +81,5 @@ someList:insert(3)
 someList:insert(2)
 someList:insert(1)
 
-print(someList)
+print(someList) --> { 1, 2, 3 }
 ```

@@ -9,6 +9,22 @@ return function()
 		return result
 	end
 
+	local function toRawEqual(value, other)
+		return {
+			pass = rawequal(value, other),
+			message = string.format("Expected rawequal() %s (%s), got %s (%s)", 
+				tostring(value),
+				typeof(value),
+				tostring(other),
+				typeof(other)
+			)
+		}
+	end
+
+	beforeAll(function()
+		expect.extend({ rawEqual = toRawEqual })
+	end)
+
 	local Copy
 	beforeEach(function()
 		Copy = CopyFactory()

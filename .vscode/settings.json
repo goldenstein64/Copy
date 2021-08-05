@@ -1,5 +1,12 @@
 {
   "Lua.diagnostics.enable": false,
   "rojo.buildOutputPath": "CopyTest",
-  "rojo.buildFileFormat": "XML"
+  "rojo.buildFileFormat": "XML",
+  "[lua]": {
+    "editor.insertSpaces": false,
+    "editor.tabSize": 2
+  },
+  "[markdown]": {
+    "editor.lineNumbers": "off"
+  }
 }

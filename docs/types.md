@@ -1,19 +1,19 @@
-# How are types supported?
+# How Types are Supported by Copy
 
 The utmost requirement for being able to copy a value is whether the state of that value can be inspected and accessed.
 
 These are all the Lua datatypes and whether they have state:
 
 | Datatypes | Has state? |
-|---|---|
-| nil | no |
-| boolean | no |
-| number | no |
-| string | no |
-| userdata | no |
-| function | yes |
-| thread | yes |
-| table | yes |
+|-----------|------------|
+| nil       | no         |
+| boolean   | no         |
+| number    | no         |
+| string    | no         |
+| userdata  | no         |
+| function  | yes        |
+| thread    | yes        |
+| table     | yes        |
 
 Those first four values (nil, boolean, number, string) are primitives. That is, their internal state is stored *directly* inside the variable. Therefore, the thing that determines the state of these values is whatever value the variable is. And therefore, it is not the state of the value that changes, but the state of the variable, and variables are trivial to copy (`x = y`). Since the `Copy` module returns these values back to the caller, copying primitives is technically supported, but that's not what `Copy` is used for.
 

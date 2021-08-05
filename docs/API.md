@@ -240,6 +240,8 @@ But you can also create them using functions. Symbol functions take the type `(T
 * **Parameter:** the old value
 * **Returns:** a boolean describing whether to set the value, and the value to set
 
+It is required that custom symbol functions are registered in the `SymbolMap` by using them as a key: `Copy.SymbolMap[symbolFunc] = true`.
+
 **`T.BehaveAs.CustomSymbols`**
 
 ```lua
@@ -266,7 +268,7 @@ it("can make ducks", function()
 end)
 ```
 
-### <a name="transform"></a> Transform
+### Transform
 
 The `Copy` module solves recursive tables by using a mapping of original values to new ones. Any values that were already copied in a `Copy()` call will be used again in subsequent assignments to that value.
 
@@ -284,4 +286,4 @@ it("transforms values", function()
 end)
 ```
 
-`Copy.Transform` accepts any value, including [Symbols](#symbols).
+`Copy.Transform` accepts anything as a key or value. It can also accept [Symbols](#symbols) as a value, and the old value will map to the output of `Symbol(oldValue)`.

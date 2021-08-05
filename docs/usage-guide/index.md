@@ -1,8 +1,14 @@
-# How to use Copy
+# How to Use Copy
 
-* [Creating Classes with Copy](classes)
+```{toctree}
+---
+titlesonly: true
+---
+types.md
+classes.md
+```
 
-## What can Copy do?
+## What can Copy Do?
 
 On the surface, the `Copy` module is very simple: any value you give it, it will do its best to clone that value and return it.
 

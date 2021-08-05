@@ -1,4 +1,4 @@
-# Adding type support to Copy
+# Adding Type Support to Copy
 
 Just like how Copy is meant to be flexible, it's also meant to be extensible. If a new copyable datatype comes out (like `Random`), it might be useful to specify a method for copying it. This page will be covering how to do just that.
 

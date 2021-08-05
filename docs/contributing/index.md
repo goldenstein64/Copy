@@ -1,5 +1,12 @@
 # Contributing
 
+```{toctree}
+---
+titlesonly: true
+---
+new-types.md
+```
+
 This project is developed using [VS Code](https://code.visualstudio.com/)/[Rojo](https://rojo.space), and the documentation is developed using [VS Code](https://code.visualstudio.com/).
 
 VS Code's Extensions side bar will recommend the extensions used in this project.

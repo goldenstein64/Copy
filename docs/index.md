@@ -1,6 +1,13 @@
 # Copy
 
-{:toc}
+```{toctree}
+---
+titlesonly: true
+---
+api.md
+usage-guide/index.md
+contributing/index.md
+```
 
 ## Purpose
 

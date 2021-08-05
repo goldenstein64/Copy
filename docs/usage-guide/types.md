@@ -4,16 +4,16 @@ The utmost requirement for being able to copy a value is whether the state of th
 
 These are all the Lua datatypes and whether they have state:
 
-| Datatypes | Has state? |
-|-----------|------------|
-| nil       | no         |
-| boolean   | no         |
-| number    | no         |
-| string    | no         |
-| userdata  | no         |
-| function  | yes        |
-| thread    | yes        |
-| table     | yes        |
+| Datatypes | Has state? | Can copy? |
+|-----------|------------|-----------|
+| nil       | no         | yes       |
+| boolean   | no         | yes       |
+| number    | no         | yes       |
+| string    | no         | yes       |
+| userdata  | no         | yes       |
+| function  | yes        | no        |
+| thread    | yes        | no        |
+| table     | yes        | yes       |
 
 Those first four values (nil, boolean, number, string) are primitives. That is, their internal state is stored *directly* inside the variable. Therefore, the thing that determines the state of these values is whatever value the variable is. And therefore, it is not the state of the value that changes, but the state of the variable, and variables are trivial to copy (`x = y`). Since the `Copy` module returns these values back to the caller, copying primitives is technically supported, but that's not what `Copy` is used for.
 

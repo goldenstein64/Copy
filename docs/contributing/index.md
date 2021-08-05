@@ -13,8 +13,6 @@ VS Code's Extensions side bar will recommend the extensions used in this project
 
 This project uses [run-in-roblox](https://github.com/rojo-rbx/run-in-roblox), [Rojo](https://rojo.space), and [TestEZ](https://github.com/Roblox/testez) for testing. TestEZ is included as a submodule.
 
-* [Adding New Type Support](contributing/new-types)
-
 ### Dev Environment
 
 Included with the project is a collection of tasks used for building and testing `Copy`.

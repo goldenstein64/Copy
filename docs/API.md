@@ -2,7 +2,7 @@
 
 This is a list of all public properties and methods contained in the Copy module.
 
-As a precursor, you may see references to `it()` functions in code blocks. This is part of the TestEZ framework used to test this module and make sure it's up to snuff. They will be cited using this format, and can be found in the `test` directory found [here](https://github.com/goldenstein64/Copy/test/TestLoader).
+As a precursor, you may see references to `it()` functions in code blocks. This is part of the TestEZ framework used to test this module and make sure it's up to snuff. They will be cited using this format and can be found in [the test directory](https://github.com/goldenstein64/Copy/tree/main/test/Tests).
 
 **`T.FileName.DescribeBlock`**
 
@@ -10,9 +10,9 @@ As a precursor, you may see references to `it()` functions in code blocks. This 
 
 There are only two functions that do the job of copying, the rest are just helper functions.
 
-### `Copy(object): newObject`
+### `Copy(object)`
 
-* `(object: T) -> newObject: T`
+**Type:** `(object: T) -> newObject: T`
 
 Creates a copy of `object`. This is guaranteed to return a result of the same type and sub-type.
 
@@ -33,15 +33,15 @@ local newCopy = Copy(Copy)
 
 This is useful for creating a `Copy` module with a different configuration, since it holds flags and contexts.
 
-### `Copy:Extend(object, ...bases): object`
+### `Copy:Extend(object, ...bases)`
 
-* `(object: T, ...bases: B) -> object: T & B`
+**Type:** `(object: T, ...bases: B) -> object: T & B`
 
 Copies all fields in `bases` to `object` from left to right. `Copy(some)` is the same as `Copy:Extend({}, some)`.
 
-### `Copy:BehaveAs(behavior, object): Symbol`
+### `Copy:BehaveAs(behavior, object)`
 
-* `(behavior: string|array, object: any) -> Symbol: Symbol`
+**Type:** `(behavior: string|array, object: any) -> Symbol: Symbol`
 
 Creates a [Symbol](#symbols). It can be placed anywhere in the base value to signify that it should follow the specified [Behavior](#behaviors).
 
@@ -66,9 +66,9 @@ end)
 
 ### `Copy:Flush()`
 
-* `() -> ()`
+**Type:** `() -> ()`
 
-Clears any data lingering from the last time something was copied. This is only useful when paired with [Copy.Flags.Flush](#Flush_Flag) set to `false`.
+Clears any data lingering from the last time something was copied. This is only useful when paired with [Copy.Flags.Flush](#copyflagsflush--true) set to `false`.
 
 ## Properties
 
@@ -76,13 +76,25 @@ There are a great number of properties `Copy` has, useful for creating versatile
 
 ### `Copy.GlobalContext`
 
-This table stores the default behaviors `Copy()` should use to copy values when no behavior is provided, categorized by context.
+This table stores the default behaviors `Copy()` should use to copy values when no behavior is provided, categorized by context. These contexts accept the same [behaviors](#behaviors) as [Copy:BehaveAs()](#copybehaveasbehavior-object).
 
-* `Copy.GlobalContext.Keys` - The default behavior to use for table keys
-* `Copy.GlobalContext.Values` - The default behavior to use for generic values
-* `Copy.GlobalContext.Meta` - The default behavior to use for metatables
+#### `Copy.GlobalContext.Keys = "set"`
 
-These contexts accept the same [behaviors](#behaviors) as [Copy:BehaveAs()](#copybehaveasbehavior-object-symbol).
+**Type:** `Behavior`
+
+The default behavior to use for table keys
+
+#### `Copy.GlobalContext.Values = "default"`
+
+**Type:** `Behavior`
+
+The default behavior to use for generic values
+
+#### `Copy.GlobalContext.Meta = "set"`
+
+**Type:** `Behavior`
+
+The default behavior to use for metatables
 
 ### `Copy.Flags`
 
@@ -90,13 +102,19 @@ A set of miscellaneous flags. Setting an unknown flag throws an error.
 
 #### `Copy.Flags.Flush = true`
 
+**Type:** `boolean`
+
 Stops `Copy()` and `Copy:Extend()` from removing internal data (namely `Copy.Transform` and `Copy.InstanceTransform`). This is useful for debugging the module in case something was copied weirdly. If you plan to use the module again afterwards, make sure to call `Copy:Flush()` beforehand.
 
 #### `Copy.Flags.SetInstanceParent = false`
 
+**Type:** `boolean`
+
 Decides whether instances cloned by the module are parented to the original instance's parent, otherwise `nil`.
 
 ### `Copy.SymbolMap`
+
+**Type:** `{[Symbol]: true}`
 
 A weak table that lists every [Symbol](#symbols) in existence as keys. Symbols delete themselves once they are not used anymore, and they can be used multiple times. Any values intended to be used as symbols should be registered in the symbol map, like so.
 

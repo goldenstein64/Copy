@@ -6,25 +6,8 @@
     {
       "label": "Build",
       "type": "shell",
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "command": "rojo build default.project.json -o CopyTest.rbxlx",
+      "command": "src/_venv/Scripts/sphinx-build.exe src docs",
       "problemMatcher": []
-    },
-    {
-      "label": "Test",
-      "type": "shell",
-      "group": {
-        "kind": "test",
-        "isDefault": true
-      },
-      "command": "run-in-roblox --place CopyTest.rbxlx --script test/TestLoader.server.lua",
-      "problemMatcher": [],
-      "dependsOn": [
-        "Build"
-      ]
     }
   ]
 }

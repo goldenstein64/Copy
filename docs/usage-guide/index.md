@@ -1,16 +1,10 @@
 ---
 layout: default
-title: How to Use Copy
 ---
 # How to Use Copy
 
-```{toctree}
----
-titlesonly: true
----
-types.md
-classes.md
-```
+- [Classes](classes)
+- [Datatypes](types)
 
 ## What can Copy Do?
 

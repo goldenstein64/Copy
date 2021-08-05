@@ -1,6 +1,5 @@
 ---
 layout: default
-title: Creating Classes With Copy
 ---
 # Creating Classes With Copy
 

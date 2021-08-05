@@ -1,6 +1,5 @@
 ---
 layout: default
-title: Adding Type Support to Copy
 ---
 # Adding Type Support to Copy
 

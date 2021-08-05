@@ -1,8 +1,14 @@
 ---
 layout: default
-title: Copy
 ---
 # Copy
+
+- [API Reference](API)
+- [Usage Guide](usage-guide)
+  - [Classes](usage-guide/classes)
+  - [Datatypes](usage-guide/types)
+- [Contributing](contributing)
+  - [Adding New Types](contributing/new-types)
 
 ## Purpose
 

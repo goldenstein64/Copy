@@ -1,15 +1,9 @@
 ---
 layout: default
-title: Contributing
 ---
 # Contributing
 
-```{toctree}
----
-titlesonly: true
----
-new-types.md
-```
+- [Adding New Types](new-types)
 
 This project is developed using [VS Code](https://code.visualstudio.com/)/[Rojo](https://rojo.space), and the documentation is developed using [VS Code](https://code.visualstudio.com/).
 

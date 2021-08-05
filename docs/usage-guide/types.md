@@ -1,6 +1,5 @@
 ---
 layout: default
-title: How Types are Supported by Copy
 ---
 # How Types are Supported by Copy
 

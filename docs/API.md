@@ -1,6 +1,5 @@
 ---
-layout: default
-title: API
+layout: has_toc
 ---
 # API
 

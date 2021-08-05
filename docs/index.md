@@ -1,13 +1,8 @@
+---
+layout: default
+title: Copy
+---
 # Copy
-
-```{toctree}
----
-titlesonly: true
----
-api.md
-usage-guide/index.md
-contributing/index.md
-```
 
 ## Purpose
 

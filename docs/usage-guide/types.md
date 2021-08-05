@@ -1,3 +1,7 @@
+---
+layout: default
+title: How Types are Supported by Copy
+---
 # How Types are Supported by Copy
 
 The utmost requirement for being able to copy a value is whether the state of that value can be inspected and accessed.

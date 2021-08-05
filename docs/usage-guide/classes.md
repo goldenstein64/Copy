@@ -1,4 +1,8 @@
-# Creating classes With Copy
+---
+layout: default
+title: Creating Classes With Copy
+---
+# Creating Classes With Copy
 
 This page lists some examples of some alternative organizations you can create using `Copy`.
 

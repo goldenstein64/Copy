@@ -1,3 +1,7 @@
+---
+layout: default
+title: How to Use Copy
+---
 # How to Use Copy
 
 ```{toctree}

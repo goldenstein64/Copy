@@ -1,3 +1,7 @@
+---
+layout: default
+title: API
+---
 # API
 
 This is a list of all public properties and methods contained in the Copy module.

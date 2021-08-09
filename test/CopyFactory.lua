@@ -16,7 +16,9 @@ return function()
 				Values = { "transform", "reconcile", "replace" },
 				Meta = {},
 			},
-		}, getmetatable(copy.GlobalContext)),
+		}, getmetatable(
+			copy.GlobalContext
+		)),
 		Transform = {},
 		SymbolMap = setmetatable({}, {
 			__mode = getmetatable(copy.SymbolMap).__mode,

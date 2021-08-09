@@ -17,6 +17,7 @@ return function()
 		Copy:Flush()
 		local newTable3 = Copy(someTable)
 
+		-- stylua: ignore
 		expect(newTable1)
 			.to.equal(newTable2)
 			.to.never.equal(newTable3)

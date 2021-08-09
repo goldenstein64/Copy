@@ -12,12 +12,13 @@ return function()
 	local function toRawEqual(value, other)
 		return {
 			pass = rawequal(value, other),
-			message = string.format("Expected rawequal() %s (%s), got %s (%s)", 
+			message = string.format(
+				"Expected rawequal() %s (%s), got %s (%s)",
 				tostring(value),
 				typeof(value),
 				tostring(other),
 				typeof(other)
-			)
+			),
 		}
 	end
 
@@ -127,14 +128,12 @@ return function()
 		end)
 
 		it("preserves functions", function()
-			local someFunction = function()
-			end
+			local someFunction = function() end
 			expect(Copy(someFunction)).to.equal(someFunction)
 		end)
 
 		it("preserves threads", function()
-			local someThread = coroutine.create(function()
-			end)
+			local someThread = coroutine.create(function() end)
 			expect(Copy(someThread)).to.equal(someThread)
 		end)
 

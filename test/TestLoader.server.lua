@@ -7,7 +7,7 @@
 local Workspace = game:GetService("Workspace")
 
 local CopyTest = Workspace.CopyTest
-	local TestEZ = require(CopyTest.TestEZ)
-	local testFolder = CopyTest.Tests
+local TestEZ = require(CopyTest.TestEZ)
+local testFolder = CopyTest.Tests
 
 TestEZ.TestBootstrap:run({ testFolder }, TestEZ.Reporters.TextReporter)

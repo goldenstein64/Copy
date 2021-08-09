@@ -103,6 +103,7 @@ return function()
 
 			Copy:Extend(someTable, baseTable)
 
+			-- stylua: ignore
 			expect(someTable.sub)
 				.to.never.equal(subSomeTable)
 				.to.never.equal(subBaseTable)
@@ -129,9 +130,12 @@ return function()
 			local meta = {}
 			local someTable = setmetatable({}, meta)
 
-			local baseTable = setmetatable({}, Copy:BehaveAs("reconcile", {
-				key = "base value",
-			}))
+			local baseTable = setmetatable(
+				{},
+				Copy:BehaveAs("reconcile", {
+					key = "base value",
+				})
+			)
 
 			Copy:Extend(someTable, baseTable)
 
@@ -141,9 +145,9 @@ return function()
 		describe("Presets", function()
 			it("always returns an array upon index", function()
 				Copy.GlobalContext.Values = "default"
-		
+
 				local valuesContext = Copy.GlobalContext.Values
-		
+
 				expect(valuesContext).to.be.a("table")
 				expect(valuesContext[1]).to.equal("transform")
 				expect(valuesContext[2]).to.equal("reconcile")

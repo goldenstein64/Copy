@@ -12,11 +12,7 @@ return function()
 
 		return {
 			pass = value.ClassName == className,
-			message = string.format(
-				"Expected Instance of class '%s', got '%s'",
-				tostring(className),
-				value.ClassName
-			),
+			message = string.format("Expected Instance of class '%s', got '%s'", tostring(className), value.ClassName),
 		}
 	end
 
@@ -114,9 +110,7 @@ return function()
 
 		Copy:Extend(some, base)
 
-		expect(some.part)
-			.to.be.ofClass("Part")
-			.to.never.equal(base.part)
+		expect(some.part).to.be.ofClass("Part").to.never.equal(base.part)
 	end)
 
 	describe("inheritance", function()

@@ -7,7 +7,6 @@ return function()
 	end)
 
 	describe("BaseTraits", function()
-
 		it("transforms values", function()
 			local array = { "value", "normal value" }
 
@@ -146,5 +145,4 @@ return function()
 			expect(newTransform["value"]).to.equal("other value")
 		end)
 	end)
-
 end
